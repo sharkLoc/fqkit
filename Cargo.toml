@@ -1,0 +1,15 @@
+[package]
+name = "fqkit"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bio = "1.0.0"
+clap = { version = "4.0.18", features = ["derive"] }
+colored = "2.0.0"
+flate2 = "1.0.24"
+plotters = "0.3.4"
+rand = "0.8.5"
+rand_pcg = "0.3.1"
