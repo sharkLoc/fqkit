@@ -22,7 +22,7 @@ pub fn file_reader(file_in: &Option<&str>) -> Result<Box<dyn BufRead>> {
         if flag {
             Ok(Box::new(BufReader::with_capacity(
                 1024 * 256,
-                read::GzDecoder::new(fp),
+                read::MultiGzDecoder::new(fp),
             )))
         } else {
             Ok(Box::new(BufReader::with_capacity(1024 * 256, fp)))
