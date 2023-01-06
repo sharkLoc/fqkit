@@ -5,6 +5,9 @@
 ## install
 
 ```bash
+cargo install fqkit
+# or
+
 git clone https://github.com/sharkLoc/fqkit.git
 cd fqkit
 cargo b --release
