@@ -112,8 +112,10 @@ enum Subcli {
         #[arg(short = '2', long = "read2")]
         read2: String,
 
-        /// barcode list file, eg: barcode  sample 
-        #[arg(short = 'b', long = "barcode")]
+        /// barcode list file, format eg:
+        /// ATGCAGTG    sample1
+        /// TGCAGTAC    sample2
+        #[arg(short = 'b', long = "barcode", verbatim_doc_comment)] 
         bar: String,
 
         /// barcode position mode, 1:left, 2:right
