@@ -1,5 +1,5 @@
 use std::{
-    fs::File,
+    fs::{File, OpenOptions},
     io::{self, prelude::*, BufRead, BufReader, BufWriter, Result, Write},
 };
 
@@ -46,5 +46,17 @@ pub fn file_writer(file_out: &Option<&str>) -> Result<Box<dyn Write>> {
         }
     } else {
         Ok(Box::new(BufWriter::new(io::stdout())))
+    }
+}
+
+pub fn file_writer_append(file_out: &str) -> Result<Box<dyn Write>> {
+    let fp = OpenOptions::new().append(true).create(true).open(file_out)?;
+    if file_out.ends_with(".gz") || file_out.ends_with(".gzip") {
+        Ok(Box::new(BufWriter::with_capacity(
+            1024 * 256,
+            write::GzEncoder::new(fp, Compression::default()),
+        )))
+    } else {
+        Ok(Box::new(BufWriter::with_capacity(1024 * 256, fp)))    
     }
 }

@@ -1,13 +1,15 @@
 use clap::Parser;
 use std::io::Result;
-
 use colored::*;
+
 use fastq::*;
 use plot::*;
+use barcode::*;
 
 mod fastq;
 mod plot;
 mod utils;
+mod barcode;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -98,6 +100,37 @@ enum Subcli {
         /// output file name or write to stdout
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
+    },
+
+    /// split barcode for PE reads
+    barcode {
+        /// input read1 fastq[.gz] file.
+        #[arg(short = '1', long = "read1")]
+        read1: String,
+
+        /// input read2 fastq[.gz] file, barcode in this file
+        #[arg(short = '2', long = "read2")]
+        read2: String,
+
+        /// barcode list file, eg: barcode  sample 
+        #[arg(short = 'b', long = "barcode")]
+        bar: String,
+
+        /// barcode position mode, 1:left, 2:right
+        #[arg(short = 'm', long = "mode", default_value_t = 2)]
+        mode: usize,
+
+        /// barcode reverse complement
+        #[arg(short = 'r', long = "rev_comp")]
+        trans: bool,
+
+        /// barcode mismatch base count
+        #[arg(short = 'e', long = "error", default_value_t = 0)]
+        mismatch: usize,
+        
+        /// fastq file output dir.
+        #[arg(short = 'o', long = "outdir", default_value_t = String::from("."))]
+        outdir: String,
     },
 }
 
@@ -203,6 +236,17 @@ fn main() -> Result<()> {
             } else {
                 stat_fq(&Some(&input.unwrap()), &sum, &None, phred)?;
             }
+        }
+        Subcli::barcode {
+            read1,
+            read2,
+            bar,
+            mode,
+            trans,
+            mismatch,
+            outdir,
+        } => {
+               split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir)?; 
         }
     }
     Ok(())
