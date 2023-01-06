@@ -23,6 +23,7 @@ Commands:
   stats  summary for fastq format file
   plot   line plot for fastq quaility stats
   fq2fa  translate fastq to fasta
+  barcode  split barcode for PE reads
   help   Print this message or the help of the given subcommand(s)
 
 Options:
