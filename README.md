@@ -3,7 +3,12 @@
 
 
 ## install
+##### setp1：install cargo first 
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 
+##### step2:
 ```bash
 cargo install fqkit
 # or
