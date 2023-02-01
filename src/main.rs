@@ -14,7 +14,7 @@ mod barcode;
 #[derive(Parser, Debug)]
 #[command(
     author = "size_t",
-    version = "version 0.1.0",
+    version = "version 0.2.0",
     about = "fqkit: a simple program for fastq file manipulation",
     long_about = None
 )]
