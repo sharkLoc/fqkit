@@ -14,7 +14,7 @@ mod barcode;
 #[derive(Parser, Debug)]
 #[command(
     author = "size_t",
-    version = "version 0.2.0",
+    version = "version 0.2.1",
     about = "fqkit: a simple program for fastq file manipulation",
     long_about = None
 )]
@@ -134,6 +134,21 @@ enum Subcli {
         #[arg(short = 'o', long = "outdir", default_value_t = String::from("."))]
         outdir: String,
     },
+
+    /// remove reads by read name.
+    remove {
+        /// input fastq[.gz] file.
+        #[arg(short = 'i', long = "input")]
+        input: String,
+
+        /// output file name[.gz] or write to stdout
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+
+        /// read name list file, one name per line and without read name prefix "@"
+        #[arg(short = 'n', long = "name")]
+        name: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -249,6 +264,17 @@ fn main() -> Result<()> {
             outdir,
         } => {
                split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir)?; 
+        }
+        Subcli::remove {
+            input,
+            out,
+            name,
+        } => {
+            if out.is_some() {
+                remove_read(&Some(&input), &Some(&out.unwrap()) ,&name)?;
+            } else {
+                remove_read(&Some(&input), &None ,&name)?;     
+            }
         }
     }
     Ok(())

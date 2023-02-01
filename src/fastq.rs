@@ -3,6 +3,7 @@ use colored::*;
 use rand::{prelude::*, Rng};
 use rand_pcg::Pcg64;
 use std::{collections::HashMap, io::Result};
+use std::io::BufRead;
 
 use crate::utils::*;
 
@@ -374,5 +375,32 @@ pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred:
         writeln!(&mut fc, "{}", out.join("\t"))?;
     }
 
+    Ok(())
+}
+
+pub fn remove_read(
+    file: &Option<&str>,
+    out: &Option<&str>,
+    name: &str,
+) -> Result<()> {
+    let mut ids = vec![];
+    let mut cot = 0usize;
+    let list = file_reader(&Some(name))?;
+    for i in list.lines().flatten(){
+        ids.push(i);
+        cot += 1;
+    }
+    if cot == 0 {
+        eprintln!("{}", "[error]: read name list is empty.".red());
+        std::process::exit(1);
+    }
+
+    let fq_reader = fastq::Reader::new(file_reader(file)?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out)?);
+    for rec in fq_reader.records().flatten() {
+        if !ids.contains(&rec.id().to_string()) {
+            fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;    
+        }    
+    }
     Ok(())
 }
