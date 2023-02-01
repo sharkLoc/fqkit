@@ -32,6 +32,7 @@ Commands:
   plot   line plot for fastq quaility stats
   fq2fa  translate fastq to fasta
   barcode  split barcode for PE reads
+  remove   remove reads by read name
   help   Print this message or the help of the given subcommand(s)
 
 Options:
