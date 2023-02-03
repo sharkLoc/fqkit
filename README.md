@@ -33,6 +33,7 @@ Commands:
   fq2fa  translate fastq to fasta
   barcode  split barcode for PE reads
   remove   remove reads by read name
+  split    split interleaved fastq file
   help   Print this message or the help of the given subcommand(s)
 
 Options:
