@@ -404,3 +404,28 @@ pub fn remove_read(
     }
     Ok(())
 }
+
+pub fn split_interleaved(
+    file: &Option<&str>,
+    out_dir: &str,
+    out_pre: &str,
+) -> Result<()> {
+    let pre1 = format!("{}/{}_r1.fq.gz", out_dir, out_pre);
+    let pre2 = format!("{}/{}_r2.fq.gz", out_dir, out_pre);
+    let mut fh1 = fastq::Writer::new(file_writer_append(&pre1)?);
+    let mut fh2 = fastq::Writer::new(file_writer_append(&pre2)?);
+    
+    let mut n = 0;
+    let fq_reader = fastq::Reader::new(file_reader(file)?);
+    for rec in fq_reader.records().flatten() {
+        n += 1;
+        if n == 1 {
+            fh1.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+        } else {
+            n = 0;
+            fh2.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+        }
+    }
+    Ok(())
+}
+
