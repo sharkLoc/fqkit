@@ -14,7 +14,7 @@ mod barcode;
 #[derive(Parser, Debug)]
 #[command(
     author = "size_t",
-    version = "version 0.2.2",
+    version = "version 0.2.3",
     about = "fqkit: a simple program for fastq file manipulation",
     long_about = None
 )]
@@ -163,8 +163,22 @@ enum Subcli {
         /// fastq file outdir
         #[arg(short = 'o', long = "out", default_value_t = String::from("."))]
         out: String,
-    }
+    },
+    
+    /// merge PE reads as interleaved fastq file
+    merge {
+        /// input read1 fastq[.gz] file.
+        #[arg(short = '1', long = "read1")]
+        read1: String,
 
+        /// input read2 fastq[.gz] file.
+        #[arg(short = '2', long = "read2")]
+        read2: String,
+
+        /// output interleaved fastq file name.
+        #[arg(short = 'o', long = "out", default_value_t = String::from("interleaved.fq.gz"))]
+        out: String,
+    }
 }
 
 fn main() -> Result<()> {
@@ -299,6 +313,13 @@ fn main() -> Result<()> {
         } => {
             split_interleaved(&Some(&input), &out, &pre)?;    
         }
+        Subcli::merge {
+            read1, 
+            read2,
+            out,
+        } => {
+            interleaved(&Some(read1.as_str()), &Some(read2.as_str()), &Some(out.as_str()))?;    
+        }    
     }
     Ok(())
 }
