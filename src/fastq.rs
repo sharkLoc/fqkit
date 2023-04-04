@@ -429,3 +429,19 @@ pub fn split_interleaved(
     Ok(())
 }
 
+pub fn interleaved(
+    file1: &Option<&str>,
+    file2: &Option<&str>,
+    out: &Option<&str>,
+) -> Result<()> {
+    let fq1_reader = fastq::Reader::new(file_reader(file1)?);
+    let fq2_reader = fastq::Reader::new(file_reader(file2)?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out)?);
+    
+    for (rec1, rec2) in fq1_reader.records().flatten().zip(fq2_reader.records().flatten()) {
+        fq_writer.write(rec1.id(), rec1.desc(), rec1.seq(), rec1.qual())?;
+        fq_writer.write(rec2.id(), rec2.desc(), rec2.seq(), rec2.qual())?;
+    }
+
+    Ok(())
+}
