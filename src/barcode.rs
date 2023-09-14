@@ -3,7 +3,8 @@ use bio::io::fastq;
 use std::collections::HashMap;
 use std::io::{BufRead, Result};
 use std::path::Path;
-
+use std::time::Instant;
+use log::*;
 
 fn barcode_list(
     file: &str,
@@ -97,13 +98,15 @@ pub fn split_fq(
     mismatch: usize,
     outdir: &str,
 ) -> Result<()> {
+    let start = Instant::now();
+
     if !Path::new(outdir).try_exists().unwrap(){
-        eprintln!("[error]: invalid output dir !");
+        error!("invalid output dir: {}",outdir);
         std::process::exit(1);
     }
     if let Ok(maps) = barcode_list(bar_file, rev_comp) {
         if maps.is_empty() {
-            eprintln!("[error]: empty barcode list file!");
+            error!("empty barcode list file: {}",bar_file);
             std::process::exit(1);
         }
 
@@ -166,10 +169,12 @@ pub fn split_fq(
                 }
             }
         } else {
-            eprintln!("[error]: invalid mode arg, must be 1 or 2 !");
+            error!("invalid mode arg, must be 1 or 2 !");
             std::process::exit(1);
         }
-        println!("data split rate: {:.4}%",get_pair as f64 / read_pair as f64 * 100.0);
+        info!("data split rate: {:.4}%",get_pair as f64 / read_pair as f64 * 100.0);
     }
+
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

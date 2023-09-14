@@ -1,85 +1,8 @@
 use bio::io::fastq;
-use colored::*;
-use rand::{prelude::*, Rng};
-use rand_pcg::Pcg64;
 use std::{collections::HashMap, io::Result};
-use std::io::BufRead;
-
+use log::*;
 use crate::utils::*;
-
-// reduce much memory but cost more time
-pub fn select_fastq(file: &Option<&str>, n: usize, seed: u64, out: &Option<&str>) -> Result<()> {
-    let mut rng = Pcg64::seed_from_u64(seed);
-    let mut get: Vec<usize> = Vec::with_capacity(n);
-
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-    for (order, _) in fq_reader.records().flatten().enumerate() {
-        if order < n {
-            get.push(order);
-        } else {
-            let ret = rng.gen_range(0..=order);
-            if ret < n {
-                get[ret] = order;
-            }
-        }
-    }
-
-    let fo = file_writer(out)?;
-    let mut w = fastq::Writer::new(fo);
-
-    let fq_reader2 = fastq::Reader::new(file_reader(file)?);
-    for (order, rec) in fq_reader2.records().flatten().enumerate() {
-        if get.contains(&order) {
-            w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-        }
-    }
-    Ok(())
-}
-
-// fast mode but cost more memory
-pub fn select_fastq2(file: &Option<&str>, n: usize, seed: u64, out: &Option<&str>) -> Result<()> {
-    let mut rng = Pcg64::seed_from_u64(seed);
-    let mut get: Vec<fastq::Record> = Vec::with_capacity(n);
-
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-    for (order, rec) in fq_reader.records().flatten().enumerate() {
-        if order < n {
-            get.push(rec);
-        } else {
-            let ret = rng.gen_range(0..=order);
-            if ret < n {
-                get[ret] = rec;
-            }
-        }
-    }
-
-    let fo = file_writer(out)?;
-    let mut w = fastq::Writer::new(fo);
-    for rec in get {
-        w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-    }
-    Ok(())
-}
-
-pub fn fq2fa(file: &Option<&str>, out: &Option<&str>) -> Result<()> {
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fo = file_writer(out)?;
-
-    for rec in fq_reader.records().flatten() {
-        let pre = rec.id();
-        let seq = std::str::from_utf8(rec.seq()).expect("Invalid UTF-8 sequence");
-        let fa = match rec.desc() {
-            Some(desc) => {
-                format!(">{} {}\n{}\n", pre, desc, seq)
-            }
-            None => {
-                format!(">{}\n{}\n", pre, seq)
-            }
-        };
-        write!(&mut fo, "{}", fa)?;
-    }
-    Ok(())
-}
+use std::time::Instant;
 
 struct Nt<'a> {
     seq: &'a [u8],
@@ -194,9 +117,11 @@ impl info {
 
 pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred: u8) -> Result<()> {
     if ![33u8, 64u8].contains(&phred) {
-        eprintln!("{}", "[error]: invalid phred value".red());
+        error!("invalid phred value");
         std::process::exit(1);
     }
+    let start = Instant::now();
+
     let fq = fastq::Reader::new(file_reader(inp)?);
     let mut fo = file_writer(&Some(pre_sum))?;
     let mut fc = file_writer(pre_cyc)?;
@@ -233,7 +158,7 @@ pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred:
                     *hs_ct.entry(-1).or_insert(0) += 1;
                 }
                 _ => {
-                    eprintln!("{}", "[error]: invalid base".red());
+                    error!("invalid base");
                     panic!();
                 }
             }
@@ -258,7 +183,7 @@ pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred:
                         *exists.entry(-1).or_insert(0) += 1;
                     }
                     _ => {
-                        eprintln!("{}", "[error]: invalid base".red());
+                        error!("invalid base");
                         panic!();
                     }
                 }
@@ -375,73 +300,10 @@ pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred:
         writeln!(&mut fc, "{}", out.join("\t"))?;
     }
 
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }
 
-pub fn remove_read(
-    file: &Option<&str>,
-    out: &Option<&str>,
-    name: &str,
-) -> Result<()> {
-    let mut ids = vec![];
-    let mut cot = 0usize;
-    let list = file_reader(&Some(name))?;
-    for i in list.lines().flatten(){
-        ids.push(i);
-        cot += 1;
-    }
-    if cot == 0 {
-        eprintln!("{}", "[error]: read name list is empty.".red());
-        std::process::exit(1);
-    }
 
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fq_writer = fastq::Writer::new(file_writer(out)?);
-    for rec in fq_reader.records().flatten() {
-        if !ids.contains(&rec.id().to_string()) {
-            fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;    
-        }    
-    }
-    Ok(())
-}
 
-pub fn split_interleaved(
-    file: &Option<&str>,
-    out_dir: &str,
-    out_pre: &str,
-) -> Result<()> {
-    let pre1 = format!("{}/{}_r1.fq.gz", out_dir, out_pre);
-    let pre2 = format!("{}/{}_r2.fq.gz", out_dir, out_pre);
-    let mut fh1 = fastq::Writer::new(file_writer_append(&pre1)?);
-    let mut fh2 = fastq::Writer::new(file_writer_append(&pre2)?);
-    
-    let mut n = 0;
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-    for rec in fq_reader.records().flatten() {
-        n += 1;
-        if n == 1 {
-            fh1.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-        } else {
-            n = 0;
-            fh2.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-        }
-    }
-    Ok(())
-}
 
-pub fn interleaved(
-    file1: &Option<&str>,
-    file2: &Option<&str>,
-    out: &Option<&str>,
-) -> Result<()> {
-    let fq1_reader = fastq::Reader::new(file_reader(file1)?);
-    let fq2_reader = fastq::Reader::new(file_reader(file2)?);
-    let mut fq_writer = fastq::Writer::new(file_writer(out)?);
-    
-    for (rec1, rec2) in fq1_reader.records().flatten().zip(fq2_reader.records().flatten()) {
-        fq_writer.write(rec1.id(), rec1.desc(), rec1.seq(), rec1.qual())?;
-        fq_writer.write(rec2.id(), rec2.desc(), rec2.seq(), rec2.qual())?;
-    }
-
-    Ok(())
-}

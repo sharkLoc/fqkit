@@ -1,22 +1,34 @@
+use anyhow::{Error,Ok};
 use clap::Parser;
-use std::io::Result;
-use colored::*;
+use env_logger::Env;
+use log::*;
 
-use fastq::*;
-use plot::*;
-use barcode::*;
-
-mod fastq;
+mod split;
+use split::*;
+mod subfq;
+use subfq::*;
+mod merge;
+use merge::*;
+mod remove;
+use remove::*;
+mod stats;
+use stats::*;
 mod plot;
-mod utils;
+use plot::*;
 mod barcode;
+use barcode::*;
+mod fq2fa;
+use fq2fa::*;
+mod utils;
+
 
 #[derive(Parser, Debug)]
 #[command(
     author = "size_t",
-    version = "version 0.2.3",
+    version = "version 0.2.4",
     about = "fqkit: a simple program for fastq file manipulation",
-    long_about = None
+    long_about = None,
+    next_line_help = true
 )]
 struct Args {
     #[clap(subcommand)]
@@ -181,7 +193,9 @@ enum Subcli {
     }
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<(), Error> {
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+
     let arg = Args::parse();
     match arg.command {
         Subcli::subfq {
@@ -206,10 +220,7 @@ fn main() -> Result<()> {
                         }
                     }
                     None => {
-                        eprintln!(
-                            "{}",
-                            "[error]: opt -r used, fastq data can't from stdin.".red()
-                        );
+                        error!("opt -r used, fastq data can't from stdin.");
                         std::process::exit(1);
                     }
                 }
@@ -228,10 +239,7 @@ fn main() -> Result<()> {
                         }
                     }
                     None => {
-                        eprintln!(
-                            "{}",
-                            "[info]: need fastq file, if data from stdin, ignore this info.".red()
-                        );
+                        warn!("need fastq file, if data from stdin, ignore this info.");
                         if out.is_some() {
                             select_fastq2(&None, num, seed, &Some(out.unwrap().as_str()))?;
                         } else {
@@ -275,7 +283,7 @@ fn main() -> Result<()> {
             cyc,
         } => {
             if input.is_none() {
-                println!("{}", "[info]: type --help for more information!".red());
+                info!("type --help for more information!");
                 std::process::exit(1);
             }
             if cyc.is_some() {
@@ -321,5 +329,6 @@ fn main() -> Result<()> {
             interleaved(&Some(read1.as_str()), &Some(read2.as_str()), &Some(out.as_str()))?;    
         }    
     }
+
     Ok(())
 }

@@ -1,7 +1,8 @@
 use std::io::BufRead;
 use std::collections::BTreeMap;
 use plotters::prelude::*;
-use colored::*;
+use log::*;
+use std::time::Instant;
 
 use crate::utils::file_reader;
 
@@ -31,14 +32,17 @@ pub fn plot_line(
     width: usize, 
     height: usize,
     ylim: f32,
-    types: &str) -> Result<(), Box<dyn std::error::Error>> {
+    types: &str
+) -> Result<(), Box<dyn std::error::Error>> {
+    let start = Instant::now();
+
     if !["svg", "png"].contains(&types) {
-        eprintln!("{}","[error]: invalid args types.".red());
+        error!("invalid args types.");
         std::process::exit(1);
     }
     let max_len = *data[0].iter().last().unwrap().0 as f32;
     if ylim < 0.0 {
-        eprintln!("{}","[error]: invalid args ylim.".red());
+        error!("invalid args ylim.");
         std::process::exit(1);
     }
     let name = if types == "png" {format!("{}.png",prefix)} else {format!("{}.svg",prefix)};
@@ -47,21 +51,21 @@ pub fn plot_line(
         png.fill(&WHITE)?;
 
         let mut charts = ChartBuilder::on(&png)
-        .margin(10)
-        .caption("Base distrbution plot", ("sans-serif", 40).into_font())
-        .x_label_area_size(40)
-        .y_label_area_size(40)
-        .build_cartesian_2d(0.1..max_len , -0.5f32..ylim)?;
+            .margin(10)
+            .caption("Base distrbution plot", ("sans-serif", 40).into_font())
+            .x_label_area_size(40)
+            .y_label_area_size(40)
+            .build_cartesian_2d(0.1..max_len , -0.5f32..ylim)?;
 
         charts
-        .configure_mesh()
-        .x_labels(20)
-        .x_desc("position")
-        .x_label_formatter(&|x| format!("{:.0}",x))
-        .y_labels(10)
-        .y_label_formatter(&|x| format!("{:.1}", x))
-        .y_desc("percent")
-        .draw()?;
+            .configure_mesh()
+            .x_labels(20)
+            .x_desc("position")
+            .x_label_formatter(&|x| format!("{:.0}",x))
+            .y_labels(10)
+            .y_label_formatter(&|x| format!("{:.1}", x))
+            .y_desc("percent")
+            .draw()?;
 
     
         let nt_a= data[0].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
@@ -71,64 +75,64 @@ pub fn plot_line(
         let nt_n= data[4].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
 
         charts
-        .draw_series(LineSeries::new(nt_a, RED))
-        .unwrap()
-        .label("A")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], RED));
+            .draw_series(LineSeries::new(nt_a, RED))
+            .unwrap()
+            .label("A")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], RED));
 
         charts
-        .draw_series(LineSeries::new(nt_t, GREEN))
-        .unwrap()
-        .label("T")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], GREEN));
-    
+            .draw_series(LineSeries::new(nt_t, GREEN))
+            .unwrap()
+            .label("T")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], GREEN));
+        
         charts
-        .draw_series(LineSeries::new(nt_g, YELLOW))
-        .unwrap()
-        .label("G")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], YELLOW));
-    
+            .draw_series(LineSeries::new(nt_g, YELLOW))
+            .unwrap()
+            .label("G")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], YELLOW));
+        
         charts
-        .draw_series(LineSeries::new(nt_c, BLACK))
-        .unwrap()
-        .label("C")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLACK));
-    
+            .draw_series(LineSeries::new(nt_c, BLACK))
+            .unwrap()
+            .label("C")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLACK));
+        
         charts
-        .draw_series(LineSeries::new(nt_n, BLUE))
-        .unwrap()
-        .label("N")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLUE));
+            .draw_series(LineSeries::new(nt_n, BLUE))
+            .unwrap()
+            .label("N")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLUE));
 
     
     
         charts
-        .configure_series_labels()
-        .background_style(&WHITE.mix(0.9))
-        .border_style(&BLACK)
-        .position(SeriesLabelPosition::UpperRight)
-        .draw()?;
+            .configure_series_labels()
+            .background_style(&WHITE.mix(0.9))
+            .border_style(&BLACK)
+            .position(SeriesLabelPosition::UpperRight)
+            .draw()?;
 
     } else {
         let svg = SVGBackend::new(&name, (width as u32, height as u32)).into_drawing_area();
         svg.fill(&WHITE)?;
 
         let mut charts = ChartBuilder::on(&svg)
-        .margin(10)
-        .caption("Base distrbution plot", ("sans-serif", 40).into_font())
-        .x_label_area_size(40)
-        .y_label_area_size(40)
-        .build_cartesian_2d(0.1..max_len , -0.5f32..ylim)?;
+            .margin(10)
+            .caption("Base distrbution plot", ("sans-serif", 40).into_font())
+            .x_label_area_size(40)
+            .y_label_area_size(40)
+            .build_cartesian_2d(0.1..max_len , -0.5f32..ylim)?;
 
         charts
-        .configure_mesh()
-        .x_labels(20)
-        .x_desc("position")
-        .x_label_formatter(&|x| format!("{:.0}",x))
-        .y_labels(10)
-        .y_label_formatter(&|x| format!("{:.1}", x))
-        .y_desc("percent")
-        .draw()?;
+            .configure_mesh()
+            .x_labels(20)
+            .x_desc("position")
+            .x_label_formatter(&|x| format!("{:.0}",x))
+            .y_labels(10)
+            .y_label_formatter(&|x| format!("{:.1}", x))
+            .y_desc("percent")
+            .draw()?;
 
     
         let nt_a= data[0].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
@@ -138,42 +142,44 @@ pub fn plot_line(
         let nt_n= data[4].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
 
         charts
-        .draw_series(LineSeries::new(nt_a, RED))
-        .unwrap()
-        .label("A")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], RED));
+            .draw_series(LineSeries::new(nt_a, RED))
+            .unwrap()
+            .label("A")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], RED));
 
         charts
-        .draw_series(LineSeries::new(nt_t, GREEN))
-        .unwrap()
-        .label("T")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], GREEN));
-    
+            .draw_series(LineSeries::new(nt_t, GREEN))
+            .unwrap()
+            .label("T")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], GREEN));
+        
         charts
-        .draw_series(LineSeries::new(nt_g, YELLOW))
-        .unwrap()
-        .label("G")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], YELLOW));
-    
+            .draw_series(LineSeries::new(nt_g, YELLOW))
+            .unwrap()
+            .label("G")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], YELLOW));
+        
         charts
-        .draw_series(LineSeries::new(nt_c, BLACK))
-        .unwrap()
-        .label("C")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLACK));
-    
+            .draw_series(LineSeries::new(nt_c, BLACK))
+            .unwrap()
+            .label("C")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLACK));
+        
         charts
-        .draw_series(LineSeries::new(nt_n, BLUE))
-        .unwrap()
-        .label("N")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLUE));
+            .draw_series(LineSeries::new(nt_n, BLUE))
+            .unwrap()
+            .label("N")
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x+20, y)], BLUE));
 
         charts
-        .configure_series_labels()
-        .background_style(&WHITE.mix(0.9))
-        .border_style(&BLACK)
-        .position(SeriesLabelPosition::UpperRight)
-        .draw()?;
+            .configure_series_labels()
+            .background_style(&WHITE.mix(0.9))
+            .border_style(&BLACK)
+            .position(SeriesLabelPosition::UpperRight)
+            .draw()?;
 
     } 
+
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }
