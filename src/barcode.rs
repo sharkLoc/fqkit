@@ -10,6 +10,8 @@ fn barcode_list(
     file: &str,
     rev_comp: bool,
 ) -> Result<HashMap<String, String>> {
+    info!("reading from barcode list file: {}",file);
+
     let fp = file_reader(&Some(file))?;
     let mut maps = HashMap::new();
     let mut error_flag = "";
@@ -29,10 +31,7 @@ fn barcode_list(
                     't' => 'A',
                     'c' => 'G',
                     _ => {
-                        eprintln!(
-                            "[warn]: invalid barcode base in sample {}, skipped",
-                            item[1]
-                        );
+                        warn!("invalid barcode base in sample {}, skipped", item[1]);
                         error_flag = "err";
                         'X'
                     }
@@ -58,10 +57,7 @@ fn barcode_list(
                     'g' => 'G',
                     'c' => 'C',
                     _ => {
-                        eprintln!(
-                            "[warn]: invalid barcode base in sample {}, skipped",
-                            item[1]
-                        );
+                        warn!("invalid barcode base in sample {}, skipped",item[1]);
                         error_flag = "err";
                         'X'
                     }
@@ -122,6 +118,10 @@ pub fn split_fq(
             fq_hand.push((bar_seq, len, fh1, fh2, fhb));
         }
         
+        info!("reading from read1 file: {}",big_fq1);
+        info!("reading from read2 file: {}",big_fq2);
+        info!("barcode position mode: {}",mode);
+
         let bar_count = fq_hand.len();
         let fq1_reader = fastq::Reader::new(file_reader(&Some(big_fq1))?);
         let fq2_reader = fastq::Reader::new(file_reader(&Some(big_fq2))?);

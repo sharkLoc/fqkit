@@ -1,6 +1,6 @@
 [package]
 name = "fqkit"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.65.0"
@@ -15,6 +15,7 @@ license = "GPL-3.0"
 [dependencies]
 anyhow = "1.0.75"
 bio = "1.0.0"
+chrono = "0.4.30"
 clap = { version = "4.0.18", features = ["derive"] }
 env_logger = "0.10.0"
 flate2 = "1.0.24"
@@ -22,3 +23,4 @@ log = "0.4.20"
 plotters = "0.3.4"
 rand = "0.8.5"
 rand_pcg = "0.3.1"
+regex = "1.9.5"

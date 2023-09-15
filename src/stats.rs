@@ -121,10 +121,19 @@ pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred:
         std::process::exit(1);
     }
     let start = Instant::now();
+    if let Some(inp) = inp {
+        info!("reading from file: {}", inp);
+    } else {
+        info!("reading from stdin");
+    }
 
     let fq = fastq::Reader::new(file_reader(inp)?);
     let mut fo = file_writer(&Some(pre_sum))?;
     let mut fc = file_writer(pre_cyc)?;
+    info!("summary result write to file: {}",pre_sum);
+    if pre_cyc.is_some() {
+        info!("cycle result write to file: {}",pre_cyc.unwrap());
+    }
 
     let mut cnt = info::new();
     let mut hs_pos: HashMap<usize, HashMap<i32, usize>> = HashMap::new();
