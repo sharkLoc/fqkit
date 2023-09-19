@@ -45,6 +45,8 @@ Commands:
           split interleaved fastq file
   merge
           merge PE reads as interleaved fastq file
+  gcplot
+          get GC content result and plot
   help
           Print this message or the help of the given subcommand(s)
 
