@@ -5,6 +5,8 @@ use env_logger::{Builder,fmt::Color};
 use log::{error, warn, info, LevelFilter,Level};
 use std::io::Write;
 
+mod gcplot;
+use gcplot::*;
 mod split;
 use split::*;
 mod search;
@@ -31,7 +33,7 @@ mod utils;
 #[derive(Parser, Debug)]
 #[command(
     author = "size_t",
-    version = "version 0.2.5",
+    version = "version 0.2.6",
     about = "fqkit: a simple program for fastq file manipulation",
     long_about = None,
     next_line_help = true
@@ -188,6 +190,29 @@ enum Subcli {
         /// output interleaved fastq file name.
         #[arg(short = 'o', long = "out", default_value_t = String::from("interleaved.fq.gz"))]
         out: String,
+    },
+    /// get GC content result and plot
+    gcplot {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// output GC contnet result file name
+        #[arg(short = 'o', long = "out")]
+        output: Option<String>,
+        /// output base figure prefix name
+        #[arg(short='p', long="prefix", default_value_t=String::from("gc_plot"))]
+        prefix: String,
+        /// set output figure width
+        #[arg(short = 'W', long = "width", default_value_t = 960)]
+        width: usize,
+        /// set output figure height
+        #[arg(short = 'H', long = "height", default_value_t = 540)]
+        height: usize,
+        /// set max ylim (0~100)
+        #[arg(short = 'y', long = "ylim", default_value_t = 15)]
+        ylim: usize,
+        /// figure type 'png' or 'svg'
+        #[arg(short='t', long="types", default_value_t=String::from("png"))]
+        types: String,
     }
 }
 
@@ -371,7 +396,22 @@ fn main() -> Result<(), Error> {
             out,
         } => {
             interleaved(&Some(read1.as_str()), &Some(read2.as_str()), &Some(out.as_str()))?;    
-        }    
+        }
+        Subcli::gcplot { input, output, prefix, width, height, ylim, types } => {
+            if let Some(input) = input {
+                if let Some(output) = output {
+                    gc_content(&Some(&input), &Some(&output), prefix, width, height, ylim, &types)?;
+                } else {
+                    gc_content(&Some(&input),&None, prefix, width, height, ylim, &types)?;
+                }
+            } else {
+                if let Some(output) = output {
+                    gc_content(&None,&Some(&output), prefix, width, height, ylim, &types)?;
+                } else {
+                    gc_content(&None,&None, prefix, width, height, ylim, &types)?;
+                }
+            }
+        }
     }
 
     Ok(())
