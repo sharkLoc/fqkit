@@ -33,7 +33,7 @@ mod utils;
 #[derive(Parser, Debug)]
 #[command(
     author = "size_t",
-    version = "version 0.2.7",
+    version = "version 0.2.8",
     about = "fqkit: a simple program for fastq file manipulation",
     long_about = None,
     next_line_help = true
