@@ -100,11 +100,14 @@ enum Subcli {
         #[arg(short = 'c', long = "cycle")]
         cyc: Option<String>,
     },
-    /// line plot for fastq quaility stats
+    /// line plot for A T G C N percentage in read position
     plot {
-        /// input cycle result data
+        /// input cycle result data: fqkit stats cycle output
         #[arg(short = 'd', long = "data")]
         data: String,
+        /// if specified, show line plot in terminal
+        #[arg( short = 's', long ="show-terminal")]
+        show: bool,
         /// output base figure prefix name
         #[arg(short='p', long="prefix", default_value_t=String::from("base_plot"))]
         prefix: String,
@@ -339,6 +342,7 @@ fn main() -> Result<(), Error> {
         },
         Subcli::plot {
             data,
+            show,
             prefix,
             width,
             height,
@@ -346,7 +350,7 @@ fn main() -> Result<(), Error> {
             types,
         } => {
             let df = cycle_data(&Some(&data))?;
-            let _x = plot_line(df, prefix, width, height, ylim, &types);
+            let _x = plot_line(df, show, prefix, width, height, ylim, &types);
         }
         Subcli::stats {
             input,

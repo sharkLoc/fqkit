@@ -2,8 +2,9 @@ use std::io::BufRead;
 use std::collections::BTreeMap;
 use plotters::prelude::*;
 use log::*;
+use textplots::{Chart, ColorPlot, LabelBuilder, LabelFormat, Shape};
+use colored::*;
 use std::time::Instant;
-
 use crate::utils::file_reader;
 
 
@@ -28,6 +29,7 @@ pub fn cycle_data(file: &Option<&str>) -> std::io::Result<Vec<BTreeMap<usize,f64
 // line plot for base A T G C N rate in position
 pub fn plot_line(
     data: Vec<BTreeMap<usize,f64>>, 
+    show: bool,
     prefix: String, 
     width: usize, 
     height: usize,
@@ -67,12 +69,31 @@ pub fn plot_line(
             .y_desc("percent")
             .draw()?;
 
-    
         let nt_a= data[0].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_t= data[1].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_g= data[2].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_c= data[3].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_n= data[4].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
+
+        if show {
+            let reads_len = nt_a.len();
+            println!( "read length: {}\t\t{}\t{}\t{}\t{}\t{}", 
+                    reads_len, 
+                    "A".truecolor(255, 0, 0).bold(),
+                    "T".truecolor(0, 255, 0).bold(),
+                    "G".truecolor(255, 255, 0).bold(),
+                    "C".truecolor(0, 0, 255).bold(),
+                    "N".truecolor(0, 255, 255).bold());
+            Chart::new_with_y_range(200, 80, 0.0, reads_len as f32, 0.0, ylim)
+                .linecolorplot(&Shape::Lines(nt_c.as_slice()), rgb::RGB { r: 0, g: 0, b: 255 }) // C blue
+                .linecolorplot(&Shape::Lines(nt_t.as_slice()), rgb::RGB { r: 0, g: 255, b: 0 }) // T green
+                .linecolorplot(&Shape::Lines(nt_a.as_slice()), rgb::RGB { r: 255, g: 0, b: 0 }) // A red
+                .linecolorplot(&Shape::Lines(nt_g.as_slice()), rgb::RGB { r: 255, g: 255, b: 0 }) // G yellow
+                .linecolorplot(&Shape::Lines(nt_n.as_slice()), rgb::RGB { r: 0, g: 255, b: 255 }) // N white
+                //.x_label_format(LabelFormat::Custom(Box::new( |_| { String::from("position")})))
+                .y_label_format(LabelFormat::Value)
+                .nice();
+        }
 
         charts
             .draw_series(LineSeries::new(nt_a, RED))
@@ -134,12 +155,30 @@ pub fn plot_line(
             .y_desc("percent")
             .draw()?;
 
-    
         let nt_a= data[0].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_t= data[1].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_g= data[2].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_c= data[3].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
         let nt_n= data[4].iter().map(|(k,v)|(*k as f32, *v as f32)).collect::<Vec<(f32,f32)>>();
+
+        if show {
+            let reads_len = nt_a.len();
+            println!( "read length: {}\t\t{}\t{}\t{}\t{}\t{}", 
+                    reads_len, 
+                    "A".truecolor(255, 0, 0).bold(),
+                    "T".truecolor(0, 255, 0).bold(),
+                    "G".truecolor(255, 255, 0).bold(),
+                    "C".truecolor(0, 0, 255).bold(),
+                    "N".truecolor(0, 255, 255).bold());
+            Chart::new_with_y_range(200, 80, 0.0, reads_len as f32, 0.0, ylim)
+                .linecolorplot(&Shape::Lines(nt_c.as_slice()), rgb::RGB { r: 0, g: 0, b: 255 }) // C blue
+                .linecolorplot(&Shape::Lines(nt_t.as_slice()), rgb::RGB { r: 0, g: 255, b: 0 }) // T green
+                .linecolorplot(&Shape::Lines(nt_a.as_slice()), rgb::RGB { r: 255, g: 0, b: 0 }) // A red
+                .linecolorplot(&Shape::Lines(nt_g.as_slice()), rgb::RGB { r: 255, g: 255, b: 0 }) // G yellow
+                .linecolorplot(&Shape::Lines(nt_n.as_slice()), rgb::RGB { r: 0, g: 255, b: 255 }) // N white
+                .y_label_format(LabelFormat::Value)
+                .nice();
+        }
 
         charts
             .draw_series(LineSeries::new(nt_a, RED))
