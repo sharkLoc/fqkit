@@ -1,6 +1,6 @@
 [package]
 name = "fqkit"
-version = "0.2.6"
+version = "0.2.7"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.65.0"
@@ -20,6 +20,7 @@ clap = { version = "4.0.18", features = ["derive"] }
 env_logger = "0.10.0"
 flate2 = "1.0.24"
 log = "0.4.20"
+lowcharts = "0.5.8"
 plotters = "0.3.4"
 rand = "0.8.5"
 rand_pcg = "0.3.1"

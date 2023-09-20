@@ -27,6 +27,8 @@ fqkit: a simple program for fastq file manipulation
 Usage: fqkit <COMMAND>
 
 Commands:
+  topn
+          get first N records from fastq file
   subfq
           subsample sequences from big fastq file
   search

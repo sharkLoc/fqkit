@@ -3,12 +3,14 @@ use bio::io::fastq;
 use std::collections::HashMap;
 use log::*;
 use plotters::prelude::*;
+use lowcharts::plot;
 use crate::utils::*;
 use std::time::Instant;
 
 pub fn gc_content(
     fqin: &Option<&str>,
     output: &Option<&str>,
+    show: bool,
     prefix: String, 
     width: usize, 
     height: usize,
@@ -33,17 +35,27 @@ pub fn gc_content(
        
     }
 
-    let mut df_ret = vec![];
-    fo.write(format!("gc_content(%)\tratio(%)\n").as_bytes())?;
+    fo.write(format!("GC(%)\tReads\tRatio(%)\n").as_bytes())?;
+    let mut df_ret = vec![]; // data for PNG / SVG
+    let mut df_num = vec![]; // data for histogram in terminal
     let total = df_hash.values().sum::<usize>() as f32;
-    for i in 0..=100 {
-        let v = (*df_hash.get(&i).unwrap_or(&0) as f32 *10000.0 / total ).round() / 100.0;
-        df_ret.push(v);
-        fo.write(format!("{}\t{}\n",i,v).as_bytes())?;
-    }
 
+    for i in 0..=100 {
+        let num = *df_hash.get(&i).unwrap_or(&0);
+        let v = (num as f32 *10000.0 / total ).round() / 100.0;
+        df_ret.push(v);
+        fo.write(format!("{}\t{}\t{}\n", i, num, v).as_bytes())?;
+        if show {
+            for _ in 0..num{
+                df_num.push(i as f64)
+            }
+        }
+    }
     plot_gc(df_ret, prefix, width, height, ylim, types)?;
-    
+
+    if show {
+        info!("{}",plot::Histogram::new(&df_num, plot::HistogramOptions { intervals: 20, ..Default::default() }));
+    }
     info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

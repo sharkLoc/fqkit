@@ -33,7 +33,7 @@ mod utils;
 #[derive(Parser, Debug)]
 #[command(
     author = "size_t",
-    version = "version 0.2.6",
+    version = "version 0.2.7",
     about = "fqkit: a simple program for fastq file manipulation",
     long_about = None,
     next_line_help = true
@@ -198,6 +198,9 @@ enum Subcli {
         /// output GC contnet result file name
         #[arg(short = 'o', long = "out")]
         output: Option<String>,
+        /// if specified, show histogram graphs in terminal
+        #[arg( short = 's', long ="show-terminal")]
+        show: bool,
         /// output base figure prefix name
         #[arg(short='p', long="prefix", default_value_t=String::from("gc_plot"))]
         prefix: String,
@@ -397,18 +400,18 @@ fn main() -> Result<(), Error> {
         } => {
             interleaved(&Some(read1.as_str()), &Some(read2.as_str()), &Some(out.as_str()))?;    
         }
-        Subcli::gcplot { input, output, prefix, width, height, ylim, types } => {
+        Subcli::gcplot { input, output, show, prefix, width, height, ylim, types } => {
             if let Some(input) = input {
                 if let Some(output) = output {
-                    gc_content(&Some(&input), &Some(&output), prefix, width, height, ylim, &types)?;
+                    gc_content(&Some(&input), &Some(&output), show, prefix, width, height, ylim, &types)?;
                 } else {
-                    gc_content(&Some(&input),&None, prefix, width, height, ylim, &types)?;
+                    gc_content(&Some(&input),&None, show, prefix, width, height, ylim, &types)?;
                 }
             } else {
                 if let Some(output) = output {
-                    gc_content(&None,&Some(&output), prefix, width, height, ylim, &types)?;
+                    gc_content(&None,&Some(&output), show, prefix, width, height, ylim, &types)?;
                 } else {
-                    gc_content(&None,&None, prefix, width, height, ylim, &types)?;
+                    gc_content(&None,&None, show, prefix, width, height, ylim, &types)?;
                 }
             }
         }
