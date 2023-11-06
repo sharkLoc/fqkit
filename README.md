@@ -22,40 +22,40 @@ cargo b --release
 ## usage
 
 ```bash
-fqkit: a simple program for fastq file manipulation
+fqkit: A simple program for fastq file manipulation
 
-Usage: fqkit <COMMAND>
+Version: 0.2.12
+Authors: sharkLoc <mmtinfo@163.com>
+
+Usage: fqkit [OPTIONS] <COMMAND>
 
 Commands:
-  topn
-          get first N records from fastq file
-  subfq
-          subsample sequences from big fastq file
-  search
-          search reads/motifs from fastq file
-  stats
-          summary for fastq format file
-  plot
-          line plot for fastq quaility stats
-  fq2fa
-          translate fastq to fasta
-  barcode
-          split barcode for PE reads
-  remove
-          remove reads by read name
-  split
-          split interleaved fastq file
-  merge
-          merge PE reads as interleaved fastq file
-  gcplot
-          get GC content result and plot
-  help
-          Print this message or the help of the given subcommand(s)
+  topn     get first N records from fastq file
+  subfq    subsample sequences from big fastq file
+  trim     trim fastq file
+  search   search reads/motifs from fastq file
+  stats    summary for fastq format file [aliases: stat]
+  plot     line plot for A T G C N percentage in read position
+  fq2fa    translate fastq to fasta
+  flatten  flatten fastq sequences
+  barcode  split barcode for PE reads
+  remove   remove reads by read name
+  split    split interleaved fastq file
+  merge    merge PE reads as interleaved fastq file
+  split2   split fastq file by records number
+  gcplot   get GC content result and plot
+  help     Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help
-          Print help information
-  -V, --version
-          Print version information
+  -h, --help     Print help information
+  -V, --version  Print version information
 
+Global FLAGS:
+  -q, --quiet  be quiet and do not show extra information
 ```
+
+## change log
+2023.11.03:
+ - update to version 0.2.12
+ - add subcommand trim
+ - update cmd help information

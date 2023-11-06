@@ -9,9 +9,12 @@ pub fn remove_read(
     file: &Option<&str>,
     out: &Option<&str>,
     name: &str,
+    quiet: bool,
 ) -> Result<(),Error> {
-    info!("reading reads from file: {}", file.unwrap());
-    info!("reading reads id form file: {}", name);
+    if !quiet {
+        info!("reading reads from file: {}", file.unwrap());
+        info!("reading reads id form file: {}", name);
+    }
     let start = Instant::now();
 
     let mut ids = vec![];
@@ -33,6 +36,8 @@ pub fn remove_read(
         }    
     }
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet {
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }

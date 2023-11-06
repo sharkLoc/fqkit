@@ -12,16 +12,19 @@ pub fn select_fastq(
     file: &Option<&str>, 
     n: usize, 
     seed: u64, 
-    out: &Option<&str>
+    out: &Option<&str>,
+    quiet: bool,
 ) -> Result<(),Error> {
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
+    if !quiet {
+        if let Some(file) = file {
+            info!("reading from file: {}", file);
+        } else {
+            info!("reading from stdin");
+        }
+        info!("rand seed: {}",seed);
+        info!("subseq number: {}", n);
+        info!("reduce much memory but cost more time");
     }
-    info!("rand seed: {}",seed);
-    info!("subseq number: {}", n);
-    info!("reduce much memory but cost more time");
     let start = Instant::now();
 
     let mut rng = Pcg64::seed_from_u64(seed);
@@ -48,7 +51,9 @@ pub fn select_fastq(
         }
     }
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet{
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }
 
@@ -57,16 +62,19 @@ pub fn select_fastq2(
     file: &Option<&str>, 
     n: usize, 
     seed: u64, 
-    out: &Option<&str>
+    out: &Option<&str>,
+    quiet: bool,
 ) -> Result<(),Error> {
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
+    if !quiet{
+        if let Some(file) = file {
+            info!("reading from file: {}", file);
+        } else {
+            info!("reading from stdin");
+        }
+        info!("rand seed: {}",seed);
+        info!("subseq num: {}", n);
+        info!("fast mode but cost more memory");
     }
-    info!("rand seed: {}",seed);
-    info!("subseq num: {}", n);
-    info!("fast mode but cost more memory");
     let start = Instant::now();
 
     let mut rng = Pcg64::seed_from_u64(seed);
@@ -90,6 +98,8 @@ pub fn select_fastq2(
         w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
     }
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet{
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }

@@ -115,24 +115,34 @@ impl info {
     }
 }
 
-pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred: u8) -> Result<()> {
+pub fn stat_fq(
+    inp: &Option<&str>, 
+    pre_sum: &str, 
+    pre_cyc: &Option<&str>, 
+    phred: u8,
+    quiet: bool,
+) -> Result<()> {
     if ![33u8, 64u8].contains(&phred) {
         error!("invalid phred value");
         std::process::exit(1);
     }
     let start = Instant::now();
-    if let Some(inp) = inp {
-        info!("reading from file: {}", inp);
-    } else {
-        info!("reading from stdin");
+    if !quiet {
+        if let Some(inp) = inp {
+            info!("reading from file: {}", inp);
+        } else {
+            info!("reading from stdin");
+        }
     }
 
     let fq = fastq::Reader::new(file_reader(inp)?);
     let mut fo = file_writer(&Some(pre_sum))?;
     let mut fc = file_writer(pre_cyc)?;
-    info!("summary result write to file: {}",pre_sum);
-    if pre_cyc.is_some() {
-        info!("cycle result write to file: {}",pre_cyc.unwrap());
+    if !quiet {
+        info!("summary result write to file: {}",pre_sum);
+        if pre_cyc.is_some() {
+            info!("cycle result write to file: {}",pre_cyc.unwrap());
+        }
     }
 
     let mut cnt = info::new();
@@ -309,10 +319,8 @@ pub fn stat_fq(inp: &Option<&str>, pre_sum: &str, pre_cyc: &Option<&str>, phred:
         writeln!(&mut fc, "{}", out.join("\t"))?;
     }
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet {
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }
-
-
-
-

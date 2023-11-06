@@ -5,8 +5,12 @@ use env_logger::{Builder,fmt::Color};
 use log::{error, warn, info, LevelFilter,Level};
 use std::io::Write;
 
+mod trimfq;
+use trimfq::*;
 mod gcplot;
 use gcplot::*;
+mod split2;
+use split2::*;
 mod split;
 use split::*;
 mod search;
@@ -27,20 +31,30 @@ mod barcode;
 use barcode::*;
 mod fq2fa;
 use fq2fa::*;
+mod flatten;
+use flatten::*;
 mod utils;
 
 
 #[derive(Parser, Debug)]
 #[command(
-    author = "size_t",
-    version = "version 0.2.8",
-    about = "fqkit: a simple program for fastq file manipulation",
+    author = "sharkLoc",
+    version = "0.2.12",
+    about = "A simple program for fastq file manipulation",
     long_about = None,
-    next_line_help = true
+    next_line_help = false,
 )]
+#[command(help_template = 
+    "{name}: {about}\n\nVersion: {version}\
+    \nAuthors: {author} <mmtinfo@163.com>\
+    \n\n{usage-heading} {usage}\n\n{all-args}\n" )
+]
 struct Args {
     #[clap(subcommand)]
     command: Subcli,
+    /// be quiet and do not show extra information
+    #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
+    pub quiet: bool,
 }
 
 #[derive(Parser, Debug)]
@@ -54,7 +68,7 @@ enum Subcli {
         /// print first N fasta records
         #[arg(short = 'n', long = "num", default_value_t = 10)]
         num: usize,
-        /// output fasta[.gz] file name, or write to stdout
+        /// output fasta[.gz] file name or write to stdout, files ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
     }, 
@@ -69,9 +83,23 @@ enum Subcli {
         #[arg(short = 'n', long = "num")]
         num: usize,
         /// reduce much memory but cost more time
-        #[arg(short = 'r', long = "rdc")]
+        #[arg(short = 'r', long = "rdc", help_heading = Some("FLAGS"))]
         rdc: bool,
-        /// read output file name or write to stdout
+        /// fastq output file name or write to stdout, files ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+    },
+    /// trim fastq file
+    trim {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// trim int bp from left  
+        #[arg(short, long, default_value_t=0)]
+        left: usize,
+        /// trim int bp from right
+        #[arg(short, long, default_value_t=0)]
+        right: usize,
+        /// fastq output file name or write to stdout, files ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
     },
@@ -82,11 +110,13 @@ enum Subcli {
         /// specify uppercase pattern/motif, e.g., -p "ATC{2,}" or -p ATCCG
         #[arg(short = 'p', long = "pattern")]
         pat: String,
-        /// output contain pattern/motif reads result fastq[.gz] file, or write to stdout
-        #[arg(short = 'o', long = "out")]
+        /// output contain pattern/motif reads result fastq[.gz] file or write to stdout,
+        /// file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out", verbatim_doc_comment)]
         out: Option<String>,
     },
     /// summary for fastq format file
+    #[command(visible_alias = "stat")]
     stats {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
@@ -106,7 +136,7 @@ enum Subcli {
         #[arg(short = 'd', long = "data")]
         data: String,
         /// if specified, show line plot in terminal
-        #[arg( short = 's', long ="show-terminal")]
+        #[arg( short = 's', long ="show-terminal", help_heading = Some("FLAGS"))]
         show: bool,
         /// output base figure prefix name
         #[arg(short='p', long="prefix", default_value_t=String::from("base_plot"))]
@@ -128,7 +158,22 @@ enum Subcli {
     fq2fa {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
-        /// output file name or write to stdout
+        /// output file name or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+    },
+    /// flatten fastq sequences
+    flatten {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// filed number, id:1, sequence:2, symbol:4, quality:8
+        /// eg. output id, sequence and quality value: 1 + 2 + 8 == 11 ,
+        #[arg(short = 'f', long = "field", default_value_t = 3, verbatim_doc_comment)]
+        flag: u8,
+        /// output seprater, can be ",",  ";", 
+        #[arg(short = 's', long = "sep", default_value_t='\t')]
+        sep: char,
+        /// output file name[.gz] or write to stdout, file ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
     },
@@ -149,7 +194,7 @@ enum Subcli {
         #[arg(short = 'm', long = "mode", default_value_t = 2)]
         mode: usize,
         /// barcode reverse complement
-        #[arg(short = 'r', long = "rev_comp")]
+        #[arg(short = 'r', long = "rev_comp", help_heading = Some("FLAGS"))]
         trans: bool,
         /// barcode mismatch base count
         #[arg(short = 'e', long = "error", default_value_t = 0)]
@@ -163,7 +208,7 @@ enum Subcli {
         /// input fastq[.gz] file.
         #[arg(short = 'i', long = "input")]
         input: String,
-        /// output file name[.gz] or write to stdout
+        /// output file name[.gz] or write to stdout, file ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
         /// read name list file, one name per line and without read name prefix "@"
@@ -194,6 +239,21 @@ enum Subcli {
         #[arg(short = 'o', long = "out", default_value_t = String::from("interleaved.fq.gz"))]
         out: String,
     },
+    /// split fastq file by records number
+    split2 {
+        /// input fastq[.gz] file.
+        #[arg(short = 'i', long = "input")]
+        input: String,
+        /// set record number for each mini fastq file
+        #[arg(short = 'n', long = "num", default_value_t = 200000)]
+        num: usize,
+        /// if specified, output gzip compressed file
+        #[arg(short = 'z', long = "gzip", help_heading = Some("FLAGS"))]
+        gzip: bool,
+        /// output prefix name
+        #[arg(short = 'p', long = "prefix", default_value_t = String::from("sub"))]
+        name: String,
+    },
     /// get GC content result and plot
     gcplot {
         /// input fastq[.gz] file, or read from stdin
@@ -202,7 +262,7 @@ enum Subcli {
         #[arg(short = 'o', long = "out")]
         output: Option<String>,
         /// if specified, show histogram graphs in terminal
-        #[arg( short = 's', long ="show-terminal")]
+        #[arg( short = 's', long ="show-terminal", help_heading = Some("FLAGS"))]
         show: bool,
         /// output base figure prefix name
         #[arg(short='p', long="prefix", default_value_t=String::from("gc_plot"))]
@@ -261,30 +321,19 @@ fn main() -> Result<(), Error> {
     match arg.command {
         Subcli::topn { input, num, out } => {
             if let Some(out) = out {
-                top_n_records(&Some(&input), num, &Some(&out))?;
+                top_n_records(&Some(&input), num, &Some(&out), arg.quiet)?;
             } else {
-                top_n_records(&Some(&input), num, &None)?;
+                top_n_records(&Some(&input), num, &None, arg.quiet)?;
             }
         }
-        Subcli::subfq {
-            input,
-            seed,
-            num,
-            rdc,
-            out,
-        } => {
+        Subcli::subfq { input, seed, num, rdc, out,} => {
             if rdc {
                 match input {
                     Some(x) => {
                         if out.is_some() {
-                            select_fastq(
-                                &Some(x.as_str()),
-                                num,
-                                seed,
-                                &Some(out.unwrap().as_str()),
-                            )?;
+                            select_fastq(&Some(x.as_str()),num, seed, &Some(out.unwrap().as_str()), arg.quiet )?;
                         } else {
-                            select_fastq(&Some(x.as_str()), num, seed, &None)?;
+                            select_fastq(&Some(x.as_str()), num, seed, &None, arg.quiet)?;
                         }
                     }
                     None => {
@@ -296,126 +345,121 @@ fn main() -> Result<(), Error> {
                 match input {
                     Some(x) => {
                         if out.is_some() {
-                            select_fastq2(
-                                &Some(x.as_str()),
-                                num,
-                                seed,
-                                &Some(out.unwrap().as_str()),
-                            )?;
+                            select_fastq2(&Some(x.as_str()),num, seed,&Some(out.unwrap().as_str()), arg.quiet)?;
                         } else {
-                            select_fastq2(&Some(x.as_str()), num, seed, &None)?;
+                            select_fastq2(&Some(x.as_str()), num, seed, &None, arg.quiet)?;
                         }
                     }
                     None => {
                         warn!("need fastq file, if data from stdin, ignore this info.");
                         if out.is_some() {
-                            select_fastq2(&None, num, seed, &Some(out.unwrap().as_str()))?;
+                            select_fastq2(&None, num, seed, &Some(out.unwrap().as_str()), arg.quiet)?;
                         } else {
-                            select_fastq2(&None, num, seed, &None)?;
+                            select_fastq2(&None, num, seed, &None, arg.quiet)?;
                         }
                     }
                 }
             }
         }
+        Subcli::trim { input, left, right, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    trim_fq(&Some(input.as_str()), left, right, &Some(out.as_str()), arg.quiet)?;
+                } else {
+                    trim_fq(&Some(input.as_str()), left, right, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    trim_fq(&None, left, right, &Some(out.as_str()), arg.quiet)?;
+                } else {
+                    trim_fq(&None, left, right, &None, arg.quiet)?;
+                }
+            }
+        }
         Subcli::search { input, pat, out } => {
             if let Some(out) = out {
-                search_fq(&input, &pat, &Some(&out))?;
+                search_fq(&input, &pat, &Some(&out), arg.quiet)?;
             }else {
-                search_fq(&input, &pat, &None)?;
+                search_fq(&input, &pat, &None, arg.quiet)?;
             }
         }
         Subcli::fq2fa { input, out } => match input {
             Some(x) => {
                 if let Some(o) = out {
-                    fq2fa(&Some(&x), &Some(&o))?;
+                    fq2fa(&Some(&x), &Some(&o), arg.quiet)?;
                 } else {
-                    fq2fa(&Some(&x), &None)?;
+                    fq2fa(&Some(&x), &None, arg.quiet)?;
                 }
             }
             None => {
                 if let Some(o) = out {
-                    fq2fa(&None, &Some(&o))?;
+                    fq2fa(&None, &Some(&o), arg.quiet)?;
                 } else {
-                    fq2fa(&None, &None)?;
+                    fq2fa(&None, &None, arg.quiet)?;
                 }
             }
         },
-        Subcli::plot {
-            data,
-            show,
-            prefix,
-            width,
-            height,
-            ylim,
-            types,
-        } => {
+        Subcli::flatten { input, flag, sep, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    flatten_fq(&Some(&input), &Some(&out), flag, sep, arg.quiet)?;
+                } else {
+                    flatten_fq(&Some(&input), &None, flag, sep, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    flatten_fq(&None, &Some(&out), flag, sep, arg.quiet)?;
+                } else {
+                    flatten_fq(&None, &None, flag, sep, arg.quiet)?;
+                }
+            }
+        },
+        Subcli::plot { data, show, prefix, width, height, ylim,types,} => {
             let df = cycle_data(&Some(&data))?;
-            let _x = plot_line(df, show, prefix, width, height, ylim, &types);
+            let _x = plot_line(df, show, prefix, width, height, ylim, &types, arg.quiet);
         }
-        Subcli::stats {
-            input,
-            phred,
-            sum,
-            cyc,
-        } => {
+        Subcli::stats { input, phred, sum,cyc,} => {
             if input.is_none() {
                 info!("type --help for more information!");
                 std::process::exit(1);
             }
             if cyc.is_some() {
-                stat_fq(&Some(&input.unwrap()), &sum, &Some(&cyc.unwrap()), phred)?;
+                stat_fq(&Some(&input.unwrap()), &sum, &Some(&cyc.unwrap()), phred, arg.quiet)?;
             } else {
-                stat_fq(&Some(&input.unwrap()), &sum, &None, phred)?;
+                stat_fq(&Some(&input.unwrap()), &sum, &None, phred, arg.quiet)?;
             }
         }
-        Subcli::barcode {
-            read1,
-            read2,
-            bar,
-            mode,
-            trans,
-            mismatch,
-            outdir,
-        } => {
-               split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir)?; 
+        Subcli::barcode { read1, read2, bar, mode, trans, mismatch, outdir, } => {
+               split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir, arg.quiet)?; 
         }
-        Subcli::remove {
-            input,
-            out,
-            name,
-        } => {
+        Subcli::remove { input,  out, name,} => {
             if out.is_some() {
-                remove_read(&Some(&input), &Some(&out.unwrap()) ,&name)?;
+                remove_read(&Some(&input), &Some(&out.unwrap()) ,&name, arg.quiet)?;
             } else {
-                remove_read(&Some(&input), &None ,&name)?;     
+                remove_read(&Some(&input), &None ,&name, arg.quiet)?;     
             }
         }
-        Subcli::split {
-            input,
-            pre, 
-            out,    
-        } => {
-            split_interleaved(&Some(&input), &out, &pre)?;    
+        Subcli::split { input, pre,   out, } => {
+            split_interleaved(&Some(&input), &out, &pre, arg.quiet)?;    
         }
-        Subcli::merge {
-            read1, 
-            read2,
-            out,
-        } => {
-            interleaved(&Some(read1.as_str()), &Some(read2.as_str()), &Some(out.as_str()))?;    
+        Subcli::merge { read1,   read2,  out, } => {
+            interleaved(&Some(read1.as_str()), &Some(read2.as_str()), &Some(out.as_str()), arg.quiet)?;    
+        }
+        Subcli::split2 { input, num, gzip, name } => {
+            split_chunk(&input, num, gzip,&name, arg.quiet)?;
         }
         Subcli::gcplot { input, output, show, prefix, width, height, ylim, types } => {
             if let Some(input) = input {
                 if let Some(output) = output {
-                    gc_content(&Some(&input), &Some(&output), show, prefix, width, height, ylim, &types)?;
+                    gc_content(&Some(&input), &Some(&output), show, prefix, width, height, ylim, &types, arg.quiet)?;
                 } else {
-                    gc_content(&Some(&input),&None, show, prefix, width, height, ylim, &types)?;
+                    gc_content(&Some(&input),&None, show, prefix, width, height, ylim, &types, arg.quiet)?;
                 }
             } else {
                 if let Some(output) = output {
-                    gc_content(&None,&Some(&output), show, prefix, width, height, ylim, &types)?;
+                    gc_content(&None,&Some(&output), show, prefix, width, height, ylim, &types, arg.quiet)?;
                 } else {
-                    gc_content(&None,&None, show, prefix, width, height, ylim, &types)?;
+                    gc_content(&None,&None, show, prefix, width, height, ylim, &types, arg.quiet)?;
                 }
             }
         }

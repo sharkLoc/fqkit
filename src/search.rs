@@ -9,15 +9,18 @@ use std::time::Instant;
 pub fn search_fq(
     fq: &str,
     pat: &str,
-    out: &Option<&str>
+    out: &Option<&str>,
+    quiet: bool,
 ) -> Result<(), Error> {
     let start = Instant::now();
-    info!("reading frim file: {}",fq);
-    info!("regex pattern is: {}",pat);
-    if let Some(out) = out {
-        info!("reads write to file: {}", out);
-    } else {
-        info!("reads write to stdout");
+    if !quiet {
+        info!("reading frim file: {}",fq);
+        info!("regex pattern is: {}",pat);
+        if let Some(out) = out {
+            info!("reads write to file: {}", out);
+        } else {
+            info!("reads write to stdout");
+        }
     }
 
     let re = Regex::new(pat)?;
@@ -35,7 +38,9 @@ pub fn search_fq(
         }
     }
 
-    info!("total reads matched number: {}",num);
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet {
+        info!("total reads matched number: {}",num);
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }

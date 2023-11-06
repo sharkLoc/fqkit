@@ -7,14 +7,16 @@ use std::time::Instant;
 
 pub fn fq2fa(
     file: &Option<&str>, 
-    out: &Option<&str>
+    out: &Option<&str>,
+    quiet: bool,
 ) -> Result<(), Error> {
-    
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
+    if !quiet {
+        if let Some(file) = file {
+            info!("reading from file: {}", file);
+        } else {
+            info!("reading from stdin");
+        }
+    }   
     let start = Instant::now();
     let mut num = 0usize;
     
@@ -36,7 +38,9 @@ pub fn fq2fa(
         write!(&mut fo, "{}", fa)?;
     }
 
-    info!("total reads number: {}",num);
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet {
+        info!("total reads number: {}",num);
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }

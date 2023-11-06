@@ -8,9 +8,12 @@ pub fn top_n_records(
     input: &Option<&str>,
     number: usize,
     output: &Option<&str>,
+    quiet: bool,
 ) -> Result<()> {
-    info!("reading from file: {}",input.unwrap());
-    info!("get top {} records",number);
+    if !quiet {
+        info!("reading from file: {}",input.unwrap());
+        info!("get top {} records",number);
+    }
     let start = Instant::now();
 
     let fp = fastq::Reader::new(file_reader(input)?);
@@ -19,6 +22,8 @@ pub fn top_n_records(
         fo.write_record(&rec)?;
     }
   
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet {
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }

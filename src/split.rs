@@ -8,6 +8,7 @@ pub fn split_interleaved(
     file: &Option<&str>,
     out_dir: &str,
     out_pre: &str,
+    quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
 
@@ -16,9 +17,11 @@ pub fn split_interleaved(
     let mut fh1 = fastq::Writer::new(file_writer_append(&pre1)?);
     let mut fh2 = fastq::Writer::new(file_writer_append(&pre2)?);
 
-    info!("reading from file: {}", file.unwrap());
-    info!("read1 output file: {}",pre1);
-    info!("read2 output file: {}",pre2);
+    if !quiet {
+        info!("reading from file: {}", file.unwrap());
+        info!("read1 output file: {}",pre1);
+        info!("read2 output file: {}",pre2);
+    }
 
     let mut num = 0usize;
     let mut flag = true;
@@ -34,7 +37,9 @@ pub fn split_interleaved(
         }
     }
 
-    info!("total split PE reads number: {}", num);
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet {
+        info!("total split PE reads number: {}", num);
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }

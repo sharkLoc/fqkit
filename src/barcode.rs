@@ -9,8 +9,11 @@ use log::*;
 fn barcode_list(
     file: &str,
     rev_comp: bool,
+    quiet: bool,
 ) -> Result<HashMap<String, String>> {
-    info!("reading from barcode list file: {}",file);
+    if !quiet {
+        info!("reading from barcode list file: {}",file);
+    }
 
     let fp = file_reader(&Some(file))?;
     let mut maps = HashMap::new();
@@ -93,6 +96,7 @@ pub fn split_fq(
     mode : usize,
     mismatch: usize,
     outdir: &str,
+    quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -100,7 +104,7 @@ pub fn split_fq(
         error!("invalid output dir: {}",outdir);
         std::process::exit(1);
     }
-    if let Ok(maps) = barcode_list(bar_file, rev_comp) {
+    if let Ok(maps) = barcode_list(bar_file, rev_comp, quiet) {
         if maps.is_empty() {
             error!("empty barcode list file: {}",bar_file);
             std::process::exit(1);
@@ -118,9 +122,11 @@ pub fn split_fq(
             fq_hand.push((bar_seq, len, fh1, fh2, fhb));
         }
         
-        info!("reading from read1 file: {}",big_fq1);
-        info!("reading from read2 file: {}",big_fq2);
-        info!("barcode position mode: {}",mode);
+        if !quiet {
+            info!("reading from read1 file: {}",big_fq1);
+            info!("reading from read2 file: {}",big_fq2);
+            info!("barcode position mode: {}",mode);
+        }
 
         let bar_count = fq_hand.len();
         let fq1_reader = fastq::Reader::new(file_reader(&Some(big_fq1))?);
@@ -172,9 +178,12 @@ pub fn split_fq(
             error!("invalid mode arg, must be 1 or 2 !");
             std::process::exit(1);
         }
-        info!("data split rate: {:.4}%",get_pair as f64 / read_pair as f64 * 100.0);
+        if !quiet {
+            info!("data split rate: {:.4}%",get_pair as f64 / read_pair as f64 * 100.0);
+        }
     }
-
-    info!("time elapsed is: {:?}",start.elapsed());
+    if !quiet {
+        info!("time elapsed is: {:?}",start.elapsed());
+    }
     Ok(())
 }
