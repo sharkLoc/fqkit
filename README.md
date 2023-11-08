@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.12
+Version: 0.2.13
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -40,6 +40,7 @@ Commands:
   flatten  flatten fastq sequences
   barcode  split barcode for PE reads
   remove   remove reads by read name
+  reverse  get a reverse-complement of fastq file
   split    split interleaved fastq file
   merge    merge PE reads as interleaved fastq file
   split2   split fastq file by records number
@@ -59,3 +60,7 @@ Global FLAGS:
  - update to version 0.2.12
  - add subcommand trim
  - update cmd help information
+
+2023.11.08:
+ - update to version 0.2.13
+ - add subcommand reverse

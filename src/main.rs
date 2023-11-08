@@ -5,6 +5,8 @@ use env_logger::{Builder,fmt::Color};
 use log::{error, warn, info, LevelFilter,Level};
 use std::io::Write;
 
+mod reverse;
+use reverse::*;
 mod trimfq;
 use trimfq::*;
 mod gcplot;
@@ -39,7 +41,7 @@ mod utils;
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.12",
+    version = "0.2.13",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -214,6 +216,17 @@ enum Subcli {
         /// read name list file, one name per line and without read name prefix "@"
         #[arg(short = 'n', long = "name")]
         name: String,
+    },
+    /// get a reverse-complement of fastq file.
+    reverse {
+        /// input fastq[.gz] file.
+        input: Option<String>,
+        /// if set, just output reverse sequences, the quality scores are also reversed
+        #[arg(short = 'r', long = "reverse")]
+        rev: bool,
+        /// output file name[.gz] or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
     },
     /// split interleaved fastq file
     split {
@@ -437,6 +450,21 @@ fn main() -> Result<(), Error> {
                 remove_read(&Some(&input), &Some(&out.unwrap()) ,&name, arg.quiet)?;
             } else {
                 remove_read(&Some(&input), &None ,&name, arg.quiet)?;     
+            }
+        }
+        Subcli::reverse { input, rev, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    reverse_comp_seq(&Some(&input), &Some(&out), rev, arg.quiet)?;
+                } else {
+                    reverse_comp_seq(&Some(&input), &None, rev, arg.quiet)?;
+                }   
+            } else {
+                if let Some(out) = out {
+                    reverse_comp_seq(&None, &Some(&out), rev, arg.quiet)?;
+                } else {
+                    reverse_comp_seq(&None, &None, rev, arg.quiet)?;
+                }
             }
         }
         Subcli::split { input, pre,   out, } => {
