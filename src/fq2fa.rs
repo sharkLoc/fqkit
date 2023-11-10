@@ -1,12 +1,14 @@
 use crate::utils::*;
 use bio::io::fastq;
+use bio::io::fasta;
 use anyhow::{Error, Ok};
 use log::*;
 use std::time::Instant;
 
 
 pub fn fq2fa(
-    file: &Option<&str>, 
+    file: &Option<&str>,
+    remove: bool,
     out: &Option<&str>,
     quiet: bool,
 ) -> Result<(), Error> {
@@ -21,22 +23,20 @@ pub fn fq2fa(
     let mut num = 0usize;
     
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fo = file_writer(out)?;
-
-    for rec in fq_reader.records().flatten() {
-        num += 1;
-        let pre = rec.id();
-        let seq = std::str::from_utf8(rec.seq()).expect("Invalid UTF-8 sequence");
-        let fa = match rec.desc() {
-            Some(desc) => {
-                format!(">{} {}\n{}\n", pre, desc, seq)
-            }
-            None => {
-                format!(">{}\n{}\n", pre, seq)
-            }
-        };
-        write!(&mut fo, "{}", fa)?;
+    let mut fo = fasta::Writer::new(file_writer(out)?);
+   
+    if remove {
+        for rec in fq_reader.records().flatten() {
+            num += 1;
+            fo.write(rec.id(), None, rec.seq())?;
+        }
+    } else {
+        for rec in fq_reader.records().flatten() {
+            num += 1;
+            fo.write(rec.id(), rec.desc(), rec.seq())?;
+        }
     }
+    
 
     if !quiet {
         info!("total reads number: {}",num);

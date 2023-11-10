@@ -1,6 +1,6 @@
 [package]
 name = "fqkit"
-version = "0.2.13"
+version = "0.2.14"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.65.0"
@@ -16,7 +16,8 @@ license = "GPL-3.0"
 anyhow = "1.0.75"
 bio = "1.0.0"
 chrono = "0.4.30"
-clap = { version = "4.0.18", features = ["derive"] }
+#clap = { version = "4.0.18", features = ["derive"] }
+clap = { version = "4.4.7", features = ["derive"] }
 colored = "2.0.4"
 env_logger = "0.10.0"
 flate2 = "1.0.24"
@@ -27,4 +28,5 @@ rand = "0.8.5"
 rand_pcg = "0.3.1"
 regex = "1.9.5"
 rgb = "0.8.36"
+term_size = "0.3.2"
 textplots = "0.8.4"

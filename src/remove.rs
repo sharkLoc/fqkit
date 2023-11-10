@@ -9,11 +9,17 @@ pub fn remove_read(
     file: &Option<&str>,
     out: &Option<&str>,
     name: &str,
+    save: &str,
     quiet: bool,
 ) -> Result<(),Error> {
     if !quiet {
-        info!("reading reads from file: {}", file.unwrap());
+        if let Some(file) = file {
+            info!("reading reads from file: {}", file);
+        } else {
+            info!("reading reads from stdin");
+        }
         info!("reading reads id form file: {}", name);
+        info!("removed reads in file: {}", save);
     }
     let start = Instant::now();
 
@@ -30,9 +36,12 @@ pub fn remove_read(
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut fq_writer = fastq::Writer::new(file_writer(out)?);
+    let mut rm_writer = fastq::Writer::new(file_writer(&Some(&save))?);
     for rec in fq_reader.records().flatten() {
         if !ids.contains(&rec.id().to_string()) {
-            fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;    
+            fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+        } else {
+            rm_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
         }    
     }
 

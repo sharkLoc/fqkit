@@ -6,7 +6,7 @@ use std::time::Instant;
 
 
 pub fn split_chunk(
-    file: &str,
+    file: &Option<&str>,
     num: usize,
     gzip: bool,
     out_pre: &str,
@@ -14,7 +14,11 @@ pub fn split_chunk(
 ) -> Result<(),Error> {
     let start = Instant::now();
     if !quiet {
-        info!("reading from file: {}", file);
+        if let Some(file) = file {
+            info!("reading from file: {}", file);
+        } else {
+            info!("reading from stdin");
+        }
     }
 
     let (mut flag, mut index) = (0usize, 0usize);
@@ -24,7 +28,7 @@ pub fn split_chunk(
         format!("{}{}.fastq",out_pre,index)
     };
 
-    let fq_reader = fastq::Reader::new(file_reader(&Some(file))?);
+    let fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut fh = vec![fastq::Writer::new(file_writer(&Some(&out))?)];
     
     if !quiet {

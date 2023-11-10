@@ -18,7 +18,11 @@ pub fn split_interleaved(
     let mut fh2 = fastq::Writer::new(file_writer_append(&pre2)?);
 
     if !quiet {
-        info!("reading from file: {}", file.unwrap());
+        if let Some(file) =file {
+            info!("reading from file: {}", file);
+        }else {
+            info!("reading from stdin");
+        }
         info!("read1 output file: {}",pre1);
         info!("read2 output file: {}",pre2);
     }

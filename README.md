@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.13
+Version: 0.2.14
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -45,6 +45,7 @@ Commands:
   merge    merge PE reads as interleaved fastq file
   split2   split fastq file by records number
   gcplot   get GC content result and plot
+  view     view fastq file page by page
   help     Print this message or the help of the given subcommand(s)
 
 Options:
@@ -64,3 +65,8 @@ Global FLAGS:
 2023.11.08:
  - update to version 0.2.13
  - add subcommand reverse
+
+2023.11.10:
+ - update to version 0.2.14
+ - add subcommand view
+ - rebuild some conmmand interface

@@ -11,7 +11,11 @@ pub fn top_n_records(
     quiet: bool,
 ) -> Result<()> {
     if !quiet {
-        info!("reading from file: {}",input.unwrap());
+        if let Some(file) = input {
+            info!("reading from file: {}",file);
+        } else {
+            info!("reading from stdin");
+        }
         info!("get top {} records",number);
     }
     let start = Instant::now();
