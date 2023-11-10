@@ -69,4 +69,4 @@ Global FLAGS:
 2023.11.10:
  - update to version 0.2.14
  - add subcommand view
- - rebuild some conmmand interface
+ - rebuilt some command interface
