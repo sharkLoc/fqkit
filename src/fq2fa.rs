@@ -36,7 +36,7 @@ pub fn fq2fa(
             fo.write(rec.id(), rec.desc(), rec.seq())?;
         }
     }
-    
+    fo.flush()?;
 
     if !quiet {
         info!("total reads number: {}",num);

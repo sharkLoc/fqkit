@@ -44,6 +44,8 @@ pub fn remove_read(
             rm_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
         }    
     }
+    fq_writer.flush()?;
+    rm_writer.flush()?;
 
     if !quiet {
         info!("time elapsed is: {:?}",start.elapsed());

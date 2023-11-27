@@ -25,7 +25,8 @@ pub fn top_n_records(
     for rec in fp.records().take(number).flatten() {
         fo.write_record(&rec)?;
     }
-  
+    fo.flush()?;
+
     if !quiet {
         info!("time elapsed is: {:?}",start.elapsed());
     }

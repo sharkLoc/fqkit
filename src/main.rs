@@ -44,7 +44,7 @@ mod utils;
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.14",
+    version = "0.2.15",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -115,6 +115,9 @@ enum Subcli {
         /// for multiple motifs, -p "TTAGGG|CCCTAA"
         #[arg(short = 'p', long = "pattern",verbatim_doc_comment)]
         pat: String,
+        /// number of additional worker threads to use
+        #[arg(short='@', long="thread", default_value_t = 1)]
+        thread: usize,
         /// output contain pattern/motif reads result fastq[.gz] file or write to stdout,
         /// file ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out", verbatim_doc_comment)]
@@ -412,18 +415,18 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        Subcli::search { input, pat, out } => {
+        Subcli::search { input, pat, thread, out } => {
             if let Some(input) = input {
                 if let Some(out) = out {
-                    search_fq(&Some(&input), &pat, &Some(&out), arg.quiet)?;
+                    search_fq(&Some(&input), &pat, &Some(&out), thread, arg.quiet)?;
                 }else {
-                    search_fq(&Some(&input), &pat, &None, arg.quiet)?;
+                    search_fq(&Some(&input), &pat, &None, thread, arg.quiet)?;
                 }
             } else {
                 if let Some(out) = out {
-                    search_fq(&None, &pat, &Some(&out), arg.quiet)?;
+                    search_fq(&None, &pat, &Some(&out), thread, arg.quiet)?;
                 }else {
-                    search_fq(&None, &pat, &None, arg.quiet)?;
+                    search_fq(&None, &pat, &None, thread, arg.quiet)?;
                 }
             }
         }

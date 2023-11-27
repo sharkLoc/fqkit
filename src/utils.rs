@@ -2,10 +2,12 @@ use std::{
     fs::{File, OpenOptions},
     io::{self, prelude::*, BufRead, BufReader, BufWriter, Result, Write},
 };
-
 use flate2::{read, write, Compression};
 
+
 const GZ_MAGIC: [u8; 3] = [0x1f, 0x8b, 0x08];
+const BUFF_SIZE: usize = 1024 * 1024;
+
 
 pub fn is_gzipped(file_name: &str) -> Result<bool> {
     let mut buffer: [u8; 3] = [0; 3];
@@ -21,11 +23,11 @@ pub fn file_reader(file_in: &Option<&str>) -> Result<Box<dyn BufRead>> {
 
         if flag {
             Ok(Box::new(BufReader::with_capacity(
-                1024 * 1024,
+                BUFF_SIZE,
                 read::MultiGzDecoder::new(fp),
             )))
         } else {
-            Ok(Box::new(BufReader::with_capacity(1024 * 1024, fp)))
+            Ok(Box::new(BufReader::with_capacity(BUFF_SIZE, fp)))
         }
     } else {
         let fp = BufReader::new(io::stdin());
@@ -38,11 +40,11 @@ pub fn file_writer(file_out: &Option<&str>) -> Result<Box<dyn Write>> {
         let fp = File::create(file_name)?;
         if file_name.ends_with(".gz") || file_name.ends_with(".gzip") {
             Ok(Box::new(BufWriter::with_capacity(
-                1024 * 1024,
+                BUFF_SIZE,
                 write::GzEncoder::new(fp, Compression::default()),
             )))
         } else {
-            Ok(Box::new(BufWriter::with_capacity(1024 * 1024, fp)))
+            Ok(Box::new(BufWriter::with_capacity(BUFF_SIZE, fp)))
         }
     } else {
         Ok(Box::new(BufWriter::new(io::stdout())))
@@ -57,10 +59,10 @@ pub fn file_writer_append(file_out: &str) -> Result<Box<dyn Write>> {
     
     if file_out.ends_with(".gz") || file_out.ends_with(".gzip") {
         Ok(Box::new(BufWriter::with_capacity(
-            1024 * 1024,
+            BUFF_SIZE,
             write::GzEncoder::new(fp, Compression::default()),
         )))
     } else {
-        Ok(Box::new(BufWriter::with_capacity(1024 * 1024, fp)))    
+        Ok(Box::new(BufWriter::with_capacity(BUFF_SIZE, fp)))    
     }
 }

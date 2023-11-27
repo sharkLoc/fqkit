@@ -1,6 +1,6 @@
 [package]
 name = "fqkit"
-version = "0.2.14"
+version = "0.2.15"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.65.0"
@@ -19,6 +19,7 @@ chrono = "0.4.30"
 #clap = { version = "4.0.18", features = ["derive"] }
 clap = { version = "4.4.7", features = ["derive"] }
 colored = "2.0.4"
+crossbeam = { version = "0.8.2", features = ["crossbeam-channel"] }
 env_logger = "0.10.0"
 flate2 = "1.0.24"
 log = "0.4.20"

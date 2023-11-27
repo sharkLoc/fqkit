@@ -38,7 +38,7 @@ pub fn reverse_comp_seq(
             out_writer.write(rec.id(), rec.desc(), rev_comp.as_slice(), rev_qual.as_slice())?;
         }
     }
-    
+    out_writer.flush()?;
     
     if !quiet{
         info!("time elapsed is: {:?}",start.elapsed());

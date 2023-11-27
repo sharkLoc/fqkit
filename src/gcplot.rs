@@ -54,6 +54,8 @@ pub fn gc_content(
             }
         }
     }
+    fo.flush()?;
+    
     //plot_gc(df_ret, prefix, width, height, ylim, types, quiet)?;
     if show {
         info!("{}",plot::Histogram::new(&df_num, plot::HistogramOptions { intervals: 20, ..Default::default() }));

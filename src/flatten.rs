@@ -46,7 +46,8 @@ pub fn flatten_fq(
         out_writer.write(out.join(sep.to_string().as_str()).as_bytes())?;
         out_writer.write("\n".as_bytes())?;
     }
-
+    out_writer.flush()?;
+    
     if !quiet{
         info!("time elapsed is: {:?}",start.elapsed());
     }

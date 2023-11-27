@@ -28,6 +28,7 @@ pub fn interleaved(
         fq_writer.write(rec1.id(), rec1.desc(), rec1.seq(), rec1.qual())?;
         fq_writer.write(rec2.id(), rec2.desc(), rec2.seq(), rec2.qual())?;
     }
+    fq_writer.flush()?;
 
     if !quiet {
         info!("total PE reads number: {}",num);

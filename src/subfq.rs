@@ -50,6 +50,7 @@ pub fn select_fastq(
             w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
         }
     }
+    w.flush()?;
 
     if !quiet{
         info!("time elapsed is: {:?}",start.elapsed());
@@ -97,7 +98,8 @@ pub fn select_fastq2(
     for rec in get {
         w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
     }
-
+    w.flush()?;
+    
     if !quiet{
         info!("time elapsed is: {:?}",start.elapsed());
     }

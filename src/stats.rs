@@ -281,6 +281,7 @@ pub fn stat_fq(
         cnt.num_q30,
         cnt.rate_q30 * 100.0
     )?;
+    fo.flush()?;
 
     // output cycle result
     let mut header = vec![
@@ -294,7 +295,9 @@ pub fn stat_fq(
     for i in 0..=max_qva {
         header.push(format!("{}", i));
     }
-    writeln!(&mut fc, "{}", header.join("\t"))?;
+    //writeln!(&mut fc, "{}", header.join("\t"))?;
+    fc.write(header.join("\t").as_bytes())?;
+    fc.write(b"\n")?;
 
     for i in 0..cnt.max_len {
         let idx = i + 1;
@@ -316,8 +319,11 @@ pub fn stat_fq(
                 out.push(format!("{}", n));
             }
         }
-        writeln!(&mut fc, "{}", out.join("\t"))?;
+        //writeln!(&mut fc, "{}", out.join("\t"))?;
+        fc.write(out.join("\t").as_bytes())?;
+        fc.write(b"\n")?;
     }
+    fc.flush()?;
 
     if !quiet {
         info!("time elapsed is: {:?}",start.elapsed());

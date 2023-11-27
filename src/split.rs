@@ -40,6 +40,8 @@ pub fn split_interleaved(
             flag = true;
         }
     }
+    fh1.flush()?;
+    fh2.flush()?;
 
     if !quiet {
         info!("total split PE reads number: {}", num);

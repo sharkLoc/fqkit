@@ -34,7 +34,7 @@ pub fn trim_fq(
         let qual = &rec.qual()[left..end];
         fq_writer.write(rec.id(), rec.desc(), seq, qual)?;
     }
-
+    fq_writer.flush()?;
 
     if !quiet {
         info!("time elapsed is: {:?}",start.elapsed());
