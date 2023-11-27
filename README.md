@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.14
+Version: 0.2.15
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
