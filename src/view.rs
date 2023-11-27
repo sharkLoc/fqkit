@@ -13,11 +13,9 @@ pub fn view_fq(
     quiet: bool,
 ) -> Result<()> {
     let time = Instant::now();
-    if !quiet {
-        if file.is_none() {
-            error!("do not read file from stdin.");
-            std::process::exit(1);
-        }
+    if !quiet && file.is_none() {
+        error!("do not read file from stdin.");
+        std::process::exit(1);
     }
 
     let fq_reader = file_reader(file)

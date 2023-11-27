@@ -38,7 +38,7 @@ pub fn gc_content(
        
     }
 
-    fo.write(format!("GC(%)\tReads\tRatio(%)\n").as_bytes())?;
+    fo.write("GC(%)\tReads\tRatio(%)\n".as_bytes())?;
     let mut df_ret = vec![]; // data for PNG / SVG
     let mut df_num = vec![]; // data for histogram in terminal
     let total = df_hash.values().sum::<usize>() as f32;

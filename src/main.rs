@@ -110,7 +110,7 @@ enum Subcli {
     /// search reads/motifs from fastq file
     search {
         /// input fastq[.gz] file, or read from stdin
-        input: String,
+        input: Option<String>,
         /// specify uppercase pattern/motif, regular expression supported, e.g., -p "ATC{2,}" or -p "ATCCG"
         /// for multiple motifs, -p "TTAGGG|CCCTAA"
         #[arg(short = 'p', long = "pattern",verbatim_doc_comment)]
@@ -413,10 +413,18 @@ fn main() -> Result<(), Error> {
             }
         }
         Subcli::search { input, pat, out } => {
-            if let Some(out) = out {
-                search_fq(&input, &pat, &Some(&out), arg.quiet)?;
-            }else {
-                search_fq(&input, &pat, &None, arg.quiet)?;
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    search_fq(&Some(&input), &pat, &Some(&out), arg.quiet)?;
+                }else {
+                    search_fq(&Some(&input), &pat, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    search_fq(&None, &pat, &Some(&out), arg.quiet)?;
+                }else {
+                    search_fq(&None, &pat, &None, arg.quiet)?;
+                }
             }
         }
         Subcli::fq2fa { input, remove, out } => {

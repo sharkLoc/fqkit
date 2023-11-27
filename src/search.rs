@@ -7,14 +7,18 @@ use std::time::Instant;
 
 
 pub fn search_fq(
-    fq: &str,
+    fq: &Option<&str>,
     pat: &str,
     out: &Option<&str>,
     quiet: bool,
 ) -> Result<(), Error> {
     let start = Instant::now();
     if !quiet {
-        info!("reading frim file: {}",fq);
+        if let Some(file) = fq {
+            info!("reading from file: {}", file);
+        } else {
+            info!("reading from stdin");
+        }
         info!("regex pattern is: {}",pat);
         if let Some(out) = out {
             info!("reads write to file: {}", out);
@@ -24,7 +28,7 @@ pub fn search_fq(
     }
 
     let re = Regex::new(pat)?;
-    let fq_reader = file_reader(&Some(fq))
+    let fq_reader = file_reader(fq)
         .map(fastq::Reader::new)?;
     let mut fo = file_writer(out)
         .map(fastq::Writer::new)?;
