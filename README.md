@@ -70,3 +70,7 @@ Global FLAGS:
  - update to version 0.2.14
  - add subcommand view
  - rebuilt some command interface
+
+2023.11.29:
+ - update to version 0.2.15
+ - recode func in stats subcommand

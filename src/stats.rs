@@ -1,61 +1,12 @@
 use bio::io::fastq;
-use std::{collections::HashMap, io::Result};
+use std::{collections::HashMap, io::Result, vec};
 use log::*;
 use crate::utils::*;
 use std::time::Instant;
 
-struct Nt<'a> {
-    seq: &'a [u8],
-    qual: &'a [u8],
-}
-type Cnt = (usize, usize, usize, usize, usize);
-
-impl<'a> Nt<'a> {
-    #[inline]
-    fn new() -> Self {
-        Nt {
-            seq: &[],
-            qual: &[],
-        }
-    }
-    #[inline]
-    fn count_nt(&self) -> Cnt {
-        let mut atgcn: Cnt = (0, 0, 0, 0, 0);
-        for i in self.seq.iter() {
-            if *i == b'A' {
-                atgcn.0 += 1;
-            }
-            if *i == b'T' {
-                atgcn.1 += 1;
-            }
-            if *i == b'G' {
-                atgcn.2 += 1;
-            }
-            if *i == b'C' {
-                atgcn.3 += 1;
-            }
-            if *i == b'N' {
-                atgcn.4 += 1;
-            }
-        }
-        atgcn
-    }
-    #[inline]
-    fn q_value(&self, phred: u8) -> (usize, usize) {
-        let mut qva = (0usize, 0usize);
-        for i in self.qual.iter() {
-            if *i - phred >= 20 {
-                qva.0 += 1;
-            }
-            if *i - phred >= 30 {
-                qva.1 += 1;
-            }
-        }
-        qva
-    }
-}
 
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 struct info {
     num_a: usize,
     rate_a: f64,
@@ -76,6 +27,7 @@ struct info {
     rate_gc: f64,
     ave_len: f64,
     max_len: usize,
+    min_len: usize,
 }
 
 impl info {
@@ -100,9 +52,11 @@ impl info {
             rate_gc: 0.0,
             ave_len: 0.0,
             max_len: 0,
+            min_len: 0,
         }
     }
     fn calc(&mut self) {
+        self.num_base = self.num_a + self.num_t + self.num_g+ self.num_c + self.num_n;
         self.ave_len = self.num_base as f64 / self.num_read as f64;
         self.rate_a = self.num_a as f64 / self.num_base as f64;
         self.rate_t = self.num_t as f64 / self.num_base as f64;
@@ -133,193 +87,116 @@ pub fn stat_fq(
         } else {
             info!("reading from stdin");
         }
+        info!("summary result write to file: {}",pre_sum);
+        if let Some(file) = pre_cyc {
+            info!("cycle result write to file: {}", file);
+        } else {
+            info!("cycle result write to stdout");
+        }
     }
 
     let fq = fastq::Reader::new(file_reader(inp)?);
     let mut fo = file_writer(&Some(pre_sum))?;
     let mut fc = file_writer(pre_cyc)?;
-    if !quiet {
-        info!("summary result write to file: {}",pre_sum);
-        if pre_cyc.is_some() {
-            info!("cycle result write to file: {}",pre_cyc.unwrap());
-        }
-    }
 
-    let mut cnt = info::new();
-    let mut hs_pos: HashMap<usize, HashMap<i32, usize>> = HashMap::new();
+    let mut stat = info::new();
     let mut max_qva = 0;
+    let mut min_len: Option<usize>= None;
+    let mut each: HashMap<usize, Vec<usize>> = HashMap::new();
     for rec in fq.records().flatten() {
-        let mut info = Nt::new();
-        info.qual = rec.qual();
-        info.seq = rec.seq();
-        // each cycle info
+
+        let this_q = *rec.qual().iter().max().unwrap() - phred;
+        if this_q > max_qva { max_qva = this_q; }
+        let len = rec.seq().len();
+        if len > stat.max_len { stat.max_len = len; }
+        
+        match min_len {
+            Some(v) => { if v>= len { min_len = Some(len) } }
+            None => min_len = Some(len) 
+        }
+     
+        let cap = this_q as usize +1 + 5; 
         for (pos, (sf, sq)) in rec.seq().iter().zip(rec.qual().iter()).enumerate() {
-            let pos1 = pos + 1;
-            let q = (sq - phred) as i32;
-            if q > max_qva {
-                max_qva = q;
+            let idx = (sq - phred) as usize;
+            if idx >= 20 {
+                stat.num_q20 +=1;
+                if idx >= 30 { stat.num_q30 +=1; }
             }
-            let mut hs_ct: HashMap<i32, usize> = HashMap::new();
-            match *sf {
-                b'A' => {
-                    *hs_ct.entry(-5).or_insert(0) += 1;
-                }
-                b'T' => {
-                    *hs_ct.entry(-4).or_insert(0) += 1;
-                }
-                b'G' => {
-                    *hs_ct.entry(-3).or_insert(0) += 1;
-                }
-                b'C' => {
-                    *hs_ct.entry(-2).or_insert(0) += 1;
-                }
-                b'N' => {
-                    *hs_ct.entry(-1).or_insert(0) += 1;
-                }
-                _ => {
-                    error!("invalid base");
-                    panic!();
-                }
-            }
-            *hs_ct.entry(q).or_insert(0) += 1;
 
-            if hs_pos.contains_key(&pos1) {
-                let exists = hs_pos.get_mut(&pos1).unwrap();
-                match *sf {
-                    b'A' => {
-                        *exists.entry(-5).or_insert(0) += 1;
-                    }
-                    b'T' => {
-                        *exists.entry(-4).or_insert(0) += 1;
-                    }
-                    b'G' => {
-                        *exists.entry(-3).or_insert(0) += 1;
-                    }
-                    b'C' => {
-                        *exists.entry(-2).or_insert(0) += 1;
-                    }
-                    b'N' => {
-                        *exists.entry(-1).or_insert(0) += 1;
-                    }
-                    _ => {
-                        error!("invalid base");
-                        panic!();
-                    }
-                }
-                *exists.entry(q).or_insert(0) += 1;
+            if each.contains_key(&pos) {
+                each.get_mut(&pos).unwrap()[idx+5] +=1;
+                if sf == &b'A' { each.get_mut(&pos).unwrap()[0] += 1; }
+                if sf == &b'T' { each.get_mut(&pos).unwrap()[1] += 1; }
+                if sf == &b'G' { each.get_mut(&pos).unwrap()[2] += 1; }
+                if sf == &b'C' { each.get_mut(&pos).unwrap()[3] += 1; }
+                if sf == &b'N' { each.get_mut(&pos).unwrap()[4] += 1; }
             } else {
-                hs_pos.entry(pos1).or_insert(hs_ct);
+                let mut v_tmp = vec![0usize; cap];
+                v_tmp[idx+5] += 1;
+                if sf == &b'A' { v_tmp[0] += 1; }
+                if sf == &b'T' { v_tmp[1] += 1; }
+                if sf == &b'G' { v_tmp[2] += 1; }
+                if sf == &b'C' { v_tmp[3] += 1; }
+                if sf == &b'N' { v_tmp[4] += 1; }
+                each.insert(pos, v_tmp.clone());
             }
         }
-
-        let nt: Cnt = info.count_nt();
-        let qv = info.q_value(phred);
-
-        cnt.num_read += 1;
-        let rlen = rec.seq().len();
-        cnt.num_base += rlen;
-
-        if rlen > cnt.max_len {
-            cnt.max_len = rlen;
-        }
-
-        cnt.num_a += nt.0;
-        cnt.num_t += nt.1;
-        cnt.num_g += nt.2;
-        cnt.num_c += nt.3;
-        cnt.num_n += nt.4;
-        cnt.num_q20 += qv.0;
-        cnt.num_q30 += qv.1;
     }
-    cnt.calc();
+    
+    for x in 0..each.len() {
+        stat.num_a += each.get(&x).unwrap()[0];
+        stat.num_t += each.get(&x).unwrap()[1];
+        stat.num_g += each.get(&x).unwrap()[2];
+        stat.num_c += each.get(&x).unwrap()[3];
+        stat.num_n += each.get(&x).unwrap()[4];
+    }
+    stat.min_len = min_len.unwrap();
+    stat.num_read = each.get(&0).unwrap().iter().take(5).sum::<usize>();
+    stat.calc();
 
     // output summary result
-    writeln!(&mut fo, "read average length:\t{}", cnt.ave_len)?;
-    writeln!(&mut fo, "read max length:\t{}", cnt.max_len)?;
-    writeln!(&mut fo, "total gc content(%):\t{:.2}", cnt.rate_gc * 100.0)?;
-    writeln!(&mut fo, "total read count:\t{}", cnt.num_read)?;
-    writeln!(&mut fo, "total base count:\t{}\n", cnt.num_base)?;
-    writeln!(
-        &mut fo,
-        "base A count:\t{}\t({:.2}%)",
-        cnt.num_a,
-        cnt.rate_a * 100.0
-    )?;
-    writeln!(
-        &mut fo,
-        "base T count:\t{}\t({:.2}%)",
-        cnt.num_t,
-        cnt.rate_t * 100.0
-    )?;
-    writeln!(
-        &mut fo,
-        "base G count:\t{}\t({:.2}%)",
-        cnt.num_g,
-        cnt.rate_g * 100.0
-    )?;
-    writeln!(
-        &mut fo,
-        "base C count:\t{}\t({:.2}%)",
-        cnt.num_c,
-        cnt.rate_c * 100.0
-    )?;
-    writeln!(
-        &mut fo,
-        "base N count:\t{}\t({:.2}%)\n",
-        cnt.num_n,
-        cnt.rate_n * 100.0
-    )?;
-    writeln!(
-        &mut fo,
-        "Number of base calls with quality value of 20 or higher (Q20+) (%)\t{}\t({:.2}%)",
-        cnt.num_q20,
-        cnt.rate_q20 * 100.0
-    )?;
-    writeln!(
-        &mut fo,
-        "Number of base calls with quality value of 30 or higher (Q30+) (%)\t{}\t({:.2}%)",
-        cnt.num_q30,
-        cnt.rate_q30 * 100.0
-    )?;
-    fo.flush()?;
-
+    writeln!(&mut fo, "read average length:\t{}", stat.ave_len)?;
+    writeln!(&mut fo, "read min length:\t{}", stat.min_len)?;
+    writeln!(&mut fo, "read max length:\t{}", stat.max_len)?;
+    writeln!(&mut fo, "total gc content(%):\t{:.2}", stat.rate_gc * 100.0)?;
+    writeln!(&mut fo, "total read count:\t{}", stat.num_read)?;
+    writeln!(&mut fo, "total base count:\t{}\n", stat.num_base)?;
+    writeln!(&mut fo, "base A count:\t{}\t({:.2}%)", stat.num_a, stat.rate_a * 100.0)?;
+    writeln!(&mut fo, "base T count:\t{}\t({:.2}%)", stat.num_t, stat.rate_t * 100.0)?;
+    writeln!(&mut fo, "base G count:\t{}\t({:.2}%)", stat.num_g, stat.rate_g * 100.0)?;
+    writeln!(&mut fo, "base C count:\t{}\t({:.2}%)", stat.num_c, stat.rate_c * 100.0)?;
+    writeln!(&mut fo, "base N count:\t{}\t({:.2}%)\n", stat.num_n,stat.rate_n * 100.0)?;
+    writeln!(&mut fo, "Number of base calls with quality value of 20 or higher (Q20+) (%)\t{}\t({:.2}%)",stat.num_q20, stat.rate_q20 * 100.0 )?;
+    writeln!(&mut fo, "Number of base calls with quality value of 30 or higher (Q30+) (%)\t{}\t({:.2}%)",stat.num_q30, stat.rate_q30 * 100.0 )?;
+        
+    
     // output cycle result
-    let mut header = vec![
-        "cycle".to_string(),
-        "A".to_string(),
-        "T".to_string(),
-        "G".to_string(),
-        "C".to_string(),
-        "N".to_string(),
-    ];
+    let mut header = vec!["cycle".to_string(), "A".to_string(), "T".to_string(), "G".to_string(), "C".to_string(), "N".to_string(),];
     for i in 0..=max_qva {
         header.push(format!("{}", i));
     }
-    //writeln!(&mut fc, "{}", header.join("\t"))?;
     fc.write(header.join("\t").as_bytes())?;
     fc.write(b"\n")?;
 
-    for i in 0..cnt.max_len {
-        let idx = i + 1;
-        let this = hs_pos.get(&idx).unwrap();
+    for x in 0..each.keys().len() { // eq sort cycle 
+        let data = each.get(&x).unwrap();
         let mut out = Vec::new();
-        out.push(format!("cyc{}", idx));
-        for x in -5..=max_qva {
-            let n = this.get(&x).unwrap_or(&0);
-            if x < 0 {
-                let rate = *n as f64
-                    / (this.get(&-5).unwrap_or(&0)
-                        + this.get(&-4).unwrap_or(&0)
-                        + this.get(&-3).unwrap_or(&0)
-                        + this.get(&-2).unwrap_or(&0)
-                        + this.get(&-1).unwrap_or(&0)) as f64
-                    * 100.0;
-                out.push(format!("{}:({:.2}%)", n, rate));
+        out.push(format!("cyc{}", x+1));
+
+        let sum_each = data.iter().take(5).sum::<usize>();
+        let index = max_qva as usize + 5;
+        for i in 0..=index {
+            if i < 5 {
+                let rate = data[i] as f64 / sum_each as f64 * 100.0;
+                out.push(format!("{}:({:.2}%)", data[i], rate));
             } else {
-                out.push(format!("{}", n));
+                if i < index {
+                    out.push(format!("{}", data[i]));
+                } else {
+                    out.push("0".to_string());
+                }
             }
         }
-        //writeln!(&mut fc, "{}", out.join("\t"))?;
         fc.write(out.join("\t").as_bytes())?;
         fc.write(b"\n")?;
     }

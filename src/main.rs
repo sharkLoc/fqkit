@@ -77,6 +77,7 @@ enum Subcli {
         out: Option<String>,
     }, 
     /// subsample sequences from big fastq file.
+    #[command(visible_alias = "sample")]
     subfq {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
@@ -229,6 +230,7 @@ enum Subcli {
         save: String,
     },
     /// get a reverse-complement of fastq file.
+    #[command(visible_alias = "rev")]
     reverse {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
