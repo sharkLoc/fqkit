@@ -198,7 +198,7 @@ pub fn stat_fq(
                 let rate = data[i] as f64 / sum_each as f64 * 100.0;
                 out.push(format!("{}:({:.2}%)", data[i], rate));
             } else {
-                let num = data.get(i).or(Some(&999)).unwrap();
+                let num = data.get(i).or(Some(&0)).unwrap();
                 out.push(format!("{}", num));
             }
         }
