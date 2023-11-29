@@ -31,7 +31,7 @@ Usage: fqkit [OPTIONS] <COMMAND>
 
 Commands:
   topn     get first N records from fastq file
-  subfq    subsample sequences from big fastq file
+  subfq    subsample sequences from big fastq file [aliases: sample]
   trim     trim fastq file
   search   search reads/motifs from fastq file
   stats    summary for fastq format file [aliases: stat]
@@ -40,7 +40,7 @@ Commands:
   flatten  flatten fastq sequences
   barcode  split barcode for PE reads
   remove   remove reads by read name
-  reverse  get a reverse-complement of fastq file
+  reverse  get a reverse-complement of fastq file [aliases: rev]
   split    split interleaved fastq file
   merge    merge PE reads as interleaved fastq file
   split2   split fastq file by records number

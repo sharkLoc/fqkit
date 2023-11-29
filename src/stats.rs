@@ -104,7 +104,6 @@ pub fn stat_fq(
     let mut min_len: Option<usize>= None;
     let mut each: HashMap<usize, Vec<usize>> = HashMap::new();
     for rec in fq.records().flatten() {
-
         let this_q = *rec.qual().iter().max().unwrap() - phred;
         if this_q > max_qva { max_qva = this_q; }
         let len = rec.seq().len();
@@ -114,8 +113,7 @@ pub fn stat_fq(
             Some(v) => { if v>= len { min_len = Some(len) } }
             None => min_len = Some(len) 
         }
-     
-        let cap = this_q as usize +1 + 5; 
+         
         for (pos, (sf, sq)) in rec.seq().iter().zip(rec.qual().iter()).enumerate() {
             let idx = (sq - phred) as usize;
             if idx >= 20 {
@@ -124,13 +122,23 @@ pub fn stat_fq(
             }
 
             if each.contains_key(&pos) {
-                each.get_mut(&pos).unwrap()[idx+5] +=1;
-                if sf == &b'A' { each.get_mut(&pos).unwrap()[0] += 1; }
-                if sf == &b'T' { each.get_mut(&pos).unwrap()[1] += 1; }
-                if sf == &b'G' { each.get_mut(&pos).unwrap()[2] += 1; }
-                if sf == &b'C' { each.get_mut(&pos).unwrap()[3] += 1; }
-                if sf == &b'N' { each.get_mut(&pos).unwrap()[4] += 1; }
+                let tf = each.get_mut(&pos).unwrap();
+                let gap = (idx+5+1) as i32 - tf.len() as i32;
+                if gap > 0 {
+                    //tf.resize(gap+tf.len(), 0);           // error
+                    //tf.resize_with(gap+tf.len(), || 0);   // error
+                    //tf.append(&mut vec![0;gap]);          // error
+                    //for _ in 0..gap { tf.push(0); }       // error
+                    for _ in 0..gap { tf.insert(tf.len(), 0); }   // WFK? ok:  add zero at vec![] tail in loop n
+                }
+                tf[idx+5] += 1;
+                if sf == &b'A' { tf[0] += 1; }
+                if sf == &b'T' { tf[1] += 1; }
+                if sf == &b'G' { tf[2] += 1; }
+                if sf == &b'C' { tf[3] += 1; }
+                if sf == &b'N' { tf[4] += 1; }
             } else {
+                let cap = this_q as usize +1 + 5;
                 let mut v_tmp = vec![0usize; cap];
                 v_tmp[idx+5] += 1;
                 if sf == &b'A' { v_tmp[0] += 1; }
@@ -138,7 +146,7 @@ pub fn stat_fq(
                 if sf == &b'G' { v_tmp[2] += 1; }
                 if sf == &b'C' { v_tmp[3] += 1; }
                 if sf == &b'N' { v_tmp[4] += 1; }
-                each.insert(pos, v_tmp.clone());
+                each.insert(pos, v_tmp);
             }
         }
     }
@@ -184,17 +192,14 @@ pub fn stat_fq(
         out.push(format!("cyc{}", x+1));
 
         let sum_each = data.iter().take(5).sum::<usize>();
-        let index = max_qva as usize + 5;
-        for i in 0..=index {
+        let index = max_qva as usize + 5 +1;
+        for i in 0..index {
             if i < 5 {
                 let rate = data[i] as f64 / sum_each as f64 * 100.0;
                 out.push(format!("{}:({:.2}%)", data[i], rate));
             } else {
-                if i < index {
-                    out.push(format!("{}", data[i]));
-                } else {
-                    out.push("0".to_string());
-                }
+                let num = data.get(i).or(Some(&999)).unwrap();
+                out.push(format!("{}", num));
             }
         }
         fc.write(out.join("\t").as_bytes())?;
