@@ -57,6 +57,9 @@ Global FLAGS:
 ```
 
 ## change log
+<details>
+<summary>timeline</summary>
+
 2023.11.03:
  - update to version 0.2.12
  - add subcommand trim
@@ -74,3 +77,4 @@ Global FLAGS:
 2023.11.29:
  - update to version 0.2.15
  - recode func in stats subcommand
+</details>
