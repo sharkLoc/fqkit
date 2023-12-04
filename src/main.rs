@@ -3,11 +3,13 @@ use clap::Parser;
 use chrono::Local;
 use env_logger::{Builder,fmt::Color};
 use log::{error, warn, LevelFilter,Level};
+use size::size_fastq;
 use view::view_fq;
 use std::io::Write;
 
 
 mod view;
+mod size;
 mod reverse;
 use reverse::*;
 mod trimfq;
@@ -44,7 +46,7 @@ mod utils;
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.15",
+    version = "0.2.16",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -138,6 +140,18 @@ enum Subcli {
         /// if not specified, cycle result write to stdout
         #[arg(short = 'c', long = "cycle")]
         cyc: Option<String>,
+    },
+    /// report the number sequences and bases
+    size {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// number of additional worker threads to use
+        #[arg(short='@', long="thread", default_value_t = 1)]
+        thread: usize,
+        /// output file name or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+
     },
     /// line plot for A T G C N percentage in read position
     plot {
@@ -480,6 +494,22 @@ fn main() -> Result<(), Error> {
                     stat_fq(&None, &sum, &None, phred, arg.quiet)?;
                 }
             }
+        }
+        Subcli::size { input, thread, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    size_fastq(&Some(&input), thread, &Some(&out), arg.quiet)?;
+                } else {
+                    size_fastq(&Some(&input), thread, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    size_fastq(&None, thread, &Some(&out), arg.quiet)?;
+                } else {
+                    size_fastq(&None, thread, &None, arg.quiet)?;
+                }
+            }
+
         }
         Subcli::barcode { read1, read2, bar, mode, trans, mismatch, outdir, } => {
                split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir, arg.quiet)?; 

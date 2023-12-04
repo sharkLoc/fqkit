@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.15
+Version: 0.2.16
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -35,6 +35,7 @@ Commands:
   trim     trim fastq file
   search   search reads/motifs from fastq file
   stats    summary for fastq format file [aliases: stat]
+  size     report the number sequences and bases
   plot     line plot for A T G C N percentage in read position
   fq2fa    translate fastq to fasta
   flatten  flatten fastq sequences
@@ -77,4 +78,8 @@ Global FLAGS:
 2023.11.29:
  - update to version 0.2.15
  - recode func in stats subcommand
+
+2023.12.04
+ - update to version 0.2.16
+ - add subcommand size
 </details>

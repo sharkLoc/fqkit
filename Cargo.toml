@@ -1,6 +1,6 @@
 [package]
 name = "fqkit"
-version = "0.2.15"
+version = "0.2.16"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.65.0"
