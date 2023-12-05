@@ -46,7 +46,7 @@ mod utils;
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.16",
+    version = "0.2.17",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -114,10 +114,16 @@ enum Subcli {
     search {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
-        /// specify uppercase pattern/motif, regular expression supported, e.g., -p "ATC{2,}" or -p "ATCCG"
+        /// specify pattern/motif, regular expression supported, e.g., -p "ATC{2,}" or -p "ATCCG"
         /// for multiple motifs, -p "TTAGGG|CCCTAA"
         #[arg(short = 'p', long = "pattern",verbatim_doc_comment)]
         pat: String,
+        /// if specified,  enable case insensitive matching for the entire pattern
+        #[arg(short = 'i', long ="ignore-case", help_heading = Some("FLAGS"))]
+        case: bool,
+        /// the number of reads in the chunk on each thread
+        #[arg(short, long, default_value_t = 5000)]
+        chunk: usize,
         /// number of additional worker threads to use
         #[arg(short='@', long="thread", default_value_t = 1)]
         thread: usize,
@@ -145,8 +151,11 @@ enum Subcli {
     size {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
+        /// the number of reads in the chunk on each thread
+        #[arg(short, long, default_value_t = 5000)]
+        chunk: usize,
         /// number of additional worker threads to use
-        #[arg(short='@', long="thread", default_value_t = 1)]
+        #[arg(short='@', long="thread", default_value_t = 3)]
         thread: usize,
         /// output file name or write to stdout, file ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
@@ -431,18 +440,18 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        Subcli::search { input, pat, thread, out } => {
+        Subcli::search { input, pat, case, chunk, thread, out } => {
             if let Some(input) = input {
                 if let Some(out) = out {
-                    search_fq(&Some(&input), &pat, &Some(&out), thread, arg.quiet)?;
+                    search_fq(&Some(&input), &pat, case, chunk,&Some(&out), thread, arg.quiet)?;
                 }else {
-                    search_fq(&Some(&input), &pat, &None, thread, arg.quiet)?;
+                    search_fq(&Some(&input), &pat, case, chunk,&None, thread, arg.quiet)?;
                 }
             } else {
                 if let Some(out) = out {
-                    search_fq(&None, &pat, &Some(&out), thread, arg.quiet)?;
+                    search_fq(&None, &pat, case, chunk,&Some(&out), thread, arg.quiet)?;
                 }else {
-                    search_fq(&None, &pat, &None, thread, arg.quiet)?;
+                    search_fq(&None, &pat, case, chunk, &None, thread, arg.quiet)?;
                 }
             }
         }
@@ -495,18 +504,18 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        Subcli::size { input, thread, out } => {
+        Subcli::size { input, thread, chunk, out } => {
             if let Some(input) = input {
                 if let Some(out) = out {
-                    size_fastq(&Some(&input), thread, &Some(&out), arg.quiet)?;
+                    size_fastq(&Some(&input), thread, chunk, &Some(&out), arg.quiet)?;
                 } else {
-                    size_fastq(&Some(&input), thread, &None, arg.quiet)?;
+                    size_fastq(&Some(&input), thread, chunk, &None, arg.quiet)?;
                 }
             } else {
                 if let Some(out) = out {
-                    size_fastq(&None, thread, &Some(&out), arg.quiet)?;
+                    size_fastq(&None, thread, chunk, &Some(&out), arg.quiet)?;
                 } else {
-                    size_fastq(&None, thread, &None, arg.quiet)?;
+                    size_fastq(&None, thread, chunk, &None, arg.quiet)?;
                 }
             }
 

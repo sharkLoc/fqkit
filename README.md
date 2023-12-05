@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.16
+Version: 0.2.17
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -82,4 +82,10 @@ Global FLAGS:
 2023.12.04
  - update to version 0.2.16
  - add subcommand size
+
+2023.12.05
+ - update to version 0.2.17
+ - update code for subcommand size and search
 </details>
+
+#### ** any bugs please report issues **💖

@@ -12,17 +12,19 @@ struct Base {
     g: usize,
     c: usize,
     n: usize,
+    read: usize,
 }
 
 impl Base {
     pub fn new() -> Self {
-        Base { a: 0, t: 0, g: 0, c: 0, n: 0 }
+        Base { a: 0, t: 0, g: 0, c: 0, n: 0, read: 0 }
     }
 }
 
 pub fn size_fastq(
     fq: &Option<&str>,
     ncpu: usize,
+    chunk: usize,
     out: &Option<&str>, 
     quiet: bool,
 ) -> Result<()> {
@@ -41,15 +43,19 @@ pub fn size_fastq(
         }
     }
 
+    let mut chunk = chunk;
+    if chunk == 0 {
+        warn!("read conut in chunk can't be: {}, changed to default value.",chunk);
+        chunk = 5000;
+    }
     let fq = fastq::Reader::new(file_reader(fq)?);
     let mut fo = file_writer(out)?;
     let mut base = Base::new();
-    let mut reads = 0usize;
     let mut bases = 0usize;
 
     if ncpu == 0 || ncpu == 1 {
         for rec in fq.records().flatten() {
-            reads += 1;
+            base.read += 1;
             for nt in rec.seq().iter() {
                 match nt {
                     &b'A' => base.a +=1,
@@ -64,8 +70,11 @@ pub fn size_fastq(
         bases = base.a + base.t + base.g + base.c + base.n; 
     } else {
         let (tx, rx) = unbounded();
-        for rec in fq.records().flatten() {
-            tx.send(rec).unwrap();
+        let mut fqiter = fq.records();
+        loop {
+            let chunk: Vec<_> = fqiter.by_ref().take(chunk).flatten().collect();
+            if chunk.is_empty() { break; }
+            tx.send(chunk).unwrap();
         }
         drop(tx);
     
@@ -75,16 +84,18 @@ pub fn size_fastq(
                 let rx_tmp = rx.clone();
                 let tx_tmp = tx2.clone();
                 s.spawn(move |_| {
-                    for rec in rx_tmp.iter() {
+                    for vrec in rx_tmp {
                         let mut base = Base::new();
-                        for nt in rec.seq().iter() {
-                            match nt {
-                                &b'A' => base.a +=1,
-                                &b'T' => base.t +=1,
-                                &b'G' => base.g +=1,
-                                &b'C' => base.c +=1,
-                                &b'N' => base.n +=1,
-                                _ => unreachable!(),
+                        for rec in vrec {
+                            for nt in rec.seq().iter() {
+                                match nt {
+                                    &b'A' => base.a +=1,
+                                    &b'T' => base.t +=1,
+                                    &b'G' => base.g +=1,
+                                    &b'C' => base.c +=1,
+                                    &b'N' => base.n +=1,
+                                    _ => unreachable!(),
+                                }
                             }
                         };
                         tx_tmp.send(base).unwrap();
@@ -95,7 +106,7 @@ pub fn size_fastq(
             drop(tx2);
     
             for data in rx2.iter() {
-                reads += 1;
+                base.read += data.read;
                 base.a += data.a;
                 base.t += data.t;
                 base.g += data.g;
@@ -106,7 +117,7 @@ pub fn size_fastq(
         }).unwrap();      
     }
 
-    fo.write(format!("reads:{}\tbases:{}\tA:{}\tT:{}\tG:{}\tC:{}\tN:{}\n", reads,bases,base.a,base.t,base.g,base.c,base.n).as_bytes()).unwrap();
+    fo.write(format!("reads:{}\tbases:{}\tA:{}\tT:{}\tG:{}\tC:{}\tN:{}\n", base.read,bases,base.a,base.t,base.g,base.c,base.n).as_bytes()).unwrap();
     fo.flush()?;
     
     if !quiet {
