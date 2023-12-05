@@ -38,6 +38,7 @@ Commands:
   size     report the number sequences and bases
   plot     line plot for A T G C N percentage in read position
   fq2fa    translate fastq to fasta
+  fq2sam   converts a fastq file to an unaligned SAM file
   flatten  flatten fastq sequences
   barcode  split barcode for PE reads
   remove   remove reads by read name
@@ -86,6 +87,7 @@ Global FLAGS:
 2023.12.05
  - update to version 0.2.17
  - update code for subcommand size and search
+ - add subcommand fq2sam
 </details>
 
 #### ** any bugs please report issues **💖

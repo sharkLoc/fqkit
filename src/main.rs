@@ -2,6 +2,7 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use chrono::Local;
 use env_logger::{Builder,fmt::Color};
+use fq2sam::fastq2sam;
 use log::{error, warn, LevelFilter,Level};
 use size::size_fastq;
 use view::view_fq;
@@ -10,6 +11,7 @@ use std::io::Write;
 
 mod view;
 mod size;
+mod fq2sam;
 mod reverse;
 use reverse::*;
 mod trimfq;
@@ -193,6 +195,30 @@ enum Subcli {
         /// if specified, remove sequence id description
         #[arg(short='r', long="remove", help_heading = Some("FLAGS"))]
         remove: bool,
+        /// output file name or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+    },
+    /// converts a fastq file to an unaligned SAM file
+    fq2sam {
+        /// input fastq[.gz] file
+        #[arg(short = '1', long = "read1")]
+        r1: String,
+        /// input fastq[.gz] file for the second read of paired end data
+        #[arg(short = '2', long = "read2", help_heading = Some("Optional Arguments"))]
+        r2: Option<String>,
+        /// sample name to insert into the read group header
+        #[arg(short = 's', long = "sample-name")]
+        sm: String,
+        /// read group name, default: A
+        #[arg(short = 'r', long = "read-group-name", help_heading = Some("Optional Arguments"))]
+        rg: Option<String>,
+        /// the library name to place into the LB attribute in the read group header
+        #[arg(short = 'l', long = "library-name", help_heading = Some("Optional Arguments"))]
+        lb: Option<String>,
+        /// the platform type (e.g. ILLUMINA, SOLID) to insert into the read group header
+        #[arg(short = 'p', long = "platform", help_heading = Some("Optional Arguments"))]
+        pl: Option<String>,
         /// output file name or write to stdout, file ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
@@ -467,6 +493,21 @@ fn main() -> Result<(), Error> {
                     fq2fa(&None, remove, &Some(&out), arg.quiet)?;
                 } else {
                     fq2fa(&None, remove, &None, arg.quiet)?;
+                }
+            }
+        }
+        Subcli::fq2sam { r1, r2, sm, rg, lb, pl, out } => {
+            if let Some(r2) = r2 {
+                if let Some(out) = out {
+                    fastq2sam(&r1,&Some(&r2),&sm,rg,lb,pl,&Some(&out),arg.quiet)?;
+                } else {
+                    fastq2sam(&r1,&Some(&r2),&sm,rg,lb,pl,&None,arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    fastq2sam(&r1,&None,&sm,rg,lb,pl,&Some(&out),arg.quiet)?;
+                } else {
+                    fastq2sam(&r1,&None,&sm,rg,lb,pl,&None,arg.quiet)?;
                 }
             }
         }
