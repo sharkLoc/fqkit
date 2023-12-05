@@ -61,6 +61,9 @@ mod utils;
 struct Args {
     #[clap(subcommand)]
     command: Subcli,
+    /// log information verbosity, eg. error, warn, info, debug, trace
+    #[arg(short = 'v', long = "verbose", global = true, default_value_t = String::from("debug"), help_heading = Some("Global FLAGS"))]
+    pub verbose: String,
     /// be quiet and do not show extra information
     #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
     pub quiet: bool,
@@ -367,6 +370,20 @@ enum Subcli {
 
 
 fn main() -> Result<(), Error> {
+    
+    let arg = Args::parse();
+    let level =  if arg.verbose == "error".to_string() {
+        LevelFilter::Error
+    } else if arg.verbose == "warn".to_string() {
+        LevelFilter::Warn
+    }else if arg.verbose == "info".to_string() {
+        LevelFilter::Info
+    } else if arg.verbose == "debug".to_string() {
+        LevelFilter::Debug
+    } else {
+        LevelFilter::Trace
+    };
+
     let mut builder = Builder::from_default_env();
     builder.format(|buf, record| {
         let mut style = buf.style();
@@ -395,11 +412,9 @@ fn main() -> Result<(), Error> {
             record.args()
         )
     })
-    .filter(None, LevelFilter::Info)
+    .filter(None, level)
     .init();
    
-
-    let arg = Args::parse();
     match arg.command {
         Subcli::topn { input, num, out } => {
             if let Some(input) = input {
