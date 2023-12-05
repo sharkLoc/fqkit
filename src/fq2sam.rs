@@ -16,19 +16,30 @@ pub fn fastq2sam(
     quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
+    if !quiet {
+        if let Some(r2) = r2 {
+            info!("read file1 from: {}",r1);
+            info!("read file2 from: {}",r2);
+        } else {
+            info!("read file from: {}",r1);
+        }
+        info!("sample name set: {}",sm);
+    }
 
     let mut sam = file_writer(out)?;
     let rg = if let Some(x) = rg { x } else { String::from("A") };
     sam.write_fmt(format_args!("@HD\tVN:1.6\tSO:queryname\n@RG\tID:{}\tSM:{}",rg,sm))?;
     if let Some(lb) = lb {
         sam.write_fmt(format_args!("\tLB:{}",lb))?;
+        if !quiet {
+            info!("library name set: {}",lb);
+        }
     }
     if let Some(pl) = pl {
         sam.write_fmt(format_args!("\tPL:{}",pl))?;
+        info!("platform set: {}",pl);
     }
     sam.write("\n".as_bytes())?;
-
-    
 
     if let Some(r2) =r2 {
         let fq1 = file_reader(&Some(r1)).map(fastq::Reader::new)?;
