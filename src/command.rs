@@ -16,7 +16,7 @@ use clap::Parser;
 pub struct Args {
     #[clap(subcommand)]
     pub command: Subcli,
-    /// control verbosity of logging, Possible values: {error, warn, info, debug, trace}
+    /// control verbosity of logging, possible values: {error, warn, info, debug, trace}
     #[arg(short = 'v', long = "verbosity", global = true, default_value_t = String::from("debug"), help_heading = Some("Global Arguments"))]
     pub verbose: String,
     /// be quiet and do not show extra information
