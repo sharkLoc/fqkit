@@ -51,11 +51,13 @@ Commands:
   help     Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help     Print help information
-  -V, --version  Print version information
+  -h, --help     Print help
+  -V, --version  Print version
+
+Global Arguments:
+  -v, --verbosity <VERBOSE>  control verbosity of logging, Possible values: {error, warn, info, debug, trace} [default: debug]
 
 Global FLAGS:
-  -v, --verbose <VERBOSE>  log information verbosity, eg. error, warn, info, debug, trace [default: debug]
   -q, --quiet  be quiet and do not show extra information
 ```
 
@@ -89,7 +91,7 @@ Global FLAGS:
  - update to version 0.2.17
  - update code for subcommand size and search
  - add subcommand fq2sam
- - add log information options verbose
+ - add log information options verbosity
 </details>
 
 #### ** any bugs please report issues **💖
