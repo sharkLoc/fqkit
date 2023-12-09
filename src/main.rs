@@ -2,7 +2,10 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
-
+mod check;
+use check::*;
+mod mask;
+use mask::*;
 mod range;
 use range::*;
 mod sort;
@@ -200,6 +203,21 @@ fn main() -> Result<(), Error> {
             let df = cycle_data(&Some(&data))?;
             let _x = plot_line(df, show, prefix, width, height, ylim, &types, arg.quiet);
         }
+        Subcli::check { input, save, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    check_fastq(&Some(&input), save, &Some(&out), arg.quiet)?;
+                } else {
+                    check_fastq(&Some(&input), save, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    check_fastq(&None, save, &Some(&out), arg.quiet)?;
+                } else {
+                    check_fastq(&None, save, &None, arg.quiet)?;
+                }
+            }
+        }
         Subcli::stats { input, phred, sum,cyc,} => {
             if let Some(input) = input {
                 if let Some(cyc) = cyc {
@@ -287,6 +305,21 @@ fn main() -> Result<(), Error> {
         }
         Subcli::merge { read1,   read2,  out, } => {
             interleaved(&Some(read1.as_str()), &Some(read2.as_str()), &Some(out.as_str()), arg.quiet)?;    
+        }
+        Subcli::mask { input, phred, low, chars, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    mask_fastq(&Some(&input), phred, low, chars, &Some(&out), arg.quiet)?;
+                } else {
+                    mask_fastq(&Some(&input), phred, low, chars, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    mask_fastq(&None, phred, low, chars, &Some(&out), arg.quiet)?;
+                } else {
+                    mask_fastq(&None, phred, low, chars, &None, arg.quiet)?;
+                }
+            }
         }
         Subcli::split2 { input, num, gzip, name } => {
             if let Some(input) = input {

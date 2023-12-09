@@ -262,6 +262,22 @@ pub enum Subcli {
         #[arg(short = 'o', long = "outdir", default_value_t = String::from("."))]
         outdir: String,
     },
+    /// check the validity of a fastq record
+    check {
+        /// input fastq[.gz] file, or read from stdin
+        /// note: this function will return an Err if one of the following conditions is met:
+        ///     - the record identifier is empty
+        ///     - there is a non-ASCII character found in either the sequence or quality strings
+        ///     - the sequence and quality strings do not have the same length
+        #[arg(verbatim_doc_comment)]
+        input: Option<String>,
+        /// if set, just save correct reads
+        #[arg(short = 's', long = "save", help_heading = Some("FLAGS"))]
+        save: bool, 
+        /// output file name[.gz] or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+    },
     /// remove reads by read name.
     remove {
         /// input fastq[.gz] file, or read from stdin
@@ -311,6 +327,23 @@ pub enum Subcli {
         /// output interleaved fastq file name.
         #[arg(short = 'o', long = "out", default_value_t = String::from("interleaved.fq.gz"))]
         out: String,
+    },
+    /// convert any low quality base to 'N' or other chars 
+    mask {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        ///phred score 33 or 64
+        #[arg(short = 'p', long = "phred", default_value_t = 33)]
+        phred: u8,
+        /// low quality
+        #[arg(short = 'l', long = "low-quality",default_value_t = 5)] 
+        low: u8,
+        /// mask low quality ( <= low quality) base with this char
+        #[arg(short = 'c', long = "char", default_value_t = 'N')]
+        chars: char,
+        /// output file name[.gz] or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
     },
     /// split fastq file by records number
     split2 {
