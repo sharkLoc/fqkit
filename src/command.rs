@@ -3,7 +3,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.18",
+    version = "0.2.19",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,

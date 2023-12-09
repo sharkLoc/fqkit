@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.18
+Version: 0.2.19
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -36,6 +36,7 @@ Commands:
   range    print fastq records in a range
   search   search reads/motifs from fastq file
   stats    summary for fastq format file [aliases: stat]
+  shuffle  shuffle fastq sequences
   size     report the number sequences and bases
   sort     sort fastq file by name/seq/gc/length
   plot     line plot for A T G C N percentage in read position
