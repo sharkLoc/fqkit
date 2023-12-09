@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.17
+Version: 0.2.18
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -36,6 +36,7 @@ Commands:
   search   search reads/motifs from fastq file
   stats    summary for fastq format file [aliases: stat]
   size     report the number sequences and bases
+  sort     sort fastq file by name/seq/gc/length
   plot     line plot for A T G C N percentage in read position
   fq2fa    translate fastq to fasta
   fq2sam   converts a fastq file to an unaligned SAM file
@@ -92,6 +93,10 @@ Global FLAGS:
  - update code for subcommand size and search
  - add subcommand fq2sam
  - add log information options verbosity
+
+2023.12.09
+ - update to version 0.2.18
+ - add subcommand sort
 </details>
 
 #### ** any bugs please report issues **💖

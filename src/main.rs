@@ -2,7 +2,8 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
-
+mod sort;
+use sort::*;
 mod view;
 use view::*;
 mod size;
@@ -210,7 +211,21 @@ fn main() -> Result<(), Error> {
                     size_fastq(&None, thread, chunk, &None, arg.quiet)?;
                 }
             }
-
+        }
+        Subcli::sort { input, name, seq, gc, length, reverse, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    sort_fastq(&Some(&input), name, seq, gc, length, reverse, &Some(&out), arg.quiet)?;
+                } else {
+                    sort_fastq(&Some(&input), name, seq, gc, length, reverse, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    sort_fastq(&None, name, seq, gc, length, reverse, &Some(&out), arg.quiet)?;
+                } else {
+                    sort_fastq(&None, name, seq, gc, length, reverse, &None, arg.quiet)?;
+                }
+            }
         }
         Subcli::barcode { read1, read2, bar, mode, trans, mismatch, outdir, } => {
                split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir, arg.quiet)?; 

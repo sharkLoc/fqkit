@@ -3,7 +3,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.17",
+    version = "0.2.18",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -121,6 +121,31 @@ pub enum Subcli {
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
 
+    },
+    /// sort fastq file by name/seq/gc/length
+    sort {
+        /// input fastq[.gz] file, or read from stdin
+        /// note: all records will be readed into memory
+        #[arg(verbatim_doc_comment)]
+        input: Option<String>,
+        /// sort reads by name
+        #[arg(short = 'n', long = "sort-by-name" ,help_heading = Some("FLAGS"))]
+        name: bool,
+        /// sort reads by sequence
+        #[arg(short = 's', long = "sort-by-seq" ,help_heading = Some("FLAGS"))]
+        seq: bool,
+        /// sort reads by gc content
+        #[arg(short = 'g', long = "sort-by-gc", help_heading = Some("FLAGS"))]
+        gc: bool,
+        /// sort read by length
+        #[arg(short = 'l', long = "sort-by-length", help_heading = Some("FLAGS"))]
+        length: bool,
+        /// output reversed result
+        #[arg(short = 'r', long = "reverse", help_heading = Some("FLAGS"))]
+        reverse: bool,
+        /// output file name or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
     },
     /// line plot for A T G C N percentage in read position
     plot {
