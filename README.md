@@ -101,6 +101,8 @@ Global FLAGS:
 2023.12.09
  - update to version 0.2.18
  - add subcommand sort, range, check and mask
+ - update to version 0.2.19
+ - add subcommand shuffle
 </details>
 
 #### ** any bugs please report issues **💖
