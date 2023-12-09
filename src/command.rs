@@ -70,6 +70,21 @@ pub enum Subcli {
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
     },
+    /// print fastq records in a range
+    range {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// skip first int read records
+        #[arg(short = 's', long = "skip", default_value_t = 0)]
+        skip: usize,
+        /// take int read records
+        #[arg(short = 't', long = "take")]
+        take: usize,
+        /// fastq output file name or write to stdout, files ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+
+    },
     /// search reads/motifs from fastq file
     search {
         /// input fastq[.gz] file, or read from stdin

@@ -2,6 +2,9 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
+
+mod range;
+use range::*;
 mod sort;
 use sort::*;
 mod view;
@@ -115,6 +118,21 @@ fn main() -> Result<(), Error> {
                     trim_fq(&None, left, right, &Some(out.as_str()), arg.quiet)?;
                 } else {
                     trim_fq(&None, left, right, &None, arg.quiet)?;
+                }
+            }
+        }
+        Subcli::range { input, skip, take, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    range_fastq(&Some(&input), skip, take, &Some(&out), arg.quiet)?;
+                } else {
+                    range_fastq(&Some(&input), skip, take, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    range_fastq(&None, skip, take, &Some(&out), arg.quiet)?;
+                } else {
+                    range_fastq(&None, skip, take, &None, arg.quiet)?;
                 }
             }
         }

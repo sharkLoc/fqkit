@@ -33,6 +33,7 @@ Commands:
   topn     get first N records from fastq file
   subfq    subsample sequences from big fastq file [aliases: sample]
   trim     trim fastq file
+  range    print fastq records in a range
   search   search reads/motifs from fastq file
   stats    summary for fastq format file [aliases: stat]
   size     report the number sequences and bases
@@ -96,7 +97,7 @@ Global FLAGS:
 
 2023.12.09
  - update to version 0.2.18
- - add subcommand sort
+ - add subcommand sort and range
 </details>
 
 #### ** any bugs please report issues **💖
