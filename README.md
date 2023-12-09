@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.19
+Version: 0.2.20
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -61,6 +61,7 @@ Options:
 
 Global Arguments:
   -v, --verbosity <VERBOSE>  control verbosity of logging, Possible values: {error, warn, info, debug, trace} [default: debug]
+      --log <LOGFILE>        if specified, write log message to file, or write to stderr
 
 Global FLAGS:
   -q, --quiet  be quiet and do not show extra information

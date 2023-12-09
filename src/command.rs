@@ -3,7 +3,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.19",
+    version = "0.2.20",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -19,6 +19,9 @@ pub struct Args {
     /// control verbosity of logging, possible values: {error, warn, info, debug, trace}
     #[arg(short = 'v', long = "verbosity", global = true, default_value_t = String::from("debug"), help_heading = Some("Global Arguments"))]
     pub verbose: String,
+    /// if specified, write log message to file, or write to stderr
+    #[arg(long = "log", global = true, help_heading = Some("Global Arguments"))]
+    pub logfile: Option<String>,
     /// be quiet and do not show extra information
     #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
     pub quiet: bool,

@@ -1,11 +1,14 @@
-use anyhow::Ok;
+use std::{fs::File, io::{BufWriter, Write}};
+use anyhow::{Ok, Result};
 use chrono::Local;
-use env_logger::{Builder,fmt::Color};
+use env_logger::{Builder,fmt::Color, Target};
 use log::{LevelFilter,Level};
-use std::io::Write;
 
 
-pub fn logger(verbose: String) -> Result<(), anyhow::Error>{
+pub fn logger(
+    verbose: String,
+    logfile: &Option<&str>,
+) -> Result<(), anyhow::Error>{
 
     let level =  if verbose == "error".to_string() {
         LevelFilter::Error
@@ -20,7 +23,6 @@ pub fn logger(verbose: String) -> Result<(), anyhow::Error>{
     };
 
     let mut builder = Builder::from_default_env();
-    
     builder.format(|buf, record| {
         let mut style = buf.style();
         match record.level() {
@@ -47,9 +49,20 @@ pub fn logger(verbose: String) -> Result<(), anyhow::Error>{
             buf.style().set_color(Color::Rgb(90, 150, 150)).value(record.target()),
             record.args()
         )
-    })
-    .filter(None, level)
-    .init();
-
+    });
+    
+    // write log message in stderr or a file
+    if let Some(file) = logfile {
+        builder.target(Target::Pipe(log_writer(file)?)).filter(None, level).init();
+    } else {
+        builder.filter(None, level).init();
+    }
+    
     Ok(())
+}
+
+
+fn log_writer(file_out: &str) -> Result<Box<dyn Write + Send>> {
+        let fp = File::create(file_out)?;
+        Ok(Box::new(BufWriter::with_capacity(1, fp)))
 }

@@ -59,7 +59,10 @@ mod utils;
 fn main() -> Result<(), Error> {
     
     let arg = Args::parse();
-    logger(arg.verbose)?;
+    match arg.logfile {
+        Some(v) => logger(arg.verbose, &Some(&v))? , 
+        None => logger(arg.verbose, &None)?
+    }
    
     match arg.command {
         Subcli::topn { input, num, out } => {
