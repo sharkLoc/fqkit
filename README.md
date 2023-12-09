@@ -43,10 +43,12 @@ Commands:
   fq2sam   converts a fastq file to an unaligned SAM file
   flatten  flatten fastq sequences
   barcode  split barcode for PE reads
+  check    check the validity of a fastq record
   remove   remove reads by read name
   reverse  get a reverse-complement of fastq file [aliases: rev]
   split    split interleaved fastq file
   merge    merge PE reads as interleaved fastq file
+  mask     convert any low quality base to 'N' or other chars
   split2   split fastq file by records number
   gcplot   get GC content result and plot
   view     view fastq file page by page
@@ -97,7 +99,7 @@ Global FLAGS:
 
 2023.12.09
  - update to version 0.2.18
- - add subcommand sort and range
+ - add subcommand sort, range, check and mask
 </details>
 
 #### ** any bugs please report issues **💖
