@@ -122,6 +122,19 @@ pub enum Subcli {
         #[arg(short = 'c', long = "cycle")]
         cyc: Option<String>,
     },
+    /// shuffle fastq sequences 
+    shuffle {
+        /// input fastq[.gz] file, or read from stdin
+        /// note: all records will be readed into memory
+        #[arg(verbatim_doc_comment)]
+        input: Option<String>,
+        /// set rand seed.
+        #[arg(short = 's', long = "seed", default_value_t = 69)]
+        seed: u64,
+        /// output file name or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+    },
     /// report the number sequences and bases
     size {
         /// input fastq[.gz] file, or read from stdin

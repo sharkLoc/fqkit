@@ -2,6 +2,9 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
+
+mod shuffle;
+use shuffle::*;
 mod check;
 use check::*;
 mod mask;
@@ -230,6 +233,21 @@ fn main() -> Result<(), Error> {
                     stat_fq(&None, &sum, &Some(&cyc), phred, arg.quiet)?;
                 } else {
                     stat_fq(&None, &sum, &None, phred, arg.quiet)?;
+                }
+            }
+        }
+        Subcli::shuffle { input, seed, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    shuffle_fastq(&Some(&input), seed, &Some(&out), arg.quiet)?;
+                } else {
+                    shuffle_fastq(&Some(&input), seed, &None, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    shuffle_fastq(&None, seed, &Some(&out), arg.quiet)?;
+                } else {
+                    shuffle_fastq(&None, seed, &None, arg.quiet)?;
                 }
             }
         }
