@@ -8,6 +8,7 @@ pub fn top_n_records(
     input: &Option<&str>,
     number: usize,
     output: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     if !quiet {
@@ -21,7 +22,7 @@ pub fn top_n_records(
     let start = Instant::now();
 
     let fp = fastq::Reader::new(file_reader(input)?);
-    let mut fo = fastq::Writer::new(file_writer(output)?);
+    let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
     for rec in fp.records().take(number).flatten() {
         fo.write_record(&rec)?;
     }

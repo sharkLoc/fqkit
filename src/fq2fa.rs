@@ -10,6 +10,7 @@ pub fn fq2fa(
     file: &Option<&str>,
     remove: bool,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(), Error> {
     if !quiet {
@@ -23,7 +24,7 @@ pub fn fq2fa(
     let mut num = 0usize;
     
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fo = fasta::Writer::new(file_writer(out)?);
+    let mut fo = fasta::Writer::new(file_writer(out, compression_level)?);
    
     if remove {
         for rec in fq_reader.records().flatten() {

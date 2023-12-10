@@ -10,6 +10,7 @@ pub fn remove_read(
     out: &Option<&str>,
     name: &str,
     save: &str,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     if !quiet {
@@ -35,8 +36,8 @@ pub fn remove_read(
     }
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fq_writer = fastq::Writer::new(file_writer(out)?);
-    let mut rm_writer = fastq::Writer::new(file_writer(&Some(&save))?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
+    let mut rm_writer = fastq::Writer::new(file_writer(&Some(&save), compression_level)?);
     for rec in fq_reader.records().flatten() {
         if !ids.contains(&rec.id().to_string()) {
             fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;

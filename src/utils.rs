@@ -35,13 +35,16 @@ pub fn file_reader(file_in: &Option<&str>) -> Result<Box<dyn BufRead>> {
     }
 }
 
-pub fn file_writer(file_out: &Option<&str>) -> Result<Box<dyn Write>> {
+pub fn file_writer(
+    file_out: &Option<&str>,
+    compression_level: u32,
+) -> Result<Box<dyn Write>> {
     if let Some(file_name) = file_out {
         let fp = File::create(file_name)?;
         if file_name.ends_with(".gz") || file_name.ends_with(".gzip") {
             Ok(Box::new(BufWriter::with_capacity(
                 BUFF_SIZE,
-                write::GzEncoder::new(fp, Compression::default()),
+                write::GzEncoder::new(fp, Compression::new(compression_level)),
             )))
         } else {
             Ok(Box::new(BufWriter::with_capacity(BUFF_SIZE, fp)))
@@ -51,7 +54,10 @@ pub fn file_writer(file_out: &Option<&str>) -> Result<Box<dyn Write>> {
     }
 }
 
-pub fn file_writer_append(file_out: &str) -> Result<Box<dyn Write>> {
+pub fn file_writer_append(
+    file_out: &str,
+    compression_level: u32,
+) -> Result<Box<dyn Write>> {
     let fp = OpenOptions::new()
         .append(true)
         .create(true)
@@ -60,7 +66,7 @@ pub fn file_writer_append(file_out: &str) -> Result<Box<dyn Write>> {
     if file_out.ends_with(".gz") || file_out.ends_with(".gzip") {
         Ok(Box::new(BufWriter::with_capacity(
             BUFF_SIZE,
-            write::GzEncoder::new(fp, Compression::default()),
+            write::GzEncoder::new(fp, Compression::new(compression_level)),
         )))
     } else {
         Ok(Box::new(BufWriter::with_capacity(BUFF_SIZE, fp)))    

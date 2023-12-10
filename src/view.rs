@@ -10,6 +10,7 @@ use crate::utils::*;
 pub fn view_fq(
     file: &Option<&str>,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     let time = Instant::now();
@@ -20,7 +21,7 @@ pub fn view_fq(
 
     let fq_reader = file_reader(file)
         .map(fastq::Reader::new)?;
-    let mut fq_writer = file_writer(out)
+    let mut fq_writer = file_writer(out, compression_level)
         .map(fastq::Writer::new)?;
 
     let mut iter_fq = fq_reader.records().flatten().peekable();

@@ -11,6 +11,7 @@ pub fn mask_fastq(
     qual_limit: u8,
     nt: char,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     if !quiet {
@@ -26,7 +27,7 @@ pub fn mask_fastq(
 
     let (mut mask_base, mut mask_read) = (0,0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
-    let mut fp_writer = file_writer(out).map(fastq::Writer::new)?;
+    let mut fp_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
     
     for rec in fp_reader.records().flatten() {
         let score_min = rec.qual().iter().min().unwrap() - phred;

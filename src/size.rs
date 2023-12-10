@@ -26,6 +26,7 @@ pub fn size_fastq(
     ncpu: usize,
     chunk: usize,
     out: &Option<&str>, 
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
@@ -49,7 +50,7 @@ pub fn size_fastq(
         chunk = 5000;
     }
     let fq = fastq::Reader::new(file_reader(fq)?);
-    let mut fo = file_writer(out)?;
+    let mut fo = file_writer(out, compression_level)?;
     let mut base = Base::new();
     let mut bases = 0usize;
 

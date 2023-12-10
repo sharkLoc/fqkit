@@ -10,6 +10,7 @@ pub fn reverse_comp_seq(
     input: &Option<&str>,
     out: &Option<&str>,
     rev: bool,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
@@ -23,7 +24,7 @@ pub fn reverse_comp_seq(
 
     let maps = HashMap::from([(b'A',b'T'),(b'T',b'A'),(b'G',b'C'),(b'C',b'G'),(b'N',b'N')]);
     let fq_reader = file_reader(input).map(fastq::Reader::new)?;
-    let mut out_writer = file_writer(out).map(fastq::Writer::new)?;
+    let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
     
     for rec in fq_reader.records().flatten() {
         let rev_seq = rec.seq().iter().copied().rev().collect::<Vec<u8>>();

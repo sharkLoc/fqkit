@@ -24,7 +24,7 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.2.20
+Version: 0.3.0
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
@@ -60,11 +60,17 @@ Options:
   -V, --version  Print version
 
 Global Arguments:
-  -v, --verbosity <VERBOSE>  control verbosity of logging, Possible values: {error, warn, info, debug, trace} [default: debug]
-      --log <LOGFILE>        if specified, write log message to file, or write to stderr
+      --compress-level <COMPRESSION_LEVEL>
+          set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file
+          just work with option -o/--out [default: 6]
+  -v, --verbosity <VERBOSE>
+          control verbosity of logging, possible values: {error, warn, info, debug, trace} [default: debug]
+      --log <LOGFILE>
+          if specified, write log message to file, or write to stderr
 
 Global FLAGS:
   -q, --quiet  be quiet and do not show extra information
+
 ```
 
 ## change log

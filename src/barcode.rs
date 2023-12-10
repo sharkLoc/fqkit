@@ -96,6 +96,7 @@ pub fn split_fq(
     mode : usize,
     mismatch: usize,
     outdir: &str,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
@@ -115,9 +116,9 @@ pub fn split_fq(
             let fq1 = format!("{}/{}_1.fq.gz", outdir, name);
             let fq2 = format!("{}/{}_2.fq.gz", outdir, name);
             let bar = format!("{}/{}_barcode.fq.gz", outdir, name);
-            let fh1 = fastq::Writer::new(file_writer_append(&fq1)?);
-            let fh2 = fastq::Writer::new(file_writer_append(&fq2)?);
-            let fhb = fastq::Writer::new(file_writer_append(&bar)?); 
+            let fh1 = fastq::Writer::new(file_writer_append(&fq1, compression_level)?);
+            let fh2 = fastq::Writer::new(file_writer_append(&fq2, compression_level)?);
+            let fhb = fastq::Writer::new(file_writer_append(&bar, compression_level)?); 
             let len = bar_seq.len();
             fq_hand.push((bar_seq, len, fh1, fh2, fhb));
         }

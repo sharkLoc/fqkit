@@ -9,6 +9,7 @@ pub fn check_fastq(
     file: &Option<&str>,
     save: bool,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     if !quiet {
@@ -22,7 +23,7 @@ pub fn check_fastq(
     let (mut total,mut ok_read, mut err_read) = (0,0,0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
     if save {
-        let mut out_writer = file_writer(out).map(fastq::Writer::new)?;
+        let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
         for rec in fp_reader.records().flatten() {
             total +=1;
             match rec.check() {

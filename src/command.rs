@@ -1,9 +1,9 @@
-use clap::Parser;
+use clap::{Parser,value_parser};
 
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.2.20",
+    version = "0.3.0",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -16,6 +16,14 @@ use clap::Parser;
 pub struct Args {
     #[clap(subcommand)]
     pub command: Subcli,
+    /// set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file
+    /// just work with option -o/--out
+    #[arg(long = "compress-level", default_value_t = 6, global = true,
+        value_parser = value_parser!(u32).range(1..=9),
+        help_heading = Some("Global Arguments"),
+        verbatim_doc_comment
+    )]
+    pub compression_level: u32,
     /// control verbosity of logging, possible values: {error, warn, info, debug, trace}
     #[arg(short = 'v', long = "verbosity", global = true, default_value_t = String::from("debug"), help_heading = Some("Global Arguments"))]
     pub verbose: String,
@@ -126,10 +134,9 @@ pub enum Subcli {
         cyc: Option<String>,
     },
     /// shuffle fastq sequences 
+    #[command(before_help = "note: all records will be readed into memory")]
     shuffle {
         /// input fastq[.gz] file, or read from stdin
-        /// note: all records will be readed into memory
-        #[arg(verbatim_doc_comment)]
         input: Option<String>,
         /// set rand seed.
         #[arg(short = 's', long = "seed", default_value_t = 69)]
@@ -154,10 +161,9 @@ pub enum Subcli {
 
     },
     /// sort fastq file by name/seq/gc/length
+    #[command(before_help = "note: all records will be readed into memory")]
     sort {
         /// input fastq[.gz] file, or read from stdin
-        /// note: all records will be readed into memory
-        #[arg(verbatim_doc_comment)]
         input: Option<String>,
         /// sort reads by name
         #[arg(short = 'n', long = "sort-by-name" ,help_heading = Some("FLAGS"))]
@@ -279,13 +285,12 @@ pub enum Subcli {
         outdir: String,
     },
     /// check the validity of a fastq record
+    #[command(before_help = "note: this function will return an Err if one of the following conditions is met:\n
+      1. the record identifier is empty.
+      2. there is a non-ASCII character found in either the sequence or quality strings.
+      3. the sequence and quality strings do not have the same length.\n")]
     check {
         /// input fastq[.gz] file, or read from stdin
-        /// note: this function will return an Err if one of the following conditions is met:
-        ///     - the record identifier is empty
-        ///     - there is a non-ASCII character found in either the sequence or quality strings
-        ///     - the sequence and quality strings do not have the same length
-        #[arg(verbatim_doc_comment)]
         input: Option<String>,
         /// if set, just save correct reads
         #[arg(short = 's', long = "save", help_heading = Some("FLAGS"))]

@@ -9,6 +9,7 @@ pub fn flatten_fq(
     out: &Option<&str>,
     flag: u8,
     sep: char,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
@@ -27,7 +28,7 @@ pub fn flatten_fq(
     }
     
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
-    let mut out_writer = file_writer(out)?;
+    let mut out_writer = file_writer(out, compression_level)?;
     let flags = format!("{:b}",flag).chars().rev().collect::<Vec<char>>();
     let mut fields = vec![];
     for (i,k) in flags.iter().enumerate() {

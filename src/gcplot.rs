@@ -16,6 +16,7 @@ pub fn gc_content(
     height: usize,
     ylim: usize,
     types: &str,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     if !quiet {
@@ -28,7 +29,7 @@ pub fn gc_content(
     let start = Instant::now();
 
     let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
-    let mut fo = file_writer(output)?;
+    let mut fo = file_writer(output, compression_level)?;
     let mut df_hash = HashMap::new() ;
 
     for rec in fq_reader.records().flatten() {

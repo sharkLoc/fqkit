@@ -13,6 +13,7 @@ pub fn sort_fastq(
     sort_by_length: bool,
     reverse: bool,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     if !quiet {
@@ -106,7 +107,7 @@ pub fn sort_fastq(
     if !quiet {
         info!("sort done, start to output ...");
     }
-    let mut fq_writer = file_writer(out).map(fastq::Writer::new)?;
+    let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
     for rec in vec_reads {
         fq_writer.write_record(&rec)?;
     }

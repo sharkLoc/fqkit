@@ -9,6 +9,7 @@ pub fn range_fastq(
     skip: usize,
     take: usize,
     output: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     if !quiet {
@@ -23,7 +24,7 @@ pub fn range_fastq(
     let start = Instant::now();
 
     let fp_reader = file_reader(input).map(fastq::Reader::new)?;
-    let mut fp_writer = file_writer(output).map(fastq::Writer::new)?;
+    let mut fp_writer = file_writer(output, compression_level).map(fastq::Writer::new)?;
     
     for rec in fp_reader.records().skip(skip).take(take).flatten() {
         fp_writer.write_record(&rec)?;

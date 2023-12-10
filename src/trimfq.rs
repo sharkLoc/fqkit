@@ -10,6 +10,7 @@ pub fn trim_fq(
     left: usize,
     right: usize,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
@@ -22,7 +23,7 @@ pub fn trim_fq(
     }
     let length = right + left;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fq_writer = fastq::Writer::new(file_writer(out)?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
     for (idx,rec) in fq_reader.records().flatten().enumerate() {
         let rlen = rec.seq().len();
         if left >= rlen || right>= rlen || length >= rlen {

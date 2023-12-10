@@ -13,6 +13,7 @@ pub fn select_fastq(
     n: usize, 
     seed: u64, 
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     if !quiet {
@@ -42,7 +43,7 @@ pub fn select_fastq(
         }
     }
 
-    let fo = file_writer(out)?;
+    let fo = file_writer(out, compression_level)?;
     let mut w = fastq::Writer::new(fo);
     let fq_reader2 = fastq::Reader::new(file_reader(file)?);
     for (order, rec) in fq_reader2.records().flatten().enumerate() {
@@ -64,6 +65,7 @@ pub fn select_fastq2(
     n: usize, 
     seed: u64, 
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     if !quiet{
@@ -93,7 +95,7 @@ pub fn select_fastq2(
         }
     }
 
-    let fo = file_writer(out)?;
+    let fo = file_writer(out, compression_level)?;
     let mut w = fastq::Writer::new(fo);
     for rec in get {
         w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;

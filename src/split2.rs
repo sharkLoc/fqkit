@@ -10,6 +10,7 @@ pub fn split_chunk(
     num: usize,
     gzip: bool,
     out_pre: &str,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
@@ -29,7 +30,7 @@ pub fn split_chunk(
     };
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fh = vec![fastq::Writer::new(file_writer(&Some(&out))?)];
+    let mut fh = vec![fastq::Writer::new(file_writer(&Some(&out), compression_level)?)];
     
     if !quiet {
         info!("start to write file: {}",out);
@@ -46,7 +47,7 @@ pub fn split_chunk(
             } else {
                 format!("{}{}.fastq",out_pre,index)
             };
-            fh.push(fastq::Writer::new(file_writer(&Some(&out))?));
+            fh.push(fastq::Writer::new(file_writer(&Some(&out), compression_level)?));
             let fhthis = fh.get_mut(index).unwrap();
             
             if !quiet {

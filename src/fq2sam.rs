@@ -13,6 +13,7 @@ pub fn fastq2sam(
     lb: Option<String>,
     pl: Option<String>,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
@@ -26,7 +27,7 @@ pub fn fastq2sam(
         info!("sample name set: {}",sm);
     }
 
-    let mut sam = file_writer(out)?;
+    let mut sam = file_writer(out, compression_level)?;
     let rg = if let Some(x) = rg { x } else { String::from("A") };
     sam.write_fmt(format_args!("@HD\tVN:1.6\tSO:queryname\n@RG\tID:{}\tSM:{}",rg,sm))?;
     if let Some(lb) = lb {

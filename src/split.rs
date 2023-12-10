@@ -8,14 +8,15 @@ pub fn split_interleaved(
     file: &Option<&str>,
     out_dir: &str,
     out_pre: &str,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
 
     let pre1 = format!("{}/{}_r1.fq.gz", out_dir, out_pre);
     let pre2 = format!("{}/{}_r2.fq.gz", out_dir, out_pre);
-    let mut fh1 = fastq::Writer::new(file_writer_append(&pre1)?);
-    let mut fh2 = fastq::Writer::new(file_writer_append(&pre2)?);
+    let mut fh1 = fastq::Writer::new(file_writer_append(&pre1, compression_level)?);
+    let mut fh2 = fastq::Writer::new(file_writer_append(&pre2, compression_level)?);
 
     if !quiet {
         if let Some(file) =file {

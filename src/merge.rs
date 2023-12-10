@@ -9,6 +9,7 @@ pub fn interleaved(
     file1: &Option<&str>,
     file2: &Option<&str>,
     out: &Option<&str>,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(), Error> {
     
@@ -21,7 +22,7 @@ pub fn interleaved(
     let mut num = 0usize;
     let fq1_reader = fastq::Reader::new(file_reader(file1)?);
     let fq2_reader = fastq::Reader::new(file_reader(file2)?);
-    let mut fq_writer = fastq::Writer::new(file_writer(out)?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
     
     for (rec1, rec2) in fq1_reader.records().flatten().zip(fq2_reader.records().flatten()) {
         num += 1;

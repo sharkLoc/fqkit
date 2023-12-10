@@ -74,6 +74,7 @@ pub fn stat_fq(
     pre_sum: &str, 
     pre_cyc: &Option<&str>, 
     phred: u8,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<()> {
     if ![33u8, 64u8].contains(&phred) {
@@ -96,8 +97,8 @@ pub fn stat_fq(
     }
 
     let fq = fastq::Reader::new(file_reader(inp)?);
-    let mut fo = file_writer(&Some(pre_sum))?;
-    let mut fc = file_writer(pre_cyc)?;
+    let mut fo = file_writer(&Some(pre_sum), compression_level)?;
+    let mut fc = file_writer(pre_cyc, compression_level)?;
 
     let mut stat = info::new();
     let mut max_qva = 0;

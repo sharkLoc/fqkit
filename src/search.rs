@@ -14,6 +14,7 @@ pub fn search_fq(
     chunk: usize,
     out: &Option<&str>,
     ncpu: usize,
+    compression_level: u32,
     quiet: bool,
 ) -> Result<(), Error> {
     let start = Instant::now();
@@ -42,7 +43,7 @@ pub fn search_fq(
         warn!("read conut in chunk can't be 0, changed to default value: {}",chunk);
     }
     let mut num = 0usize;
-    let mut fo = file_writer(out)
+    let mut fo = file_writer(out, compression_level)
         .map(fastq::Writer::new)?;
     let fq_reader = file_reader(fq)
             .map(fastq::Reader::new).unwrap();
