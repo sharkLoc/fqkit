@@ -110,6 +110,10 @@ Global FLAGS:
  - add subcommand sort, range, check and mask
  - update to version 0.2.19
  - add subcommand shuffle
+
+2023.12.10
+ - update to version 0.3.0
+ - add glob option --compress-level for gzip output file 
 </details>
 
 #### ** any bugs please report issues **💖
