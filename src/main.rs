@@ -2,7 +2,8 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
-
+mod concat;
+use concat::*;
 mod shuffle;
 use shuffle::*;
 mod check;
@@ -286,6 +287,9 @@ fn main() -> Result<(), Error> {
         }
         Subcli::barcode { read1, read2, bar, mode, trans, mismatch, outdir, } => {
                split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir, arg.compression_level, arg.quiet)?; 
+        }
+        Subcli::concat { read1, read2, out1, out2 } => {
+            concat_fqstq_lane(&read1, &read2, &out1, &out2, arg.compression_level, arg.quiet)?;
         }
         Subcli::remove { input, out, name , save} => {
             if let Some(input) = input {

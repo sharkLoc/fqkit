@@ -48,7 +48,22 @@ pub enum Subcli {
         /// output fasta[.gz] file name or write to stdout, files ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
-    }, 
+    },
+    /// concat fastq files from different lanes
+    concat {
+        /// input read1 list file, one fastq[.gz] file perl line
+        #[arg(short = 'i', long = "input1")]
+        read1: String,
+        /// input read2 list file, one fastq[.gz] file perl line
+        #[arg(short = 'I', long = "input2")]
+        read2: String,
+        /// read1 output file name,  file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out1", default_value_t = String::from("."))]
+        out1: String,
+        /// read2 output file name,  file ending in .gz will be compressed automatically
+        #[arg(short = 'O', long = "out2", default_value_t = String::from("."))]
+        out2: String,
+    },
     /// subsample sequences from big fastq file.
     #[command(visible_alias = "sample")]
     subfq {
