@@ -1,6 +1,12 @@
 ![](https://github.com/sharkLoc/fqkit/blob/main/doc/fqkit_icon.PNG)
 
 # fqkit
+![Static Badge](https://img.shields.io/badge/Author-sharkLoc-blue)
+![Static Badge](https://img.shields.io/badge/Tool-fqkit-red)
+![Crates.io (latest)](https://img.shields.io/crates/dv/fqkit?labelColor=rgb&color=hex&link=https%3A%2F%2Fcrates.io%2Fcrates%2Ffqkit)
+![Crates.io](https://img.shields.io/crates/d/fqkit?label=Total%20download%20in%20crate.io)
+
+
 🦀 a simple program for fastq file manipulation
 
 
