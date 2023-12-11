@@ -1,3 +1,5 @@
+![](https://github.com/sharkLoc/fqkit/blob/main/doc/fqkit_icon.PNG)
+
 # fqkit
 🦀 a simple program for fastq file manipulation
 
