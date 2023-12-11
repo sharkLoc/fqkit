@@ -3,7 +3,7 @@ use clap::{Parser,value_parser};
 #[derive(Parser, Debug)]
 #[command(
     author = "sharkLoc",
-    version = "0.3.0",
+    version = "0.3.1",
     about = "A simple program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -17,7 +17,7 @@ pub struct Args {
     #[clap(subcommand)]
     pub command: Subcli,
     /// set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file
-    /// just work with option -o/--out
+    ///just work with option -o/--out
     #[arg(long = "compress-level", default_value_t = 6, global = true,
         value_parser = value_parser!(u32).range(1..=9),
         help_heading = Some("Global Arguments"),
@@ -51,17 +51,17 @@ pub enum Subcli {
     },
     /// concat fastq files from different lanes
     concat {
-        /// input read1 list file, one fastq[.gz] file perl line
+        /// input read1 list file, one fastq[.gz] file per line
         #[arg(short = 'i', long = "input1")]
         read1: String,
-        /// input read2 list file, one fastq[.gz] file perl line
+        /// input read2 list file, one fastq[.gz] file per line
         #[arg(short = 'I', long = "input2")]
         read2: String,
         /// read1 output file name,  file ending in .gz will be compressed automatically
-        #[arg(short = 'o', long = "out1", default_value_t = String::from("."))]
+        #[arg(short = 'o', long = "out1")]
         out1: String,
         /// read2 output file name,  file ending in .gz will be compressed automatically
-        #[arg(short = 'O', long = "out2", default_value_t = String::from("."))]
+        #[arg(short = 'O', long = "out2")]
         out2: String,
     },
     /// subsample sequences from big fastq file.
@@ -116,7 +116,7 @@ pub enum Subcli {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
         /// specify pattern/motif, regular expression supported, e.g., -p "ATC{2,}" or -p "ATCCG"
-        /// for multiple motifs, -p "TTAGGG|CCCTAA"
+        ///for multiple motifs, -p "TTAGGG|CCCTAA"
         #[arg(short = 'p', long = "pattern",verbatim_doc_comment)]
         pat: String,
         /// if specified,  enable case insensitive matching for the entire pattern
@@ -129,7 +129,22 @@ pub enum Subcli {
         #[arg(short='@', long="thread", default_value_t = 1)]
         thread: usize,
         /// output contain pattern/motif reads result fastq[.gz] file or write to stdout,
-        /// file ending in .gz will be compressed automatically
+        ///file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out", verbatim_doc_comment)]
+        out: Option<String>,
+    },
+    /// grep fastq sequence by read id or full name
+    grep {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// read name list file, one name per line and without read name prefix "@"
+        #[arg(short = 'i', long = "id-list")]
+        ids: String,
+        /// if specified, match read by full name instead of just id
+        #[arg(short = 'f', long = "--full-name", help_heading = Some("FLAGS"))]
+        full: bool,
+        /// output matched reads result in fastq[.gz] file or write to stdout,
+        ///file ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out", verbatim_doc_comment)]
         out: Option<String>,
     },
@@ -258,12 +273,27 @@ pub enum Subcli {
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
     },
+    /// converts the fastq file quality scores
+    fqscore {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// converts the quality scores from phred 64 to phred 33, quality - 31
+        #[arg(long = "to33", help_heading = Some("FLAGS"))]
+        to33: bool,
+        /// converts the quality scores from phred 33 to phred 64, quality + 31
+        #[arg(long = "to64", help_heading = Some("FLAGS"))]
+        to64: bool,
+        /// output file name or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+
+    },
     /// flatten fastq sequences
     flatten {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
         /// filed number, id:1, sequence:2, symbol:4, quality:8
-        /// eg. output id, sequence and quality value: 1 + 2 + 8 == 11 ,
+        ///eg. output id, sequence and quality value: 1 + 2 + 8 == 11 ,
         #[arg(short = 'f', long = "field", default_value_t = 3, verbatim_doc_comment)]
         flag: u8,
         /// output seprater, can be ",",  ";", 
@@ -282,8 +312,8 @@ pub enum Subcli {
         #[arg(short = '2', long = "read2")]
         read2: String,
         /// barcode list file, format eg:
-        /// ATGCAGTG    sample1
-        /// TGCAGTAC    sample2
+        ///ATGCAGTG    sample1
+        ///TGCAGTAC    sample2
         #[arg(short = 'b', long = "barcode", verbatim_doc_comment)] 
         bar: String,
         /// barcode position mode, 1:left, 2:right

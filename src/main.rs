@@ -2,6 +2,10 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
+mod fqscore;
+use fqscore::*;
+mod grep;
+use grep::*;
 mod concat;
 use concat::*;
 mod shuffle;
@@ -161,6 +165,21 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
+        Subcli::grep { input, ids, full, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    grep_fastq(&Some(&input), &ids, full, &Some(&out), arg.compression_level, arg.quiet)?;
+                } else {
+                    grep_fastq(&Some(&input), &ids, full, &None, arg.compression_level, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    grep_fastq(&None, &ids, full, &Some(&out), arg.compression_level, arg.quiet)?;
+                } else {
+                    grep_fastq(&None, &ids, full, &None, arg.compression_level, arg.quiet)?;
+                }
+            }
+        }
         Subcli::fq2fa { input, remove, out } => {
             if let Some(input) = input {
                 if let Some(out) = out {
@@ -189,6 +208,21 @@ fn main() -> Result<(), Error> {
                 } else {
                     fastq2sam(&r1,&None,&sm,rg,lb,pl,&None, arg.compression_level, arg.quiet)?;
                 }
+            }
+        }
+        Subcli::fqscore { input, to33, to64, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    phred_score(&Some(&input), &Some(&out), to33, to64, arg.compression_level, arg.quiet)?;
+                } else {
+                    phred_score(&Some(&input), &None, to33, to64, arg.compression_level, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    phred_score(&None, &Some(&out), to33, to64, arg.compression_level, arg.quiet)?;
+                 } else {
+                    phred_score(&None, &None, to33, to64, arg.compression_level, arg.quiet)?;
+                 }
             }
         }
         Subcli::flatten { input, flag, sep, out } => {

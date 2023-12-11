@@ -24,17 +24,19 @@ cargo b --release
 ```bash
 fqkit: A simple program for fastq file manipulation
 
-Version: 0.3.0
+Version: 0.3.1
 Authors: sharkLoc <mmtinfo@163.com>
 
 Usage: fqkit [OPTIONS] <COMMAND>
 
 Commands:
   topn     get first N records from fastq file
+  concat   concat fastq files from different lanes
   subfq    subsample sequences from big fastq file [aliases: sample]
   trim     trim fastq file
   range    print fastq records in a range
   search   search reads/motifs from fastq file
+  grep     grep fastq sequence by read id or full name
   stats    summary for fastq format file [aliases: stat]
   shuffle  shuffle fastq sequences
   size     report the number sequences and bases
@@ -42,6 +44,7 @@ Commands:
   plot     line plot for A T G C N percentage in read position
   fq2fa    translate fastq to fasta
   fq2sam   converts a fastq file to an unaligned SAM file
+  fqscore  converts the fastq file quality scores
   flatten  flatten fastq sequences
   barcode  split barcode for PE reads
   check    check the validity of a fastq record
