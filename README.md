@@ -32,12 +32,14 @@ cargo b --release
 ## usage
 
 ```bash
-fqkit: A simple program for fastq file manipulation
+FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.3.1
+Version: 0.3.2
+
 Authors: sharkLoc <mmtinfo@163.com>
+Source code: https://github.com/sharkLoc/fqkit.git
 
-Usage: fqkit [OPTIONS] <COMMAND>
+Usage: fqkit.exe [OPTIONS] <COMMAND>
 
 Commands:
   topn     get first N records from fastq file
@@ -50,6 +52,7 @@ Commands:
   stats    summary for fastq format file [aliases: stat]
   shuffle  shuffle fastq sequences
   size     report the number sequences and bases
+  slide    extract subsequences in sliding windows
   sort     sort fastq file by name/seq/gc/length
   plot     line plot for A T G C N percentage in read position
   fq2fa    translate fastq to fasta
@@ -74,16 +77,16 @@ Options:
 
 Global Arguments:
       --compress-level <COMPRESSION_LEVEL>
-          set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file
-          just work with option -o/--out [default: 6]
+          set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file, just work with option -o/--out [default: 6]
   -v, --verbosity <VERBOSE>
-          control verbosity of logging, possible values: {error, warn, info, debug, trace} [default: debug]
+          control verbosity of logging, possible values: {error,warn,info,debug,trace} [default: debug]
       --log <LOGFILE>
-          if specified, write log message to file, or write to stderr
+          if file name specified, write log message to this file, or write to stderr
 
 Global FLAGS:
-  -q, --quiet  be quiet and do not show extra information
+  -q, --quiet  be quiet and do not show any extra information
 
+Use "fqkit help [command]" for more information about a command
 ```
 
 ## change log
@@ -126,7 +129,15 @@ Global FLAGS:
 
 2023.12.10
  - update to version 0.3.0
- - add glob option --compress-level for gzip output file 
+ - add glob option --compress-level for gzip output file
+
+2023.12.11
+- update to version 0.3.1
+- add subcommand grep and fqscore
+
+2023.12.11
+- update to version 0.3.2
+- add subcommand slide
 </details>
 
 #### ** any bugs please report issues **💖

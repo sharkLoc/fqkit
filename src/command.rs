@@ -2,35 +2,36 @@ use clap::{Parser,value_parser};
 
 #[derive(Parser, Debug)]
 #[command(
+    name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.1",
-    about = "A simple program for fastq file manipulation",
+    version = "0.3.2",
+    about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
 )]
 #[command(help_template = 
-    "{name}: {about}\n\nVersion: {version}\
-    \nAuthors: {author} <mmtinfo@163.com>\
-    \n\n{usage-heading} {usage}\n\n{all-args}\n"
+    "{name} -- {about}\n\nVersion: {version}\
+    \n\nAuthors: {author} <mmtinfo@163.com>\
+    \nSource code: https://github.com/sharkLoc/fqkit.git\
+    \n\n{usage-heading} {usage}\n\n{all-args}\n\nUse \"fqkit help [command]\" for more information about a command"
 )]
 pub struct Args {
     #[clap(subcommand)]
     pub command: Subcli,
-    /// set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file
-    ///just work with option -o/--out
+    /// set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file,
+    /// just work with option -o/--out
     #[arg(long = "compress-level", default_value_t = 6, global = true,
         value_parser = value_parser!(u32).range(1..=9),
-        help_heading = Some("Global Arguments"),
-        verbatim_doc_comment
+        help_heading = Some("Global Arguments")
     )]
     pub compression_level: u32,
-    /// control verbosity of logging, possible values: {error, warn, info, debug, trace}
+    /// control verbosity of logging, possible values: {error,warn,info,debug,trace}
     #[arg(short = 'v', long = "verbosity", global = true, default_value_t = String::from("debug"), help_heading = Some("Global Arguments"))]
     pub verbose: String,
-    /// if specified, write log message to file, or write to stderr
+    /// if file name specified, write log message to this file, or write to stderr
     #[arg(long = "log", global = true, help_heading = Some("Global Arguments"))]
     pub logfile: Option<String>,
-    /// be quiet and do not show extra information
+    /// be quiet and do not show any extra information
     #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
     pub quiet: bool,
 }
@@ -189,6 +190,23 @@ pub enum Subcli {
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
 
+    },
+    /// extract subsequences in sliding windows
+    slide {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        ///set sliding window step size
+        #[arg(short = 'w', long = "window", default_value_t = 10)]
+        window: usize,
+        ///set sliding window step size
+        #[arg(short = 's', long = "step", default_value_t = 5)]
+        step: usize,
+        /// suffix added to the sequence ID
+        #[arg(short = 'S', long = "suffidx", default_value_t = String::from("_slide"))]
+        suffix: String,
+        /// output file name or write to stdout, file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
     },
     /// sort fastq file by name/seq/gc/length
     #[command(before_help = "note: all records will be readed into memory")]

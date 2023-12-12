@@ -2,6 +2,9 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
+
+mod slide;
+use slide::*;
 mod fqscore;
 use fqscore::*;
 mod grep;
@@ -301,6 +304,21 @@ fn main() -> Result<(), Error> {
                     size_fastq(&None, thread, chunk, &Some(&out), arg.compression_level, arg.quiet)?;
                 } else {
                     size_fastq(&None, thread, chunk, &None, arg.compression_level, arg.quiet)?;
+                }
+            }
+        }
+        Subcli::slide { input, window, step, suffix, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    slide_fastq(&Some(&input), step, window, &Some(&out), &suffix, arg.compression_level, arg.quiet)?;
+                } else {
+                    slide_fastq(&Some(&input), step, window, &None, &suffix, arg.compression_level, arg.quiet)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    slide_fastq(&None, step, window, &Some(&out), &suffix, arg.compression_level, arg.quiet)?;
+                } else {
+                    slide_fastq(&None, step, window, &None, &suffix, arg.compression_level, arg.quiet)?;
                 }
             }
         }
