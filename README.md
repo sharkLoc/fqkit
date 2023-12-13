@@ -1,4 +1,4 @@
-![](https://github.com/sharkLoc/fqkit/blob/main/doc/fqkit_icon.PNG)
+![icon](doc/fqkit_icon.PNG)
 
 # fqkit
 ![Static Badge](https://img.shields.io/badge/Author-sharkLoc-blue)
