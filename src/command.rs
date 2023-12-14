@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.2",
+    version = "0.3.3",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -320,6 +320,39 @@ pub enum Subcli {
         /// output file name[.gz] or write to stdout, file ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
+    },
+    /// join paired end reads that are overlapping into a single longer read
+    #[command(before_help=r"Note:
+    1. if overlapping regions are detected, low quality bases are corrected by high quality paired bases. 
+    2. if a base is corrected, the quality value is also corrected.
+    3. only paired end reads such as the following will be detected and merged, overlap mode:
+       r1: GCAAGCGTTAATCGGAATTTATGGGCGTAAAGCGCACGCAGGA
+                            |\|||||||||||||||||||||||\ 
+                            TCTATGGGCGTAAAGCGCACGCAGGCATGCTGGGCGTAAAGCGCACGCAGGC  r2: reverse complement
+    
+    ")]
+    join {
+        /// input read1 fastq[.gz] file
+        #[arg(short = '1', long = "read1")]
+        read1: String,
+        /// input read2 fastq[.gz] file
+        #[arg(short = '2', long = "read2")]
+        read2: String,
+        /// minimum overlap length in PE reads
+        #[arg(short = 'l', long = "length", default_value_t=15)]
+        length: usize,
+        /// maximum mismatch count in overlap region
+        #[arg(short = 'm', long = "miss", default_value_t=10)]
+        miss: usize,
+        /// output unmerged  read1 fastq file name,  file ending in .gz will be compressed automatically
+        #[arg(short='f', long = "out1")]
+        out1: String,
+        /// output unmerged  read2 fastq file name,  file ending in .gz will be compressed automatically
+        #[arg(short='r', long = "out2")]
+        out2: String,
+        /// output merged fastq file name,  file ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "merged")]
+        merged: String,
     },
     /// split barcode for PE reads
     barcode {

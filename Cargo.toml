@@ -1,6 +1,6 @@
 [package]
 name = "fqkit"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.65.0"
@@ -14,7 +14,7 @@ license = "GPL-3.0"
 
 [dependencies]
 anyhow = "1.0.75"
-bio = "1.0.0"
+bio = "1.5.0"
 chrono = "0.4.30"
 clap = { version = "4.4.7", features = ["derive"] }
 colored = "2.0.4"

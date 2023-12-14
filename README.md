@@ -34,7 +34,7 @@ cargo b --release
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.3.2
+Version: 0.3.3
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
@@ -59,6 +59,7 @@ Commands:
   fq2sam   converts a fastq file to an unaligned SAM file
   fqscore  converts the fastq file quality scores
   flatten  flatten fastq sequences
+  join     join paired end reads that are overlapping into a single longer read
   barcode  split barcode for PE reads
   check    check the validity of a fastq record
   remove   remove reads by read name
