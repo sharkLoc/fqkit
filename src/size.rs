@@ -87,6 +87,7 @@ pub fn size_fastq(
                     for vrec in rx_tmp {
                         let mut base = Base::new();
                         for rec in vrec {
+                            base.read += 1;
                             for nt in rec.seq().iter() {
                                 match nt {
                                     &b'A' => base.a +=1,
