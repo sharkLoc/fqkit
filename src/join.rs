@@ -135,8 +135,8 @@ pub fn join_fastq(
         let mut fq_iter1 = fq_reader1.records();
         let mut fq_iter2 = fq_reader2.records();
         loop {
-            let pe_vec: Vec<_> = fq_iter1.by_ref().flatten().zip(fq_iter2.by_ref().flatten()).take(chunk).collect(); 
-            //fq_iter1.take(chunk).flatten().zip(fq_iter2.take(chunk).flatten()).collect();
+            let pe_vec: Vec<_> = fq_iter1.by_ref().take(chunk).flatten().zip(fq_iter2.by_ref().take(chunk).flatten()).collect();
+            // fq_iter1.by_ref().flatten().zip(fq_iter2.by_ref().flatten()).take(chunk).collect();    slower, deprecated
             if pe_vec.is_empty() {
                 break;
             }
