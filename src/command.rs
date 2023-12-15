@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.3",
+    version = "0.3.4",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -329,7 +329,6 @@ pub enum Subcli {
        r1: GCAAGCGTTAATCGGAATTTATGGGCGTAAAGCGCACGCAGGA
                             |\|||||||||||||||||||||||\ 
                             TCTATGGGCGTAAAGCGCACGCAGGCATGCTGGGCGTAAAGCGCACGCAGGC  r2: reverse complement
-    
     ")]
     join {
         /// input read1 fastq[.gz] file
@@ -344,10 +343,16 @@ pub enum Subcli {
         /// maximum mismatch count in overlap region
         #[arg(short = 'm', long = "miss", default_value_t=10)]
         miss: usize,
-        /// output unmerged  read1 fastq file name,  file ending in .gz will be compressed automatically
+        /// the number of reads in the chunk on each thread
+        #[arg(short, long, default_value_t = 5000)]
+        chunk: usize,
+        /// number of additional worker threads to use
+        #[arg(short='@', long="thread", default_value_t = 6)]
+        thread: usize,
+        /// output unmerged forward(read1) fastq file name,  file ending in .gz will be compressed automatically
         #[arg(short='f', long = "out1")]
         out1: String,
-        /// output unmerged  read2 fastq file name,  file ending in .gz will be compressed automatically
+        /// output unmerged resverse(read2) fastq file name,  file ending in .gz will be compressed automatically
         #[arg(short='r', long = "out2")]
         out2: String,
         /// output merged fastq file name,  file ending in .gz will be compressed automatically

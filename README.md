@@ -1,4 +1,5 @@
-![icon](doc/fqkit_icon.PNG)
+![icon](https://github.com/sharkLoc/fqkit/blob/main/doc/fqkit_icon.PNG)
+<!-- ![icon](doc/fqkit_icon.PNG) -->
 
 # fqkit
 ![Static Badge](https://img.shields.io/badge/Author-sharkLoc-blue)
@@ -34,7 +35,7 @@ cargo b --release
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.3.3
+Version: 0.3.4
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
