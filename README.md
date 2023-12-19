@@ -14,12 +14,12 @@
 
 
 ## install
-##### setp1：install cargo first 
+##### setp1： install cargo first 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-##### step2:
+##### step2:  on linux or windows
 ```bash
 cargo install fqkit
 # or
@@ -35,7 +35,7 @@ cargo b --release
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.3.4
+Version: 0.3.5
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
@@ -47,6 +47,7 @@ Commands:
   concat   concat fastq files from different lanes
   subfq    subsample sequences from big fastq file [aliases: sample]
   trim     trim fastq file
+  filter   a simple filter for pair end fastq sqeuence
   range    print fastq records in a range
   search   search reads/motifs from fastq file
   grep     grep fastq sequence by read id or full name
@@ -78,12 +79,9 @@ Options:
   -V, --version  Print version
 
 Global Arguments:
-      --compress-level <COMPRESSION_LEVEL>
-          set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file, just work with option -o/--out [default: 6]
-  -v, --verbosity <VERBOSE>
-          control verbosity of logging, possible values: {error,warn,info,debug,trace} [default: debug]
-      --log <LOGFILE>
-          if file name specified, write log message to this file, or write to stderr
+      --compress-level <int>  set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file, just work with option -o/--out [default: 6]
+      --log <str>             if file name specified, write log message to this file, or write to stderr
+  -v, --verbosity <str>       control verbosity of logging, possible values: {error,warn,info,debug,trace} [default: debug]
 
 Global FLAGS:
   -q, --quiet  be quiet and do not show any extra information
@@ -140,6 +138,10 @@ Use "fqkit help [command]" for more information about a command
 2023.12.11
 - update to version 0.3.2
 - add subcommand slide
+
+2023.12.19
+- update to version 0.3.5
+- add subcommand filter
 </details>
 
 #### ** any bugs please report issues **💖

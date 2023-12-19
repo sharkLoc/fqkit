@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.4",
+    version = "0.3.5",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -21,16 +21,19 @@ pub struct Args {
     /// set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file,
     /// just work with option -o/--out
     #[arg(long = "compress-level", default_value_t = 6, global = true,
-        value_parser = value_parser!(u32).range(1..=9),
+        value_parser = value_parser!(u32).range(1..=9), value_name = "int",
         help_heading = Some("Global Arguments")
     )]
     pub compression_level: u32,
-    /// control verbosity of logging, possible values: {error,warn,info,debug,trace}
-    #[arg(short = 'v', long = "verbosity", global = true, default_value_t = String::from("debug"), help_heading = Some("Global Arguments"))]
-    pub verbose: String,
     /// if file name specified, write log message to this file, or write to stderr
-    #[arg(long = "log", global = true, help_heading = Some("Global Arguments"))]
+    #[arg(long = "log", global = true, help_heading = Some("Global Arguments"), value_name = "str")]
     pub logfile: Option<String>,
+    /// control verbosity of logging, possible values: {error,warn,info,debug,trace}
+    #[arg(short = 'v', long = "verbosity", global = true, value_name = "str",
+        default_value_t = String::from("debug"),
+        help_heading = Some("Global Arguments")
+    )]
+    pub verbose: String,
     /// be quiet and do not show any extra information
     #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
     pub quiet: bool,
@@ -96,6 +99,52 @@ pub enum Subcli {
         /// fastq output file name or write to stdout, files ending in .gz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
+    },
+    /// a simple filter for pair end fastq sqeuence
+    filter {
+        /// input read1 fastq[.gz] file
+        #[arg(short = '1', long = "read1")]
+        read1: String,
+        /// input read2 fastq[.gz] file
+        #[arg(short = '2', long = "read2")]
+        read2: String,
+        /// if one read number of N base is more then N base limit, then this read pair is discarded.
+        #[arg(short = 'n', long = "n-limit", default_value_t=5)]
+        nbase: usize,
+        /// reads shorter than length_required will be discarded
+        #[arg(short = 'l', long = "length", default_value_t=30)]
+        length: usize,
+        /// the complexity is defined as the percentage of base that is different from its next base (base[i] != base[i+1]),
+        /// a 51-bp sequence, with 3 bases that is different from its next base
+        /// seq = 'AAAATTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGCCCC',  and complexity = 3/(51-1) = 6%
+        /// the threshold for low complexity filter (0~100). 30 is recommended, which means 30% complexity is required.
+        #[arg(short = 'y', long = "complexity", default_value_t = 0,
+            value_parser = value_parser!(u32).range(0..=100),
+            verbatim_doc_comment
+        )]
+        complexity: u32,
+        /// if one read's average quality score < average qual, then this read pair is discarded,
+        /// eg. Q20 error 0.01, Q30 error 0.001, averaging the probability of error is 0.0055 => Q value 22.59637
+        #[arg(short = 'q', long = "average_qual", default_value_t = 20, verbatim_doc_comment)]
+        average_qual: u8,
+        ///phred score 33 or 64
+        #[arg(short = 'p', long = "phred", default_value_t = 33)]
+        phred: u8,
+        /// the number of reads in the chunk on each thread
+        #[arg(short, long, default_value_t = 5000)]
+        chunk: usize,
+        /// number of additional worker threads to use
+        #[arg(short='@', long="thread", default_value_t = 6)]
+        thread: usize,
+        /// specify the file to store reads(interleaved) that cannot pass the filters, file ending in .gz will be compressed automatically
+        #[arg(short='u', long = "failed")]
+        failed: String,
+        /// output pass filtered  forward(read1) fastq file name,  file ending in .gz will be compressed automatically
+        #[arg(short='f', long = "out1")]
+        out1: String,
+        /// output pass filtered resverse(read2) fastq file name,  file ending in .gz will be compressed automatically
+        #[arg(short='r', long = "out2")]
+        out2: String,
     },
     /// print fastq records in a range
     range {

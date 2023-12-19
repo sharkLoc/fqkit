@@ -2,6 +2,9 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
+
+mod filter;
+use filter::*;
 mod join;
 use join::*;
 mod slide;
@@ -340,6 +343,9 @@ fn main() -> Result<(), Error> {
         }
         Subcli::barcode { read1, read2, bar, mode, trans, mismatch, outdir, } => {
                split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir, arg.compression_level, arg.quiet)?; 
+        }
+        Subcli::filter { read1, read2, nbase, length, complexity, average_qual, phred, chunk, thread, failed, out1, out2 } => {
+            filter_fastq(&read1, &read2, nbase, length, complexity, average_qual, phred, chunk, thread, &failed, &out1, &out2, arg.compression_level, arg.quiet)?;
         }
         Subcli::join { read1, read2, length, miss, chunk, thread, out1, out2, merged } => {
             join_fastq(&read1, &read2, length, miss, chunk, thread, &merged, &out1, &out2, arg.compression_level, arg.quiet)?;

@@ -28,8 +28,8 @@ pub fn join_fastq(
         } else {
             info!("additional thread num is: {}", ncpu);
         }
-        info!("outout unmerged read1 file: {}", out_r1);
-        info!("outout unmerged read2 file: {}", out_r2);
+        info!("output unmerged read1 file: {}", out_r1);
+        info!("output unmerged read2 file: {}", out_r2);
         info!("output merged pe reads file: {}",merge_fq);
     }
     let start = Instant::now();

@@ -18,8 +18,10 @@ pub fn logger(
         LevelFilter::Info
     } else if verbose == "debug".to_string() {
         LevelFilter::Debug
-    } else {
+    } else if verbose == "trace".to_string() {
         LevelFilter::Trace
+    } else {
+        LevelFilter::Off
     };
 
     let mut builder = Builder::from_default_env();
