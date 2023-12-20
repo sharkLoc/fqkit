@@ -181,5 +181,5 @@ fn phred_mean(
         .map(|x| { 10.0f64.powf((x - phred) as f64 / -10.0) })
         .sum::<f64>() / qual.len() as f64;
     
-    (-10.0f64 * ave_error.log10()) as u8
+    (-10.0f64 * ave_error.log10()).round() as u8
 }
