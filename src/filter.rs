@@ -178,8 +178,8 @@ fn phred_mean(
 ) -> u8 {
     let ave_error = qual
         .iter()
-        .map(|x| { 10.0f64.powf((x -phred) as f64 / 10.0) })
+        .map(|x| { 10.0f64.powf((x - phred) as f64 / -10.0) })
         .sum::<f64>() / qual.len() as f64;
     
-    (ave_error.log10() * -10.0f64) as u8 - phred
+    (-10.0f64 * ave_error.log10()) as u8
 }
