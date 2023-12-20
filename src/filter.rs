@@ -69,7 +69,7 @@ pub fn filter_fastq(
                 .filter(|(q1,q2)| {q1 != q2})
                 .count()  as f64 / rec1.seq().len() as f64 * 100.0 ) as usize;
             let complx2 = (rec2.seq().iter().skip(1)
-                .zip(rec1.seq().iter())
+                .zip(rec2.seq().iter())
                 .filter(|(q1,q2)| {q1 != q2})
                 .count()  as f64 / rec2.seq().len() as f64 * 100.0 ) as usize;
             if complx1 < complex || complx2 < complex {
@@ -135,7 +135,7 @@ pub fn filter_fastq(
                                 .filter(|(q1,q2)| {q1 != q2})
                                 .count()  as f64 / rec1.seq().len() as f64 * 100.0 ) as usize;
                             let complx2 = (rec2.seq().iter().skip(1)
-                                .zip(rec1.seq().iter())
+                                .zip(rec2.seq().iter())
                                 .filter(|(q1,q2)| {q1 != q2})
                                 .count()  as f64 / rec2.seq().len() as f64 * 100.0 ) as usize;
                             if complx1 < complex || complx2 < complex {
