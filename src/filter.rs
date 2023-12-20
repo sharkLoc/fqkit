@@ -46,18 +46,22 @@ pub fn filter_fastq(
     let mut failed_writer = file_writer(&Some(failed), compression_level).map(fastq::Writer::new)?;
     let complex = complexity as usize;
     let (mut pe_ok, mut pe_fail) = (0usize,0usize);
+    let (mut fail_n, mut fail_qual,mut fail_len) = (0usize,0usize,0usize);
+
     if ncpu <= 1 {
         for (rec1,rec2) in fq_reader1.records().flatten().zip(fq_reader2.records().flatten()) {
             if rec1.seq().iter().filter(|v| v == &&b'N').count() > nbase || rec2.seq().iter().filter(|v| v == &&b'N').count() > nbase {
                 failed_writer.write_record(&rec1)?;
                 failed_writer.write_record(&rec2)?;
                 pe_fail += 1;
+                fail_n += 1;
                 continue;
             }
             if rec1.seq().len() < length || rec2.seq().len() < length {
                 failed_writer.write_record(&rec1)?;
                 failed_writer.write_record(&rec2)?;
                 pe_fail += 1;
+                fail_len += 1;
                 continue;
             }
             let complx1 = (rec1.seq().iter().skip(1)
@@ -78,6 +82,7 @@ pub fn filter_fastq(
                 failed_writer.write_record(&rec1)?;
                 failed_writer.write_record(&rec2)?;
                 pe_fail += 1;
+                fail_qual += 1;
                 continue;
             }
             pe_ok += 1;
@@ -112,13 +117,16 @@ pub fn filter_fastq(
                     for vec_pe in rx_tmp.iter() {
                         let mut passed = vec![];
                         let mut failed = vec![];
+                        let (mut fail_n, mut fail_qual,mut fail_len) = (0usize,0usize,0usize);
                         for (rec1,rec2) in vec_pe {
                             if rec1.seq().iter().filter(|v| v == &&b'N').count() > nbase || rec2.seq().iter().filter(|v| v == &&b'N').count() > nbase {
                                 failed.push((rec1,rec2));
+                                fail_n += 1;
                                 continue;
                             }
                             if rec1.seq().len() < length || rec2.seq().len() < length {
                                 failed.push((rec1,rec2));
+                                fail_len += 1;
                                 continue;
                             }
                             let complx1 = (rec1.seq().iter().skip(1)
@@ -135,17 +143,21 @@ pub fn filter_fastq(
                             }
                             if phred_mean(rec1.qual(),phred) < average_qual || phred_mean(rec2.qual(), phred) < average_qual {
                                 failed.push((rec1,rec2));
+                                fail_qual += 1;
                                 continue;
                             }
                             passed.push((rec1,rec2));
                         }
-                        tx_tmp.send((passed,failed)).unwrap();
+                        tx_tmp.send((passed,failed,fail_n,fail_len,fail_qual)).unwrap();
                     }
                 });
             }).collect();
             drop(tx2);
 
-            for (vec_pass,vec_failed) in rx2.iter() {
+            for (vec_pass,vec_failed,n,len,qual) in rx2.iter() {
+                fail_n += n;
+                fail_len += len;
+                fail_qual += qual;
                 for (rec1,rec2) in vec_pass {
                     pe_ok += 1;
                     out_writer1.write_record(&rec1).unwrap();
@@ -164,8 +176,11 @@ pub fn filter_fastq(
     failed_writer.flush()?;
     
     if !quiet {
-        info!("total clean pe reads number: {}", pe_ok);
-        info!("total failed pe reads number: {}", pe_fail);
+        info!("total clean pe reads number (r1+r2): {}", pe_ok*2);
+        info!("total failed pe reads number (r1+r2): {}", pe_fail*2);
+        info!("read1 or read2 failed due to low quality (r1+r2): {}",fail_n*2);
+        info!("read1 or read2 failed due to too many N (r1+r2): {}",fail_n*2);
+        info!("read1 or read2 failed due to too short (r1+r2): {}",fail_len*2);
         info!("time elapsed is: {:?}",start.elapsed());
     }
     Ok(())

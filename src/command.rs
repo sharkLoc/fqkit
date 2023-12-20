@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.5",
+    version = "0.3.6",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -134,7 +134,7 @@ pub enum Subcli {
         #[arg(short, long, default_value_t = 5000)]
         chunk: usize,
         /// number of additional worker threads to use
-        #[arg(short='@', long="thread", default_value_t = 6)]
+        #[arg(short='@', long="thread", default_value_t = 4)]
         thread: usize,
         /// specify the file to store reads(interleaved) that cannot pass the filters, file ending in .gz will be compressed automatically
         #[arg(short='u', long = "failed")]
