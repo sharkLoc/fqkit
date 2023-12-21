@@ -164,7 +164,7 @@ pub fn stat_fq(
     stat.calc();
 
     // output summary result
-    writeln!(&mut fo, "read average length:\t{}", stat.ave_len)?;
+    writeln!(&mut fo, "read average length:\t{:.0}", stat.ave_len)?;
     writeln!(&mut fo, "read min length:\t{}", stat.min_len)?;
     writeln!(&mut fo, "read max length:\t{}", stat.max_len)?;
     writeln!(&mut fo, "total gc content(%):\t{:.2}", stat.rate_gc * 100.0)?;
