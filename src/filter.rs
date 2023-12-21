@@ -46,22 +46,20 @@ pub fn filter_fastq(
     let mut failed_writer = file_writer(&Some(failed), compression_level).map(fastq::Writer::new)?;
     let complex = complexity as usize;
     let (mut pe_ok, mut pe_fail) = (0usize,0usize);
-    let (mut fail_n, mut fail_qual,mut fail_len, mut fail_complex) = (0usize,0usize,0usize,0usize);
+    
 
     if ncpu <= 1 {
         for (rec1,rec2) in fq_reader1.records().flatten().zip(fq_reader2.records().flatten()) {
             if rec1.seq().iter().filter(|v| v == &&b'N').count() > nbase || rec2.seq().iter().filter(|v| v == &&b'N').count() > nbase {
+                pe_fail += 1;
                 failed_writer.write_record(&rec1)?;
                 failed_writer.write_record(&rec2)?;
-                pe_fail += 1;
-                fail_n += 1;
                 continue;
             }
             if rec1.seq().len() < length || rec2.seq().len() < length {
+                pe_fail += 1;
                 failed_writer.write_record(&rec1)?;
                 failed_writer.write_record(&rec2)?;
-                pe_fail += 1;
-                fail_len += 1;
                 continue;
             }
             let complx1 = (rec1.seq().iter().skip(1)
@@ -73,17 +71,15 @@ pub fn filter_fastq(
                 .filter(|(q1,q2)| {q1 != q2})
                 .count()  as f64 / rec2.seq().len() as f64 * 100.0 ) as usize;
             if complx1 < complex || complx2 < complex {
+                pe_fail += 1;
                 failed_writer.write_record(&rec1)?;
                 failed_writer.write_record(&rec2)?;
-                pe_fail += 1;
-                fail_complex += 1;
                 continue;
             }
             if phred_mean(rec1.qual(),phred) < average_qual || phred_mean(rec2.qual(), phred) < average_qual {
+                pe_fail += 1;
                 failed_writer.write_record(&rec1)?;
                 failed_writer.write_record(&rec2)?;
-                pe_fail += 1;
-                fail_qual += 1;
                 continue;
             }
             pe_ok += 1;
@@ -115,19 +111,16 @@ pub fn filter_fastq(
                 let tx_tmp = tx2.clone();
                 let rx_tmp = rx.clone();
                 s.spawn(move |_| {
-                    for vec_pe in rx_tmp.iter() {
-                        let mut passed = vec![];
-                        let mut failed = vec![];
-                        let (mut fail_n, mut fail_qual,mut fail_len, mut fail_complex) = (0usize,0usize,0usize,0usize);
+                    let mut passed = vec![];
+                    let mut failed = vec![];
+                    for vec_pe in rx_tmp.iter() {    
                         for (rec1,rec2) in vec_pe {
                             if rec1.seq().iter().filter(|v| v == &&b'N').count() > nbase || rec2.seq().iter().filter(|v| v == &&b'N').count() > nbase {
                                 failed.push((rec1,rec2));
-                                fail_n += 1;
                                 continue;
                             }
                             if rec1.seq().len() < length || rec2.seq().len() < length {
                                 failed.push((rec1,rec2));
-                                fail_len += 1;
                                 continue;
                             }
                             let complx1 = (rec1.seq().iter().skip(1)
@@ -140,28 +133,21 @@ pub fn filter_fastq(
                                 .count()  as f64 / rec2.seq().len() as f64 * 100.0 ) as usize;
                             if complx1 < complex || complx2 < complex {
                                 failed.push((rec1,rec2));
-                                fail_complex += 1;
                                 continue;
                             }
                             if phred_mean(rec1.qual(),phred) < average_qual || phred_mean(rec2.qual(), phred) < average_qual {
                                 failed.push((rec1,rec2));
-                                fail_qual += 1;
                                 continue;
                             }
                             passed.push((rec1,rec2));
                         }
-                        tx_tmp.send((passed,failed,fail_n,fail_len,fail_qual,fail_complex)).unwrap();
                     }
+                    tx_tmp.send((passed,failed)).unwrap();
                 });
             }).collect();
             drop(tx2);
 
-            for (vec_pass,vec_failed,n,len,qual,complex) in rx2.iter() {
-                fail_n += n;
-                fail_len += len;
-                fail_qual += qual;
-                fail_complex += complex;
-
+            for (vec_pass,vec_failed) in rx2.iter() {
                 for (rec1,rec2) in vec_pass {
                     pe_ok += 1;
                     out_writer1.write_record(&rec1).unwrap();
@@ -182,10 +168,6 @@ pub fn filter_fastq(
     if !quiet {
         info!("total clean pe reads number (r1+r2): {}", pe_ok*2);
         info!("total failed pe reads number (r1+r2): {}", pe_fail*2);
-        info!("read1 or read2 failed due to low complexity (r1+r2): {}",fail_complex*2);
-        info!("read1 or read2 failed due to low quality (r1+r2): {}",fail_n*2);
-        info!("read1 or read2 failed due to too many N (r1+r2): {}",fail_n*2);
-        info!("read1 or read2 failed due to too short (r1+r2): {}",fail_len*2);
         info!("time elapsed is: {:?}",start.elapsed());
     }
     Ok(())

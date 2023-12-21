@@ -115,16 +115,16 @@ pub enum Subcli {
         #[arg(short = 'l', long = "length", default_value_t=30)]
         length: usize,
         /// the complexity is defined as the percentage of base that is different from its next base (base[i] != base[i+1]),
-        /// a 51-bp sequence, with 3 bases that is different from its next base
-        /// seq = 'AAAATTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGCCCC',  and complexity = 3/(51-1) = 6%
-        /// the threshold for low complexity filter (0~100). 30 is recommended, which means 30% complexity is required.
+        ///a 51-bp sequence, with 3 bases that is different from its next base
+        ///seq = 'AAAATTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGCCCC',  and complexity = 3/(51-1) = 6%
+        ///the threshold for low complexity filter (0~100). 30 is recommended, which means 30% complexity is required.
         #[arg(short = 'y', long = "complexity", default_value_t = 0,
             value_parser = value_parser!(u32).range(0..=100),
             verbatim_doc_comment
         )]
         complexity: u32,
         /// if one read's average quality score < average qual, then this read pair is discarded,
-        /// eg. Q20 error 0.01, Q30 error 0.001, averaging the probability of error is 0.0055 => Q value 22.59637
+        ///eg. Q20 error 0.01, Q30 error 0.001, averaging the probability of error is 0.0055 => Q value 22.59637
         #[arg(short = 'q', long = "average_qual", default_value_t = 20, verbatim_doc_comment)]
         average_qual: u8,
         ///phred score 33 or 64
