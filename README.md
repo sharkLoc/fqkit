@@ -29,6 +29,11 @@ cd fqkit
 cargo b --release
 # mv target/release/fqkit to anywhere you want 
 ```
+##### install latest version
+
+```bash
+cargo install --git https://github.com/sharkLoc/fqkit.git
+```
 
 ## usage
 
