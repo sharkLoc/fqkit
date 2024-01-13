@@ -8,9 +8,10 @@ use log::{LevelFilter,Level};
 pub fn logger(
     verbose: String,
     logfile: &Option<&str>,
+    quiet: bool,
 ) -> Result<(), anyhow::Error>{
 
-    let level =  if verbose == "error".to_string() {
+    let mut level =  if verbose == "error".to_string() {
         LevelFilter::Error
     } else if verbose == "warn".to_string() {
         LevelFilter::Warn
@@ -23,6 +24,9 @@ pub fn logger(
     } else {
         LevelFilter::Off
     };
+    if quiet {
+        level = LevelFilter::Off;
+    }
 
     let mut builder = Builder::from_default_env();
     builder.format(|buf, record| {

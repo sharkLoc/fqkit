@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.6",
+    version = "0.3.7",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -356,6 +356,7 @@ pub enum Subcli {
 
     },
     /// flatten fastq sequences
+    #[command(visible_alias = "flat")]
     flatten {
         /// input fastq[.gz] file, or read from stdin
         input: Option<String>,
@@ -462,6 +463,20 @@ pub enum Subcli {
         /// save removed reads in read name list
         #[arg(short = 's', long = "save",default_value_t=String::from("rm.fq.gz"))]
         save: String,
+    },
+    /// rename sequence id in fastq file
+    rename {
+        /// input fastq[.gz] file, or read from stdin
+        input: Option<String>,
+        /// if specified, keep sequence id description
+        #[arg(short = 'k', long = "keep", help_heading = Some("FLAGS"))]
+        keep: bool, 
+        /// set new id prefix for sequence
+        #[arg(short = 'p', long = "prefix")]
+        prefix: Option<String>,
+        /// output fastq[.gz] file name, or write to stdout, file name ending in .gz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        output: Option<String>,
     },
     /// get a reverse-complement of fastq file.
     #[command(visible_alias = "rev")]

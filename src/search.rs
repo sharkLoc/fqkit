@@ -15,26 +15,23 @@ pub fn search_fq(
     out: &Option<&str>,
     ncpu: usize,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(), Error> {
     let start = Instant::now();
-    if !quiet {
-        if let Some(file) = fq {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("regex pattern is: {}",pat);
-        if ncpu == 1 || ncpu == 0 {
-            info!("thread num is: {}", ncpu);
-        } else {
-            info!("additional thread num is: {}", ncpu);
-        }
-        if let Some(out) = out {
-            info!("reads write to file: {}", out);
-        } else {
-            info!("reads write to stdout");
-        }
+    if let Some(file) = fq {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
+    }
+    info!("regex pattern is: {}",pat);
+    if ncpu == 1 || ncpu == 0 {
+        info!("thread num is: {}", ncpu);
+    } else {
+        info!("additional thread num is: {}", ncpu);
+    }
+    if let Some(out) = out {
+        info!("reads write to file: {}", out);
+    } else {
+        info!("reads write to stdout");
     }
 
     let mut chunk = chunk;
@@ -101,9 +98,7 @@ pub fn search_fq(
         }).unwrap();
     }
     
-    if !quiet {
-        info!("total reads matched number: {}",num);
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("total reads matched number: {}",num);
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

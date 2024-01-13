@@ -11,15 +11,12 @@ pub fn fq2fa(
     remove: bool,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(), Error> {
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-    }   
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
+    }  
     let start = Instant::now();
     let mut num = 0usize;
     
@@ -39,9 +36,7 @@ pub fn fq2fa(
     }
     fo.flush()?;
 
-    if !quiet {
-        info!("total reads number: {}",num);
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("total reads number: {}",num);
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

@@ -9,16 +9,13 @@ pub fn top_n_records(
     number: usize,
     output: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        if let Some(file) = input {
-            info!("reading from file: {}",file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("get top {} records",number);
+    if let Some(file) = input {
+        info!("reading from file: {}",file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("get top {} records",number);
     let start = Instant::now();
 
     let fp = fastq::Reader::new(file_reader(input)?);
@@ -28,8 +25,6 @@ pub fn top_n_records(
     }
     fo.flush()?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

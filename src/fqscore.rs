@@ -11,29 +11,24 @@ pub fn phred_score(
     to33: bool,
     to64: bool,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        if let Some(r) = file {
-            info!("read file from: {}",r);
-        } else {
-            info!("read file from: stdin");
-        }
+    if let Some(r) = file {
+        info!("read file from: {}",r);
+    } else {
+        info!("read file from: stdin");
     }
     
-    if !quiet {
-        let mut n = 0;
-        if to33 { n += 1; }
-        if to64 { n += 1; }
-        if n > 1 {
-            error!("only one of the flags --to33 and --to64 is allowed");
-            std::process::exit(1);
-        }
-        if n == 0 {
-            error!("please specifiy one of the flags: --to33, --to64");
-            std::process::exit(1);
-        }
+    let mut n = 0;
+    if to33 { n += 1; }
+    if to64 { n += 1; }
+    if n > 1 {
+        error!("only one of the flags --to33 and --to64 is allowed");
+        std::process::exit(1);
     }
+    if n == 0 {
+        error!("please specifiy one of the flags: --to33, --to64");
+        std::process::exit(1);
+    }    
 
     let start = Instant::now();
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
@@ -52,9 +47,6 @@ pub fn phred_score(
     }
     fq_writer.flush()?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
-
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

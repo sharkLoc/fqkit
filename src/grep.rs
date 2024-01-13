@@ -12,16 +12,13 @@ pub fn grep_fastq(
     full_name: bool,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        if let Some(file) = fq {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("reading reads id from file: {}",list);
+    if let Some(file) = fq {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("reading reads id from file: {}",list);
 
     let start = Instant::now();
     let mut num = 0usize;
@@ -31,16 +28,14 @@ pub fn grep_fastq(
     for id in fp_id.lines().flatten() {
         ids.push(id);
     }
-    if !quiet {
-        if ids.is_empty() {
-            error!("no reads id in file: {}",list);
-            std::process::exit(1);
-        }
-        if let Some(out) = out {
-            info!("reads write to file: {}", out);
-        } else {
-            info!("reads write to stdout");
-        }
+    if ids.is_empty() {
+        error!("no reads id in file: {}",list);
+        std::process::exit(1);
+    }
+    if let Some(out) = out {
+        info!("reads write to file: {}", out);
+    } else {
+        info!("reads write to stdout");
     }
 
     let mut fo = file_writer(out, compression_level).map(fastq::Writer::new)?;
@@ -62,10 +57,8 @@ pub fn grep_fastq(
     }
     fo.flush()?;
 
-    if !quiet {
-        info!("total reads matched number: {}",num);
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
-
+ 
+    info!("total reads matched number: {}",num);
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

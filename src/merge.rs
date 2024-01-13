@@ -10,13 +10,10 @@ pub fn interleaved(
     file2: &Option<&str>,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(), Error> {
     
-    if !quiet {
-        info!("reading from file: {}", file1.unwrap());
-        info!("reading from file: {}", file2.unwrap());
-    }
+    info!("reading from file: {}", file1.unwrap());
+    info!("reading from file: {}", file2.unwrap());
     let start = Instant::now();
 
     let mut num = 0usize;
@@ -31,9 +28,7 @@ pub fn interleaved(
     }
     fq_writer.flush()?;
 
-    if !quiet {
-        info!("total PE reads number: {}",num);
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("total PE reads number: {}",num);
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

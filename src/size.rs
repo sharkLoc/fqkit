@@ -27,21 +27,18 @@ pub fn size_fastq(
     chunk: usize,
     out: &Option<&str>, 
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
-    if !quiet {
-        if let Some(inp) = fq {
-            info!("reading from file: {}", inp);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("additional worker threads is: {}", ncpu);
-        if let Some(file) = out {
-            info!("output result write to file: {}", file);
-        } else {
-            info!("output result write to stdout");
-        }
+    if let Some(inp) = fq {
+        info!("reading from file: {}", inp);
+    } else {
+        info!("reading from stdin");
+    }
+    info!("additional worker threads is: {}", ncpu);
+    if let Some(file) = out {
+        info!("output result write to file: {}", file);
+    } else {
+        info!("output result write to stdout");
     }
 
     let mut chunk = chunk;
@@ -122,8 +119,6 @@ pub fn size_fastq(
     fo.write(format!("reads:{}\tbases:{}\tA:{}\tT:{}\tG:{}\tC:{}\tN:{}\n", base.read,bases,base.a,base.t,base.g,base.c,base.n).as_bytes()).unwrap();
     fo.flush()?;
     
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

@@ -11,10 +11,9 @@ pub fn view_fq(
     file: &Option<&str>,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
     let time = Instant::now();
-    if !quiet && file.is_none() {
+    if file.is_none() {
         error!("do not read file from stdin.");
         std::process::exit(1);
     }
@@ -54,9 +53,6 @@ pub fn view_fq(
         }
     }
 
-    if !quiet {
-        info!("time elapsed is: {:?}",time.elapsed());
-    }
-    
+    info!("time elapsed is: {:?}",time.elapsed());
     Ok(())
 }

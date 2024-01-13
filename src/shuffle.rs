@@ -12,17 +12,15 @@ pub fn shuffle_fastq(
     seed: u64,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("rand seed: {}",seed);
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("rand seed: {}",seed);
     let start = Instant::now();
+
     let mut rng = Pcg64::seed_from_u64(seed);
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     
@@ -31,9 +29,9 @@ pub fn shuffle_fastq(
         vec_reads.push(rec);
     }
     
-    if !quiet { info!("all records has been readed into memory, start shuffle ..."); }
+    info!("all records has been readed into memory, start shuffle ...");
     vec_reads.shuffle(&mut rng);
-    if !quiet { info!("shuffle done, start write to output ..."); }
+    info!("shuffle done, start write to output ...");
 
     let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
     for rec in vec_reads {
@@ -41,8 +39,6 @@ pub fn shuffle_fastq(
     }
     fq_writer.flush()?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

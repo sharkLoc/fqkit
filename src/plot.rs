@@ -35,7 +35,6 @@ pub fn plot_line(
     height: usize,
     ylim: f32,
     types: &str,
-    quiet: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let start = Instant::now();
 
@@ -219,9 +218,7 @@ pub fn plot_line(
             .draw()?;
 
     } 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
     
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

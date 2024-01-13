@@ -14,27 +14,22 @@ pub fn fastq2sam(
     pl: Option<String>,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
-    if !quiet {
-        if let Some(r2) = r2 {
-            info!("read file1 from: {}",r1);
-            info!("read file2 from: {}",r2);
-        } else {
-            info!("read file from: {}",r1);
-        }
-        info!("sample name set: {}",sm);
+    if let Some(r2) = r2 {
+        info!("read file1 from: {}",r1);
+        info!("read file2 from: {}",r2);
+    } else {
+        info!("read file from: {}",r1);
     }
+    info!("sample name set: {}",sm);
 
     let mut sam = file_writer(out, compression_level)?;
     let rg = if let Some(x) = rg { x } else { String::from("A") };
     sam.write_fmt(format_args!("@HD\tVN:1.6\tSO:queryname\n@RG\tID:{}\tSM:{}",rg,sm))?;
     if let Some(lb) = lb {
         sam.write_fmt(format_args!("\tLB:{}",lb))?;
-        if !quiet {
-            info!("library name set: {}",lb);
-        }
+        info!("library name set: {}",lb);
     }
     if let Some(pl) = pl {
         sam.write_fmt(format_args!("\tPL:{}",pl))?;
@@ -94,9 +89,6 @@ pub fn fastq2sam(
     }
     sam.flush()?;
 
-
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

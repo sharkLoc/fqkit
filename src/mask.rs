@@ -12,17 +12,14 @@ pub fn mask_fastq(
     nt: char,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("low quality value： {}", qual_limit);
-        info!("mask low quality bases with: {}", nt);
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("low quality value： {}", qual_limit);
+    info!("mask low quality bases with: {}", nt);
     let start = Instant::now();
 
     let (mut mask_base, mut mask_read) = (0,0);
@@ -34,7 +31,7 @@ pub fn mask_fastq(
         if score_min > qual_limit {
             fp_writer.write_record(&rec)?;
         } else {
-            if !quiet { trace!("mask read record id: {}", rec.id()); }
+            trace!("mask read record id: {}", rec.id());
             mask_read += 1;
 
             let mut seq = String::new();
@@ -52,9 +49,8 @@ pub fn mask_fastq(
     }
     fp_writer.flush()?;
 
-    if !quiet {
-        info!("total mask {} bases from {} reads", mask_base, mask_read);
-        info!("time elapsed is: {:?}",start.elapsed());
-    }    
+    
+    info!("total mask {} bases from {} reads", mask_base, mask_read);
+    info!("time elapsed is: {:?}",start.elapsed()); 
     Ok(())
 }

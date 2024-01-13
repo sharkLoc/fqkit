@@ -12,17 +12,14 @@ pub fn slide_fastq(
     out: &Option<&str>,
     suffix: &str,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("window size : {}", wind);
-        info!("step size: {}", step);
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("window size : {}", wind);
+    info!("step size: {}", step);
     let start = Instant::now();
 
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
@@ -52,7 +49,7 @@ pub fn slide_fastq(
                     };
                     fq_writer.write_record(&Record::with_attrs(rec.id(), Some(this_desc.as_str()), &seq[st..len], &qual[st..len]))?;
                 } else {
-                    if !quiet { trace!("slice read start position: {} is bigger than read length: {}",st+1,len); }
+                    trace!("slice read start position: {} is bigger than read length: {}",st+1,len);
                 }
                 // single read slice done, init window size with input value 
                 window = wind;
@@ -62,9 +59,6 @@ pub fn slide_fastq(
     }
     fq_writer.flush()?;
 
-
-    if !quiet{
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

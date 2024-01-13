@@ -20,24 +20,22 @@ pub fn filter_fastq(
     out1: &str,
     out2: &str,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
+    
     let start = Instant::now();
-    if !quiet {
-        info!("read forward reads from file: {}", read1);
-        info!("read reverse reads from file: {}", read2);
-        if ![33u8, 64u8].contains(&phred) {
-            error!("invalid phred value");
-            std::process::exit(1);
-        }
-        if ncpu <= 1 {
-            info!("thread num is: {}", ncpu);
-        } else {
-            info!("additional thread num is: {}", ncpu);
-        }
-        info!("output clean read1 file: {}", out1);
-        info!("output clean read2 file: {}", out2);
+    info!("read forward reads from file: {}", read1);
+    info!("read reverse reads from file: {}", read2);
+    if ![33u8, 64u8].contains(&phred) {
+        error!("invalid phred value");
+        std::process::exit(1);
     }
+    if ncpu <= 1 {
+        info!("thread num is: {}", ncpu);
+    } else {
+        info!("additional thread num is: {}", ncpu);
+    }
+    info!("output clean read1 file: {}", out1);
+    info!("output clean read2 file: {}", out2);
 
     let fq_reader1 = file_reader(&Some(read1)).map(fastq::Reader::new)?;
     let fq_reader2 = file_reader(&Some(read2)).map(fastq::Reader::new)?;
@@ -165,11 +163,9 @@ pub fn filter_fastq(
     out_writer2.flush()?;
     failed_writer.flush()?;
     
-    if !quiet {
-        info!("total clean pe reads number (r1+r2): {}", pe_ok*2);
-        info!("total failed pe reads number (r1+r2): {}", pe_fail*2);
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("total clean pe reads number (r1+r2): {}", pe_ok*2);
+    info!("total failed pe reads number (r1+r2): {}", pe_fail*2);
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }
 

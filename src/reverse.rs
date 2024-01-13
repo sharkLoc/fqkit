@@ -11,15 +11,12 @@ pub fn reverse_comp_seq(
     out: &Option<&str>,
     rev: bool,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
-    if !quiet {
-        if let Some(file) = input {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
+    if let Some(file) = input {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
 
     let maps = HashMap::from([(b'A',b'T'),(b'T',b'A'),(b'G',b'C'),(b'C',b'G'),(b'N',b'N')]);
@@ -41,9 +38,6 @@ pub fn reverse_comp_seq(
     }
     out_writer.flush()?;
     
-    if !quiet{
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
-
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

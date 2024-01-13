@@ -40,7 +40,7 @@ cargo install --git https://github.com/sharkLoc/fqkit.git
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.3.6
+Version: 0.3.7
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
@@ -70,6 +70,7 @@ Commands:
   barcode  split barcode for PE reads
   check    check the validity of a fastq record
   remove   remove reads by read name
+  rename   rename sequence id in fastq file
   reverse  get a reverse-complement of fastq file [aliases: rev]
   split    split interleaved fastq file
   merge    merge PE reads as interleaved fastq file

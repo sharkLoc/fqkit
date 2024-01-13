@@ -10,17 +10,14 @@ pub fn flatten_fq(
     flag: u8,
     sep: char,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("flag value is: {}", flag);
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("flag value is: {}", flag);
 
     if flag == 0 || flag>15 {
         error!("error flag numer: {}, flag range [1..15]",flag);
@@ -49,8 +46,6 @@ pub fn flatten_fq(
     }
     out_writer.flush()?;
     
-    if !quiet{
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

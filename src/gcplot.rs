@@ -17,14 +17,11 @@ pub fn gc_content(
     ylim: usize,
     types: &str,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(),Error> {
-    if !quiet {
-        if let Some(inp) = fqin {
-            info!("reading from file: {}", inp);
-        } else {
-            info!("reading from stdin");
-        }
+    if let Some(inp) = fqin {
+        info!("reading from file: {}", inp);
+    } else {
+        info!("reading from stdin");
     }
     let start = Instant::now();
 
@@ -61,11 +58,9 @@ pub fn gc_content(
     if show {
         info!("{}",plot::Histogram::new(&df_num, plot::HistogramOptions { intervals: 20, ..Default::default() }));
     }
-    plot_gc(df_ret, prefix, width, height, ylim, types, quiet)?;
+    plot_gc(df_ret, prefix, width, height, ylim, types)?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }
 
@@ -77,7 +72,6 @@ fn plot_gc(
     height: usize,
     ylim: usize,
     types: &str,
-    quiet: bool,
 ) -> Result<(),Error> {
     if !["svg", "png"].contains(&types) {
         error!("invalid args types.");
@@ -88,9 +82,7 @@ fn plot_gc(
         std::process::exit(1);
     }
     let name = if types == "png" {format!("{}.png",prefix)} else {format!("{}.svg",prefix)};
-    if !quiet {
-        info!("output gc content plot: {}",name);
-    }
+    info!("output gc content plot: {}",name);
 
     if types == "png" {
         let png = BitMapBackend::new(&name, (width as u32, height as u32)).into_drawing_area();

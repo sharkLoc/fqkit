@@ -10,17 +10,14 @@ pub fn range_fastq(
     take: usize,
     output: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        if let Some(file) = input {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("skip first {} records", skip);
-        info!("get {} records", take);
+    if let Some(file) = input {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("skip first {} records", skip);
+    info!("get {} records", take);
     let start = Instant::now();
 
     let fp_reader = file_reader(input).map(fastq::Reader::new)?;
@@ -31,8 +28,6 @@ pub fn range_fastq(
     }
     fp_writer.flush()?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

@@ -11,15 +11,12 @@ pub fn split_chunk(
     gzip: bool,
     out_pre: &str,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(),Error> {
     let start = Instant::now();
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
 
     let (mut flag, mut index) = (0usize, 0usize);
@@ -32,9 +29,7 @@ pub fn split_chunk(
     let fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut fh = vec![fastq::Writer::new(file_writer(&Some(&out), compression_level)?)];
     
-    if !quiet {
-        info!("start to write file: {}",out);
-    }
+    info!("start to write file: {}",out);
     for rec in fq_reader.records().flatten() {
         if flag < num {
             let fhthis = fh.get_mut(index).unwrap();
@@ -50,17 +45,13 @@ pub fn split_chunk(
             fh.push(fastq::Writer::new(file_writer(&Some(&out), compression_level)?));
             let fhthis = fh.get_mut(index).unwrap();
             
-            if !quiet {
-                info!("start to write file: {}",out);
-            }
+            info!("start to write file: {}",out);
             fhthis.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
             flag = 1; // already write one record in this loop, flag add one  
         }
     }
 
-    if !quiet {
-        info!("total chunk number is: {}", index + 1);
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("total chunk number is: {}", index + 1);
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

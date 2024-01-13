@@ -11,16 +11,14 @@ pub fn trim_fq(
     right: usize,
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
     let start = Instant::now();
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    
     let length = right + left;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
@@ -37,9 +35,6 @@ pub fn trim_fq(
     }
     fq_writer.flush()?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
-
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

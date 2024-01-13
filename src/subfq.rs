@@ -14,18 +14,15 @@ pub fn select_fastq(
     seed: u64, 
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(),Error> {
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("rand seed: {}",seed);
-        info!("subseq number: {}", n);
-        info!("reduce much memory but cost more time");
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("rand seed: {}",seed);
+    info!("subseq number: {}", n);
+    info!("reduce much memory but cost more time");
     let start = Instant::now();
 
     let mut rng = Pcg64::seed_from_u64(seed);
@@ -53,9 +50,7 @@ pub fn select_fastq(
     }
     w.flush()?;
 
-    if !quiet{
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }
 
@@ -66,18 +61,15 @@ pub fn select_fastq2(
     seed: u64, 
     out: &Option<&str>,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(),Error> {
-    if !quiet{
-        if let Some(file) = file {
-            info!("reading from file: {}", file);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("rand seed: {}",seed);
-        info!("subseq num: {}", n);
-        info!("fast mode but cost more memory");
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
     }
+    info!("rand seed: {}",seed);
+    info!("subseq num: {}", n);
+    info!("fast mode but cost more memory");
     let start = Instant::now();
 
     let mut rng = Pcg64::seed_from_u64(seed);
@@ -102,8 +94,6 @@ pub fn select_fastq2(
     }
     w.flush()?;
     
-    if !quiet{
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

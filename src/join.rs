@@ -18,20 +18,17 @@ pub fn join_fastq(
     out_r1: &str,
     out_r2: &str,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
-    if !quiet {
-        info!("read forward reads from file: {}", fq1);
-        info!("read reverse reads from file: {}", fq2);
-        if ncpu <= 1 {
-            info!("thread num is: {}", ncpu);
-        } else {
-            info!("additional thread num is: {}", ncpu);
-        }
-        info!("output unmerged read1 file: {}", out_r1);
-        info!("output unmerged read2 file: {}", out_r2);
-        info!("output merged pe reads file: {}",merge_fq);
+    info!("read forward reads from file: {}", fq1);
+    info!("read reverse reads from file: {}", fq2);
+    if ncpu <= 1 {
+        info!("thread num is: {}", ncpu);
+    } else {
+        info!("additional thread num is: {}", ncpu);
     }
+    info!("output unmerged read1 file: {}", out_r1);
+    info!("output unmerged read2 file: {}", out_r2);
+    info!("output merged pe reads file: {}",merge_fq);
     let start = Instant::now();
 
     let fq_reader1 = file_reader(&Some(fq1)).map(fastq::Reader::new)?;
@@ -72,9 +69,7 @@ pub fn join_fastq(
             let y_clip = alignment.yend - alignment.y_aln_len();
             if min_overlap > alignment.y_aln_len() + y_clip {
                 min_overlap_fail += 1;
-                if !quiet {
-                    trace!("pe reads overlap length {} < min_overlap length: {}",alignment.y_aln_len() + y_clip ,min_overlap)
-                }
+                trace!("pe reads overlap length {} < min_overlap length: {}",alignment.y_aln_len() + y_clip ,min_overlap);
                 out_writer1.write_record(&rec1)?;
                 out_writer2.write_record(&rec2)?;
                 continue;
@@ -95,9 +90,7 @@ pub fn join_fastq(
                 }
                 if subst > max_mismatch {
                     max_mismatch_fail += 1;
-                    if !quiet { 
-                        trace!("mismatch count in overlap region: {} < allowed max mismatch number: {}",subst, max_mismatch); 
-                    }
+                    trace!("mismatch count in overlap region: {} < allowed max mismatch number: {}",subst, max_mismatch); 
                     out_writer1.write_record(&rec1)?;
                     out_writer2.write_record(&rec2)?;
                     continue;
@@ -172,9 +165,7 @@ pub fn join_fastq(
                             let y_clip = alignment.yend - alignment.y_aln_len();
                             if min_overlap > alignment.y_aln_len() + y_clip {
                                 min_overlap_fail += 1;
-                                if !quiet {
-                                    trace!("pe reads overlap length {} < min_overlap length: {}",alignment.y_aln_len() + y_clip ,min_overlap)
-                                }
+                                trace!("pe reads overlap length {} < min_overlap length: {}",alignment.y_aln_len() + y_clip ,min_overlap);
                                 merge_failed.push((rec1,rec2));
                                 continue;
                             }
@@ -194,9 +185,7 @@ pub fn join_fastq(
                                 }
                                 if subst > max_mismatch {
                                     max_mismatch_fail += 1;
-                                    if !quiet { 
-                                        trace!("mismatch count in overlap region: {} < allowed max mismatch number: {}",subst, max_mismatch); 
-                                    }
+                                    trace!("mismatch count in overlap region: {} < allowed max mismatch number: {}",subst, max_mismatch); 
                                     merge_failed.push((rec1,rec2));
                                     continue;
                                 }
@@ -250,13 +239,13 @@ pub fn join_fastq(
     out_writer1.flush()?;
     out_writer2.flush()?;
 
-    if !quiet {
-        info!("total pe reads: {}", total_count);
-        info!("total merged pe reads: {}",merge_count);
-        info!("max_mismatch_failed pe reads: {}",max_mismatch_fail);
-        info!("min_overlap_failed pe reads: {}",min_overlap_fail);
-        //info!("mean merged read length: {}"); todo
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+
+    info!("total pe reads: {}", total_count);
+    info!("total merged pe reads: {}",merge_count);
+    info!("max_mismatch_failed pe reads: {}",max_mismatch_fail);
+    info!("min_overlap_failed pe reads: {}",min_overlap_fail);
+    //info!("mean merged read length: {}"); todo
+    info!("time elapsed is: {:?}",start.elapsed());
+
     Ok(())
 }

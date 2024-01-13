@@ -14,14 +14,11 @@ pub fn concat_fqstq_lane(
     out_r1: &str,
     out_r2: &str,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(), Error> {
-    if !quiet {
-        info!("read forward reads for lane list: {}", r1_list);
-        info!("read forward reads for lane list: {}", r2_list);
-        info!("outout read1 in file: {}", out_r1);
-        info!("outout read1 in file: {}", out_r2);
-    }
+    info!("read forward reads for lane list: {}", r1_list);
+    info!("read forward reads for lane list: {}", r2_list);
+    info!("outout read1 in file: {}", out_r1);
+    info!("outout read1 in file: {}", out_r2);
     let start = Instant::now();
 
     let mut vec1 = vec![];
@@ -40,7 +37,7 @@ pub fn concat_fqstq_lane(
     let mut out_writer2 = file_writer(&Some(out_r2), compression_level).map(fastq::Writer::new)?;
     let mut pe_read  = 0;
     for pe in vec1.iter().zip(vec2.iter()) {
-        if !quiet { info!("concat pe reads from file {} and {}",pe.0, pe.1); }
+        info!("concat pe reads from file {} and {}",pe.0, pe.1);
         let fq_reader1 = file_reader(&Some(pe.0)).map(fastq::Reader::new)?;
         let fq_reader2 = file_reader(&Some(pe.1)).map(fastq::Reader::new)?;
         for (rec1,rec2) in fq_reader1.records().flatten().zip(fq_reader2.records().flatten()) {
@@ -52,10 +49,9 @@ pub fn concat_fqstq_lane(
         out_writer2.flush()?;
 
     }
-    if !quiet {
-        info!("total concat {} PE reads from {} different lane files",pe_read, vec1.len());
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+
+    info!("total concat {} PE reads from {} different lane files",pe_read, vec1.len());
+    info!("time elapsed is: {:?}",start.elapsed());
 
     Ok(())
 }

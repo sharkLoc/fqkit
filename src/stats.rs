@@ -75,25 +75,22 @@ pub fn stat_fq(
     pre_cyc: &Option<&str>, 
     phred: u8,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<()> {
     if ![33u8, 64u8].contains(&phred) {
         error!("invalid phred value");
         std::process::exit(1);
     }
     let start = Instant::now();
-    if !quiet {
-        if let Some(inp) = inp {
-            info!("reading from file: {}", inp);
-        } else {
-            info!("reading from stdin");
-        }
-        info!("summary result write to file: {}",pre_sum);
-        if let Some(file) = pre_cyc {
-            info!("cycle result write to file: {}", file);
-        } else {
-            info!("cycle result write to stdout");
-        }
+    if let Some(inp) = inp {
+        info!("reading from file: {}", inp);
+    } else {
+        info!("reading from stdin");
+    }
+    info!("summary result write to file: {}",pre_sum);
+    if let Some(file) = pre_cyc {
+        info!("cycle result write to file: {}", file);
+    } else {
+        info!("cycle result write to stdout");
     }
 
     let fq = fastq::Reader::new(file_reader(inp)?);
@@ -208,8 +205,6 @@ pub fn stat_fq(
     }
     fc.flush()?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }

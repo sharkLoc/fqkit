@@ -11,17 +11,14 @@ pub fn remove_read(
     name: &str,
     save: &str,
     compression_level: u32,
-    quiet: bool,
 ) -> Result<(),Error> {
-    if !quiet {
-        if let Some(file) = file {
-            info!("reading reads from file: {}", file);
-        } else {
-            info!("reading reads from stdin");
-        }
-        info!("reading reads id form file: {}", name);
-        info!("removed reads in file: {}", save);
+    if let Some(file) = file {
+        info!("reading reads from file: {}", file);
+    } else {
+        info!("reading reads from stdin");
     }
+    info!("reading reads id form file: {}", name);
+    info!("removed reads in file: {}", save);
     let start = Instant::now();
 
     let mut ids = vec![];
@@ -48,8 +45,6 @@ pub fn remove_read(
     fq_writer.flush()?;
     rm_writer.flush()?;
 
-    if !quiet {
-        info!("time elapsed is: {:?}",start.elapsed());
-    }
+    info!("time elapsed is: {:?}",start.elapsed());
     Ok(())
 }
