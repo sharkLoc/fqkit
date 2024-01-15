@@ -1,5 +1,6 @@
 use bio::io::fastq;
-use std::{collections::HashMap, io::Result, vec};
+use anyhow::Result;
+use std::{collections::HashMap, vec};
 use log::*;
 use crate::utils::*;
 use std::time::Instant;

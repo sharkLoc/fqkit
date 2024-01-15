@@ -1,5 +1,5 @@
 use bio::io::fastq::{self, Record};
-use std::io::Result;
+use anyhow::Result;
 use std::time::Instant;
 use log::*;
 use crate::utils::*;

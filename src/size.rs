@@ -1,5 +1,5 @@
 use bio::io::fastq;
-use std:: io::Result;
+use anyhow::Result;
 use log::*;
 use crossbeam::channel::unbounded;
 use crate::utils::*;

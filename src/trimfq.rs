@@ -1,6 +1,6 @@
 use crate::utils::*;
 use bio::io::fastq;
-use std::io::Result;
+use anyhow::Result;
 use std::time::Instant;
 use log::*;
 

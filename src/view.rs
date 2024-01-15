@@ -2,10 +2,10 @@ use log::*;
 use colored::*;
 use term_size::dimensions;
 use bio::io::fastq;
-use std::io::{self,Result};
+use std::io;
 use std::time::Instant;
 use crate::utils::*;
-
+use anyhow::Result;
 
 pub fn view_fq(
     file: &Option<&str>,

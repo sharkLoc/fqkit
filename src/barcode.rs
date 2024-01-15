@@ -1,7 +1,8 @@
 use crate::utils::*;
 use bio::io::fastq;
 use std::collections::HashMap;
-use std::io::{BufRead, Result};
+use std::io::BufRead;
+use anyhow::Result;
 use std::path::Path;
 use std::time::Instant;
 use log::*;
@@ -93,6 +94,8 @@ pub fn split_fq(
     mode : usize,
     mismatch: usize,
     outdir: &str,
+    gzip: bool,
+    bzip2: bool,
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
@@ -101,6 +104,18 @@ pub fn split_fq(
         error!("invalid output dir: {}",outdir);
         std::process::exit(1);
     }
+    let mut n = 0;
+    if gzip {
+        n += 1;
+    } 
+    if bzip2 {
+        n += 1;
+    }
+    if n > 1 {
+        error!("only one of the flags --gzip and --bzip2 is allowed");
+        std::process::exit(1);
+    }
+    
     if let Ok(maps) = barcode_list(bar_file, rev_comp) {
         if maps.is_empty() {
             error!("empty barcode list file: {}",bar_file);
@@ -109,9 +124,22 @@ pub fn split_fq(
 
         let mut fq_hand = Vec::new();
         for (bar_seq, name) in maps {
-            let fq1 = format!("{}/{}_1.fq.gz", outdir, name);
-            let fq2 = format!("{}/{}_2.fq.gz", outdir, name);
-            let bar = format!("{}/{}_barcode.fq.gz", outdir, name);
+            let fq1 = if gzip {
+                format!("{}/{}_1.fq.gz", outdir, name) 
+            } else if bzip2 { 
+                format!("{}/{}_1.fq.bz2", outdir, name)
+            };
+            let fq2 = if gzip {
+                format!("{}/{}_2.fq.gz", outdir, name)
+            } else if bzip2 {
+                format!("{}/{}_2.fq.bz2", outdir, name)
+            };
+            let bar = if gzip {
+                format!("{}/{}_barcode.fq.gz", outdir, name)
+            } else if bzip2 {
+                format!("{}/{}_barcode.fq.bz2", outdir, name)
+            };
+
             let fh1 = fastq::Writer::new(file_writer_append(&fq1, compression_level)?);
             let fh2 = fastq::Writer::new(file_writer_append(&fq2, compression_level)?);
             let fhb = fastq::Writer::new(file_writer_append(&bar, compression_level)?); 

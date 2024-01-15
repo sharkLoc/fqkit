@@ -6,10 +6,10 @@ use textplots::{Chart, ColorPlot, LabelBuilder, LabelFormat, Shape};
 use colored::*;
 use std::time::Instant;
 use crate::utils::file_reader;
-
+use anyhow::Result;
 
 // get cycle result
-pub fn cycle_data(file: &Option<&str>) -> std::io::Result<Vec<BTreeMap<usize,f64>>>{
+pub fn cycle_data(file: &Option<&str>) -> Result<Vec<BTreeMap<usize,f64>>>{
     let mut cyc: Vec<BTreeMap<usize,f64>> = Vec::new();
     let fp = file_reader(file)?;
     for _ in 0..5 {  cyc.push(BTreeMap::new()); }
