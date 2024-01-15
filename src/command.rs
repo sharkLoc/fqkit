@@ -8,12 +8,20 @@ use clap::{Parser,value_parser};
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
+    before_help = r"Fqkit supports reading and writing gzip (.gz) format.
+Bzip2 format is supported since v0.3.8
+
+Compression level:
+  format   range   default   crate
+  gzip     1-9     6         https://crates.io/crates/flate2
+  bzip     1-9     6         https://crates.io/crates/bzip2"
 )]
-#[command(help_template = 
+#[command(help_template =
     "{name} -- {about}\n\nVersion: {version}\
     \n\nAuthors: {author} <mmtinfo@163.com>\
     \nSource code: https://github.com/sharkLoc/fqkit.git\
-    \n\n{usage-heading} {usage}\n\n{all-args}\n\nUse \"fqkit help [command]\" for more information about a command"
+    \n\n{before-help}
+{usage-heading} {usage}\n\n{all-args}\n\nUse \"fqkit help [command]\" for more information about a command"
 )]
 pub struct Args {
     #[clap(subcommand)]
