@@ -45,7 +45,16 @@ Version: 0.3.8
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
 
-Usage: fqkit.exe [OPTIONS] <COMMAND>
+Fqkit supports reading and writing gzip (.gz) format.
+Bzip2 format is supported since v0.3.8
+
+Compression level:
+  format   range   default   crate
+  gzip     1-9     6         https://crates.io/crates/flate2
+  bzip     1-9     6         https://crates.io/crates/bzip2
+
+
+Usage: fqkit [OPTIONS] <COMMAND>
 
 Commands:
   topn     get first N records from fastq file
@@ -65,7 +74,7 @@ Commands:
   fq2fa    translate fastq to fasta
   fq2sam   converts a fastq file to an unaligned SAM file
   fqscore  converts the fastq file quality scores
-  flatten  flatten fastq sequences
+  flatten  flatten fastq sequences [aliases: flat]
   join     join paired end reads that are overlapping into a single longer read
   barcode  split barcode for PE reads
   check    check the validity of a fastq record
@@ -85,9 +94,9 @@ Options:
   -V, --version  Print version
 
 Global Arguments:
-      --compress-level <int>  set gzip compression level 1 (compress faster) - 9 (compress better) for gzip output file, just work with option -o/--out [default: 6]
+      --compress-level <int>  set gzip/bzip2 compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2 output file, just work with option -o/--out [default: 6]
       --log <str>             if file name specified, write log message to this file, or write to stderr
-  -v, --verbosity <str>       control verbosity of logging, possible values: {error,warn,info,debug,trace} [default: debug]
+  -v, --verbosity <str>       control verbosity of logging, possible values: {error, warn, info, debug, trace} [default: debug]
 
 Global FLAGS:
   -q, --quiet  be quiet and do not show any extra information
