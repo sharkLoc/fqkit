@@ -128,16 +128,22 @@ pub fn split_fq(
                 format!("{}/{}_1.fq.gz", outdir, name) 
             } else if bzip2 { 
                 format!("{}/{}_1.fq.bz2", outdir, name)
+            } else {
+                format!("{}/{}_1.fq", outdir, name)
             };
             let fq2 = if gzip {
                 format!("{}/{}_2.fq.gz", outdir, name)
             } else if bzip2 {
                 format!("{}/{}_2.fq.bz2", outdir, name)
+            } else {
+                format!("{}/{}_2.fq", outdir, name)
             };
             let bar = if gzip {
                 format!("{}/{}_barcode.fq.gz", outdir, name)
             } else if bzip2 {
                 format!("{}/{}_barcode.fq.bz2", outdir, name)
+            } else {
+                format!("{}/{}_barcode.fq", outdir, name)
             };
 
             let fh1 = fastq::Writer::new(file_writer_append(&fq1, compression_level)?);
