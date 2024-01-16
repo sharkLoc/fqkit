@@ -10,6 +10,7 @@ pub fn split_chunk(
     num: usize,
     gzip: bool,
     bzip2: bool,
+    xz: bool,
     out_pre: &str,
     compression_level: u32,
 ) -> Result<(),Error> {
@@ -26,8 +27,11 @@ pub fn split_chunk(
     if bzip2 {
         n += 1;
     }
+    if xz {
+        n += 1;
+    }
     if n > 1 {
-        error!("only one of the flags --gzip and --bzip2 is allowed");
+        error!("only one of the flags --gzip , --xz and --bzip2 is allowed");
         std::process::exit(1);
     }
 
@@ -36,6 +40,8 @@ pub fn split_chunk(
         format!("{}{}.fastq.gz",out_pre,index)
     } else if bzip2 {
         format!("{}{}.fastq.bz2",out_pre,index)
+    } else if xz {
+        format!("{}{}.fastq.xz",out_pre,index)
     } else {
         format!("{}{}.fastq",out_pre,index)
     };
@@ -55,6 +61,8 @@ pub fn split_chunk(
                 format!("{}{}.fastq.gz",out_pre,index)
             } else if bzip2 {
                 format!("{}{}.fastq.bz2",out_pre,index)
+            } else if xz {
+                format!("{}{}.fastq.xz",out_pre,index)
             } else {
                 format!("{}{}.fastq",out_pre,index)
             };

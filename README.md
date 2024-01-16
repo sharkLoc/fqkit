@@ -40,19 +40,20 @@ cargo install --git https://github.com/sharkLoc/fqkit.git
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.3.8
+Version: 0.3.9
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
 
 Fqkit supports reading and writing gzip (.gz) format.
-Bzip2 format is supported since v0.3.8
+Bzip2 (.bz2) format is supported since v0.3.8.
+Xz (.xz) format is supported since v0.3.9.
 
 Compression level:
   format   range   default   crate
   gzip     1-9     6         https://crates.io/crates/flate2
   bzip     1-9     6         https://crates.io/crates/bzip2
-
+  xz       1-9     6         https://crates.io/crates/xz2
 
 Usage: fqkit [OPTIONS] <COMMAND>
 

@@ -96,6 +96,7 @@ pub fn split_fq(
     outdir: &str,
     gzip: bool,
     bzip2: bool,
+    xz: bool,
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
@@ -111,8 +112,11 @@ pub fn split_fq(
     if bzip2 {
         n += 1;
     }
+    if xz {
+        n += 1;
+    }
     if n > 1 {
-        error!("only one of the flags --gzip and --bzip2 is allowed");
+        error!("only one of the flags --gzip, --xz and --bzip2 is allowed");
         std::process::exit(1);
     }
     
@@ -128,6 +132,8 @@ pub fn split_fq(
                 format!("{}/{}_1.fq.gz", outdir, name) 
             } else if bzip2 { 
                 format!("{}/{}_1.fq.bz2", outdir, name)
+            } else if xz {
+                format!("{}/{}_1.fq.xz", outdir, name)
             } else {
                 format!("{}/{}_1.fq", outdir, name)
             };
@@ -135,6 +141,8 @@ pub fn split_fq(
                 format!("{}/{}_2.fq.gz", outdir, name)
             } else if bzip2 {
                 format!("{}/{}_2.fq.bz2", outdir, name)
+            } else if xz {
+                format!("{}/{}_2.fq.xz", outdir, name)
             } else {
                 format!("{}/{}_2.fq", outdir, name)
             };
@@ -142,6 +150,8 @@ pub fn split_fq(
                 format!("{}/{}_barcode.fq.gz", outdir, name)
             } else if bzip2 {
                 format!("{}/{}_barcode.fq.bz2", outdir, name)
+            } else if xz {
+                format!("{}/{}_barcode.fq.xz", outdir, name)
             } else {
                 format!("{}/{}_barcode.fq", outdir, name)
             };

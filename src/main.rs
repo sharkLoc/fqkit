@@ -342,8 +342,8 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        Subcli::barcode { read1, read2, bar, mode, trans, mismatch, gzip, bzip2, outdir, } => {
-               split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir, gzip, bzip2, arg.compression_level)?; 
+        Subcli::barcode { read1, read2, bar, mode, trans, mismatch, gzip, bzip2, xz, outdir, } => {
+               split_fq(&read1, &read2, &bar, trans, mode, mismatch, &outdir, gzip, bzip2, xz,arg.compression_level)?; 
         }
         Subcli::filter { read1, read2, nbase, length, complexity, average_qual, phred, chunk, thread, failed, out1, out2 } => {
             filter_fastq(&read1, &read2, nbase, length, complexity, average_qual, phred, chunk, thread, &failed, &out1, &out2, arg.compression_level)?;
@@ -424,11 +424,11 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        Subcli::split2 { input, num, gzip, bzip2, name } => {
+        Subcli::split2 { input, num, gzip, bzip2, xz, name } => {
             if let Some(input) = input {
-                split_chunk(&Some(&input), num, gzip, bzip2, &name, arg.compression_level)?;
+                split_chunk(&Some(&input), num, gzip, bzip2, xz, &name, arg.compression_level)?;
             } else {
-                split_chunk(&None, num, gzip, bzip2, &name, arg.compression_level)?;
+                split_chunk(&None, num, gzip, bzip2, xz, &name, arg.compression_level)?;
             }
         }
         Subcli::gcplot { input, output, show, prefix, width, height, ylim, types } => {
