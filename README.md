@@ -40,7 +40,7 @@ cargo install --git https://github.com/sharkLoc/fqkit.git
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.3.9
+Version: 0.3.10
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
@@ -48,20 +48,23 @@ Source code: https://github.com/sharkLoc/fqkit.git
 Fqkit supports reading and writing gzip (.gz) format.
 Bzip2 (.bz2) format is supported since v0.3.8.
 Xz (.xz) format is supported since v0.3.9.
+Under the same compression level, xz has the highest compression ratio but consumes more time. 
 
 Compression level:
   format   range   default   crate
   gzip     1-9     6         https://crates.io/crates/flate2
-  bzip     1-9     6         https://crates.io/crates/bzip2
+  bzip2    1-9     6         https://crates.io/crates/bzip2
   xz       1-9     6         https://crates.io/crates/xz2
+
 
 Usage: fqkit [OPTIONS] <COMMAND>
 
 Commands:
-  topn     get first N records from fastq file
+  topn     get first N records from fastq file [aliases: head]
+  tail     get last N records from fastq file
   concat   concat fastq files from different lanes
   subfq    subsample sequences from big fastq file [aliases: sample]
-  trim     trim fastq file
+  trim     trim fastq reads by position
   filter   a simple filter for pair end fastq sqeuence
   range    print fastq records in a range
   search   search reads/motifs from fastq file
@@ -77,7 +80,7 @@ Commands:
   fqscore  converts the fastq file quality scores
   flatten  flatten fastq sequences [aliases: flat]
   join     join paired end reads that are overlapping into a single longer read
-  barcode  split barcode for PE reads
+  barcode  perform demultiplex for pair-end fastq reads
   check    check the validity of a fastq record
   remove   remove reads by read name
   rename   rename sequence id in fastq file
@@ -95,7 +98,7 @@ Options:
   -V, --version  Print version
 
 Global Arguments:
-      --compress-level <int>  set gzip/bzip2 compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2 output file, just work with option -o/--out [default: 6]
+      --compress-level <int>  set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file, just work with option -o/--out [default: 6]
       --log <str>             if file name specified, write log message to this file, or write to stderr
   -v, --verbosity <str>       control verbosity of logging, possible values: {error, warn, info, debug, trace} [default: debug]
 

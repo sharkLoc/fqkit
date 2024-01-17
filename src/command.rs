@@ -4,13 +4,14 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.9",
+    version = "0.3.10",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
     before_help = r"Fqkit supports reading and writing gzip (.gz) format.
 Bzip2 (.bz2) format is supported since v0.3.8.
 Xz (.xz) format is supported since v0.3.9.
+Under the same compression level, xz has the highest compression ratio but consumes more time. 
 
 Compression level:
   format   range   default   crate
@@ -53,7 +54,19 @@ pub struct Args {
 #[allow(non_camel_case_types)]
 pub enum Subcli {
     /// get first N records from fastq file
+    #[command(visible_alias = "head")]
     topn {
+        /// input fastq file, or read from stdin
+        input: Option<String>,
+        /// print first N fastq records
+        #[arg(short = 'n', long = "num", default_value_t = 10)]
+        num: usize,
+        /// output fastq file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+    },
+    /// get last N records from fastq file
+    tail {
         /// input fastq file, or read from stdin
         input: Option<String>,
         /// print first N fastq records
@@ -96,7 +109,7 @@ pub enum Subcli {
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
     },
-    /// trim fastq file
+    /// trim fastq reads by position
     trim {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -419,7 +432,7 @@ pub enum Subcli {
         #[arg(short = 'o', long = "merged")]
         merged: String,
     },
-    /// split barcode for PE reads
+    /// perform demultiplex for pair-end fastq reads 
     barcode {
         /// input read1 fastq file
         #[arg(short = '1', long = "read1")]

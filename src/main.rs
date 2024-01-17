@@ -2,6 +2,8 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
+mod tail;
+use tail::*;
 mod rename;
 use rename::*;
 mod filter;
@@ -90,6 +92,21 @@ fn main() -> Result<(), Error> {
                     top_n_records(&None, num, &Some(&out), arg.compression_level)?;
                 } else {
                     top_n_records(&None, num, &None, arg.compression_level)?;
+                }
+            }
+        }
+        Subcli::tail { input, num, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    tail_n_records(&Some(&input), num, &Some(&out), arg.compression_level)?;
+                } else {
+                    tail_n_records(&Some(&input), num, &None, arg.compression_level)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    tail_n_records(&None, num, &Some(&out), arg.compression_level)?;
+                } else {
+                    tail_n_records(&None, num, &None, arg.compression_level)?;
                 }
             }
         }
