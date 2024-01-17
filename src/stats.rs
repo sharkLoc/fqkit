@@ -21,6 +21,12 @@ struct info {
     rate_n: f64,
     num_read: usize,
     num_base: usize,
+    num_q5: usize,
+    rate_q5: f64,
+    num_q10: usize,
+    rate_q10: f64,
+    num_q15: usize,
+    rate_q15: f64,
     num_q20: usize,
     rate_q20: f64,
     num_q30: usize,
@@ -46,6 +52,12 @@ impl info {
             rate_n: 0.0,
             num_read: 0,
             num_base: 0,
+            num_q5: 0,
+            rate_q5: 0.0,
+            num_q10: 0,
+            rate_q10: 0.0,
+            num_q15: 0,
+            rate_q15: 0.0,
             num_q20: 0,
             rate_q20: 0.0,
             num_q30: 0,
@@ -65,6 +77,9 @@ impl info {
         self.rate_c = self.num_c as f64 / self.num_base as f64;
         self.rate_n = self.num_n as f64 / self.num_base as f64;
         self.rate_gc = (self.num_g + self.num_c) as f64 / self.num_base as f64;
+        self.rate_q5 = self.num_q5 as f64 / self.num_base as f64;
+        self.rate_q10 = self.num_q10 as f64 / self.num_base as f64;
+        self.rate_q15 = self.num_q15 as f64 / self.num_base as f64;
         self.rate_q20 = self.num_q20 as f64 / self.num_base as f64;
         self.rate_q30 = self.num_q30 as f64 / self.num_base as f64;
     }
@@ -115,6 +130,9 @@ pub fn stat_fq(
          
         for (pos, (sf, sq)) in rec.seq().iter().zip(rec.qual().iter()).enumerate() {
             let idx = (sq - phred) as usize;
+            if idx >= 5 { stat.num_q5 += 1; }
+            if idx >= 10 { stat.num_q10 += 1; }
+            if idx >= 15 { stat.num_q15 += 1; }
             if idx >= 20 {
                 stat.num_q20 +=1;
                 if idx >= 30 { stat.num_q30 +=1; }
@@ -173,6 +191,9 @@ pub fn stat_fq(
     writeln!(&mut fo, "base G count:\t{}\t({:.2}%)", stat.num_g, stat.rate_g * 100.0)?;
     writeln!(&mut fo, "base C count:\t{}\t({:.2}%)", stat.num_c, stat.rate_c * 100.0)?;
     writeln!(&mut fo, "base N count:\t{}\t({:.2}%)\n", stat.num_n,stat.rate_n * 100.0)?;
+    writeln!(&mut fo, "Number of base calls with quality value of 5 or higher (Q5+) (%)\t{}\t({:.2}%)",stat.num_q5, stat.rate_q5 * 100.0 )?;
+    writeln!(&mut fo, "Number of base calls with quality value of 10 or higher (Q10+) (%)\t{}\t({:.2}%)",stat.num_q10, stat.rate_q10 * 100.0 )?;
+    writeln!(&mut fo, "Number of base calls with quality value of 15 or higher (Q15+) (%)\t{}\t({:.2}%)",stat.num_q15, stat.rate_q15 * 100.0 )?;
     writeln!(&mut fo, "Number of base calls with quality value of 20 or higher (Q20+) (%)\t{}\t({:.2}%)",stat.num_q20, stat.rate_q20 * 100.0 )?;
     writeln!(&mut fo, "Number of base calls with quality value of 30 or higher (Q30+) (%)\t{}\t({:.2}%)",stat.num_q30, stat.rate_q30 * 100.0 )?;
         
