@@ -2,6 +2,8 @@ use anyhow::{Error,Ok};
 use clap::Parser;
 use log::{error, warn};
 
+mod select;
+use select::*;
 mod tail;
 use tail::*;
 mod rename;
@@ -144,6 +146,9 @@ fn main() -> Result<(), Error> {
                     }
                 }
             }
+        }
+        Subcli::select { read1, read2, out1, out2 } => {
+            select_pe_fastq(&read1, &read2, &out1, &out2, arg.compression_level)?;
         }
         Subcli::trim { input, left, right, out } => {
             if let Some(input) = input {

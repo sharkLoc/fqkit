@@ -102,12 +102,27 @@ pub enum Subcli {
         /// subseq number
         #[arg(short = 'n', long = "num")]
         num: usize,
-        /// reduce much memory but cost more time
+        /// read files twice to reduce much memory but cost more time
         #[arg(short = 'r', long = "rdc", help_heading = Some("FLAGS"))]
         rdc: bool,
         /// fastq output file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out")]
         out: Option<String>,
+    },
+    /// select pair-end reads by read id
+    select {
+        /// input read1 fastq file
+        #[arg(short = '1', long = "read1")]
+        read1: String,
+        /// input read2 fastq file
+        #[arg(short = '2', long = "read2")]
+        read2: String,
+        /// output selected  forward(read1) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short='f', long = "out1")]
+        out1: String,
+        /// output selected resverse(read2) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short='r', long = "out2")]
+        out2: String,
     },
     /// trim fastq reads by position
     trim {
