@@ -64,6 +64,7 @@ Commands:
   tail     get last N records from fastq file
   concat   concat fastq files from different lanes
   subfq    subsample sequences from big fastq file [aliases: sample]
+  select   select pair-end reads by read id
   trim     trim fastq reads by position
   filter   a simple filter for pair end fastq sqeuence
   range    print fastq records in a range
