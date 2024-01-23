@@ -114,35 +114,28 @@ fn main() -> Result<(), Error> {
         }
         Subcli::subfq { input, seed, num, rdc, out,} => {
             if rdc {
-                match input {
-                    Some(x) => {
-                        if out.is_some() {
-                            select_fastq(&Some(x.as_str()),num, seed, &Some(out.unwrap().as_str()), arg.compression_level)?;
-                        } else {
-                            select_fastq(&Some(x.as_str()), num, seed, &None, arg.compression_level)?;
-                        }
+                if let Some(input) = input {
+                    if let Some(out) = out {
+                        select_fastq(&Some(&input),num, seed, &Some(&out), arg.compression_level)?;
+                    } else {
+                        select_fastq(&Some(&input), num, seed, &None, arg.compression_level)?;
                     }
-                    None => {
-                        error!("opt -r used, fastq data can't from stdin.");
-                        std::process::exit(1);
-                    }
+                } else {
+                    error!("opt -r used, fastq data can't from stdin.");
+                    std::process::exit(1);
                 }
             } else {
-                match input {
-                    Some(x) => {
-                        if out.is_some() {
-                            select_fastq2(&Some(x.as_str()),num, seed,&Some(out.unwrap().as_str()), arg.compression_level)?;
-                        } else {
-                            select_fastq2(&Some(x.as_str()), num, seed, &None, arg.compression_level)?;
-                        }
+                if let Some(input) = input {
+                    if let Some(out) = out {
+                        select_fastq2(&Some(&input),num, seed, &Some(&out), arg.compression_level)?;
+                    } else {
+                        select_fastq2(&Some(&input), num, seed, &None, arg.compression_level)?;
                     }
-                    None => {
-                        warn!("need fastq file, if data from stdin, ignore this info.");
-                        if out.is_some() {
-                            select_fastq2(&None, num, seed, &Some(out.unwrap().as_str()), arg.compression_level)?;
-                        } else {
-                            select_fastq2(&None, num, seed, &None, arg.compression_level)?;
-                        }
+                } else {
+                    if let Some(out) = out {
+                        select_fastq2(&None, num, seed, &Some(&out), arg.compression_level)?;
+                    } else {
+                        select_fastq2(&None, num, seed, &None, arg.compression_level)?;
                     }
                 }
             }
