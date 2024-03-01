@@ -91,6 +91,7 @@ Commands:
   mask     convert any low quality base to 'N' or other chars
   split2   split fastq file by records number
   gcplot   get GC content result and plot
+  length   get reads length count
   view     view fastq file page by page
   help     Print this message or the help of the given subcommand(s)
 

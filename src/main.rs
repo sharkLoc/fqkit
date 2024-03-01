@@ -1,7 +1,10 @@
 use anyhow::{Error,Ok};
 use clap::Parser;
-use log::{error, warn};
+use log::error;
 
+
+mod length;
+use length::*;
 mod select;
 use select::*;
 mod tail;
@@ -458,6 +461,21 @@ fn main() -> Result<(), Error> {
                     gc_content(&None,&Some(&output), show, prefix, width, height, ylim, &types, arg.compression_level)?;
                 } else {
                     gc_content(&None,&None, show, prefix, width, height, ylim, &types, arg.compression_level)?;
+                }
+            }
+        }
+        Subcli::length { input, out } => {
+            if let Some(input) = input {
+                if let Some(out) = out {
+                    fq_length(&Some(&input), &Some(&out), arg.compression_level)?;
+                } else {
+                    fq_length(&Some(&input), &None, arg.compression_level)?;
+                }
+            } else {
+                if let Some(out) = out {
+                    fq_length(&None, &Some(&out), arg.compression_level)?;
+                } else {
+                    fq_length(&None, &None, arg.compression_level)?;
                 }
             }
         }

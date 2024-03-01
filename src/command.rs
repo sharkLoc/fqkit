@@ -624,6 +624,14 @@ pub enum Subcli {
         #[arg(short='t', long="types", default_value_t=String::from("png"))]
         types: String,
     },
+    /// get reads length count
+    length {
+        /// input fastq file, or read from stdin
+        input: Option<String>,
+        /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short = 'o', long = "out")]
+        out: Option<String>,
+    },
     /// view fastq file page by page
     view {
         /// input fastq file
