@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.12",
+    version = "0.3.13",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -408,44 +408,6 @@ pub enum Subcli {
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out" ,value_name = "str")]
         out: Option<String>,
-    },
-    /// join paired end reads that are overlapping into a single longer read
-    #[command(before_help=r"Note:
-    1. if overlapping regions are detected, low quality bases are corrected by high quality paired bases. 
-    2. if a base is corrected, the quality value is also corrected.
-    3. only paired end reads such as the following will be detected and merged, overlap mode:
-       r1: GCAAGCGTTAATCGGAATTTATGGGCGTAAAGCGCACGCAGGA
-                            |\|||||||||||||||||||||||\ 
-                            TCTATGGGCGTAAAGCGCACGCAGGCATGCTGGGCGTAAAGCGCACGCAGGC  r2: reverse complement
-    ")]
-    join {
-        /// input read1 fastq file
-        #[arg(short = '1', long = "read1" ,value_name = "str")]
-        read1: String,
-        /// input read2 fastq file
-        #[arg(short = '2', long = "read2" ,value_name = "str")]
-        read2: String,
-        /// minimum overlap length in PE reads
-        #[arg(short = 'l', long = "length", default_value_t=15 ,value_name = "int")]
-        length: usize,
-        /// maximum mismatch count in overlap region
-        #[arg(short = 'm', long = "miss", default_value_t=10 ,value_name = "int")]
-        miss: usize,
-        /// the number of reads in the chunk on each thread
-        #[arg(short, long, default_value_t = 5000 ,value_name = "int")]
-        chunk: usize,
-        /// number of additional worker threads to use
-        #[arg(short='@', long="thread", default_value_t = 6 ,value_name = "int")]
-        thread: usize,
-        /// output unmerged forward(read1) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short='f', long = "out1" ,value_name = "str")]
-        out1: String,
-        /// output unmerged resverse(read2) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short='r', long = "out2" ,value_name = "str")]
-        out2: String,
-        /// output merged fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "merged" ,value_name = "str")]
-        merged: String,
     },
     /// perform demultiplex for pair-end fastq reads 
     barcode {

@@ -13,8 +13,6 @@ mod rename;
 use rename::*;
 mod filter;
 use filter::*;
-mod join;
-use join::*;
 mod slide;
 use slide::*;
 mod fqscore;
@@ -365,9 +363,6 @@ fn main() -> Result<(), Error> {
         }
         Subcli::filter { read1, read2, nbase, length, complexity, average_qual, phred, chunk, thread, failed, out1, out2 } => {
             filter_fastq(&read1, &read2, nbase, length, complexity, average_qual, phred, chunk, thread, &failed, &out1, &out2, arg.compression_level)?;
-        }
-        Subcli::join { read1, read2, length, miss, chunk, thread, out1, out2, merged } => {
-            join_fastq(&read1, &read2, length, miss, chunk, thread, &merged, &out1, &out2, arg.compression_level)?;
         }
         Subcli::concat { read1, read2, out1, out2 } => {
             concat_fqstq_lane(&read1, &read2, &out1, &out2, arg.compression_level)?;
