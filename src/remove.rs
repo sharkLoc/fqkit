@@ -10,6 +10,7 @@ pub fn remove_read(
     out: &Option<&str>,
     name: &str,
     save: &str,
+    rm: bool,
     compression_level: u32,
 ) -> Result<(),Error> {
     if let Some(file) = file {
@@ -18,7 +19,9 @@ pub fn remove_read(
         info!("reading reads from stdin");
     }
     info!("reading reads id form file: {}", name);
-    info!("removed reads in file: {}", save);
+    if !rm {
+        info!("removed reads in file: {}", save);
+    }
     let start = Instant::now();
 
     let mut ids = vec![];
@@ -34,16 +37,26 @@ pub fn remove_read(
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
-    let mut rm_writer = fastq::Writer::new(file_writer(&Some(&save), compression_level)?);
-    for rec in fq_reader.records().flatten() {
-        if !ids.contains(&rec.id().to_string()) {
-            fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-        } else {
-            rm_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-        }    
+
+    if rm {
+        for rec in fq_reader.records().flatten() {
+            if !ids.contains(&rec.id().to_string()) {
+                fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+            }
+        }
+        fq_writer.flush()?;
+    } else {
+        let mut rm_writer = fastq::Writer::new(file_writer(&Some(&save), compression_level)?);
+        for rec in fq_reader.records().flatten() {
+            if !ids.contains(&rec.id().to_string()) {
+                fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+            } else {
+                rm_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+            }    
+        }
+        fq_writer.flush()?;
+        rm_writer.flush()?;
     }
-    fq_writer.flush()?;
-    rm_writer.flush()?;
 
     info!("time elapsed is: {:?}",start.elapsed());
     Ok(())

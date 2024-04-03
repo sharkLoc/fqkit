@@ -8,7 +8,9 @@ use crate::utils::*;
 pub fn rename_fastq(
     input: &Option<&str>,
     keep: bool,
-    prefix: Option<String>, //&str,
+    prefix: Option<String>,
+    label: Option<&str>,
+    before: bool,
     output: &Option<&str>,
     compression_level: u32,
 ) -> Result<()> {
@@ -18,7 +20,7 @@ pub fn rename_fastq(
     } else {
         info!("reading from stdin");
     }
-
+  
     let fp = fastq::Reader::new(file_reader(input)?);
     let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
     let mut n: usize = 0;
@@ -26,7 +28,22 @@ pub fn rename_fastq(
     if let Some(pre) = prefix {
         for rec in fp.records().flatten() {
             n += 1;
-            let newid = format!("{}{}",pre,n);
+            /*let newid = match label {
+                Some(x) => {
+                    if before { 
+                        format!("{}{}{}",x,pre,n)
+                    } else { 
+                        format!("{}{}{}",pre,x,n)
+                    }
+                },
+                None => { format!("{}{}",pre,n) }
+            };*/
+            let newid = if before {
+                format!("{}{}{}",label.unwrap_or_default(),pre,n)
+            } else {
+                format!("{}{}{}",pre,label.unwrap_or_default(),n)
+            };
+            
             let record = if keep { 
                 Record::with_attrs(&newid, rec.desc(), rec.seq(),rec.qual()) 
             } else { 
@@ -38,10 +55,24 @@ pub fn rename_fastq(
     } else {
         for rec in fp.records().flatten() {
             n += 1;
+            /*let newid = if let Some(x) = label {
+                if before { 
+                    format!("{}{}",x,rec.id())
+                } else {
+                    format!("{}{}",rec.id(),x)
+                }
+            } else {
+                format!("{}",rec.id())
+            };*/
+            let newid = if before {
+                format!("{}{}",label.unwrap_or_default(),rec.id())
+            } else {
+                format!("{}{}",rec.id(),label.unwrap_or_default())
+            };
             let record = if keep { 
-                Record::with_attrs(rec.id(), rec.desc(), rec.seq(),rec.qual()) 
+                Record::with_attrs(&newid, rec.desc(), rec.seq(),rec.qual()) 
             } else { 
-                Record::with_attrs(rec.id(), None, rec.seq(),rec.qual())
+                Record::with_attrs(&newid, None, rec.seq(),rec.qual())
             };
             fo.write_record(&record)?;
         }

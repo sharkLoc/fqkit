@@ -144,18 +144,18 @@ fn main() -> Result<(), Error> {
         Subcli::select { read1, read2, out1, out2 } => {
             select_pe_fastq(&read1, &read2, &out1, &out2, arg.compression_level)?;
         }
-        Subcli::trim { input, left, right, out } => {
+        Subcli::trim { input, left, right, len, out } => {
             if let Some(input) = input {
                 if let Some(out) = out {
-                    trim_fq(&Some(input.as_str()), left, right, &Some(out.as_str()), arg.compression_level)?;
+                    trim_fq(&Some(input.as_str()), left, right, len, &Some(out.as_str()), arg.compression_level)?;
                 } else {
-                    trim_fq(&Some(input.as_str()), left, right, &None, arg.compression_level)?;
+                    trim_fq(&Some(input.as_str()), left, right, len, &None, arg.compression_level)?;
                 }
             } else {
                 if let Some(out) = out {
-                    trim_fq(&None, left, right, &Some(out.as_str()), arg.compression_level)?;
+                    trim_fq(&None, left, right, len, &Some(out.as_str()), arg.compression_level)?;
                 } else {
-                    trim_fq(&None, left, right, &None, arg.compression_level)?;
+                    trim_fq(&None, left, right, len, &None, arg.compression_level)?;
                 }
             }
         }
@@ -367,33 +367,35 @@ fn main() -> Result<(), Error> {
         Subcli::concat { read1, read2, out1, out2 } => {
             concat_fqstq_lane(&read1, &read2, &out1, &out2, arg.compression_level)?;
         }
-        Subcli::remove { input, out, name , save} => {
+        Subcli::remove { input, out, name , save, rm} => {
             if let Some(input) = input {
                 if let Some(out) = out {
-                    remove_read(&Some(&input), &Some(&out) ,&name, &save, arg.compression_level)?;
+                    remove_read(&Some(&input), &Some(&out) ,&name, &save, rm, arg.compression_level)?;
                 } else {
-                    remove_read(&Some(&input), &None ,&name, &save, arg.compression_level)?;
+                    remove_read(&Some(&input), &None ,&name, &save, rm, arg.compression_level)?;
                 }
             } else {
                 if let Some(out) = out {
-                    remove_read(&None, &Some(&out) ,&name, &save, arg.compression_level)?;
+                    remove_read(&None, &Some(&out) ,&name, &save, rm, arg.compression_level)?;
                 } else {
-                    remove_read(&None, &None ,&name, &save, arg.compression_level)?;
+                    remove_read(&None, &None ,&name, &save, rm, arg.compression_level)?;
                 }
             }
         }
-        Subcli::rename { input, keep, prefix, output } => {
+        Subcli::rename { input, keep, prefix, label, before, output } => {
+            let x = label.unwrap_or_default(); 
+            let label = Some(x.as_str());
             if let Some(input) =input {
                 if let Some(output) = output {
-                    rename_fastq(&Some(&input), keep, prefix, &Some(&output), arg.compression_level)?;
+                    rename_fastq(&Some(&input), keep, prefix, label, before, &Some(&output), arg.compression_level)?;
                 } else {
-                    rename_fastq(&Some(&input), keep, prefix, &None, arg.compression_level)?;
+                    rename_fastq(&Some(&input), keep, prefix, label, before, &None, arg.compression_level)?;
                 }
             } else {
                 if let Some(output) = output {
-                    rename_fastq(&None, keep, prefix, &Some(&output), arg.compression_level)?;
+                    rename_fastq(&None, keep, prefix, label, before, &Some(&output), arg.compression_level)?;
                 } else {
-                    rename_fastq(&None, keep, prefix, &None, arg.compression_level)?;
+                    rename_fastq(&None, keep, prefix, label, before, &None, arg.compression_level)?;
                 }
             }
         }
