@@ -11,15 +11,15 @@ pub fn logger(
     quiet: bool,
 ) -> Result<(), anyhow::Error>{
 
-    let mut level =  if verbose == "error".to_string() {
+    let mut level =  if verbose == *"error" {
         LevelFilter::Error
-    } else if verbose == "warn".to_string() {
+    } else if verbose == *"warn" {
         LevelFilter::Warn
-    }else if verbose == "info".to_string() {
+    }else if verbose == *"info" {
         LevelFilter::Info
-    } else if verbose == "debug".to_string() {
+    } else if verbose == *"debug" {
         LevelFilter::Debug
-    } else if verbose == "trace".to_string() {
+    } else if verbose == *"trace" {
         LevelFilter::Trace
     } else {
         LevelFilter::Off

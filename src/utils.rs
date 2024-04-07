@@ -13,26 +13,26 @@ const MAGIC_MAX_LEN: usize  = 6;
 const BUFF_SIZE: usize = 1024 * 1024;
 
 
-fn magic_num(file_name: &str) -> Result<[u8; MAGIC_MAX_LEN], Error> {
+fn magic_num(file_name: &String) -> Result<[u8; MAGIC_MAX_LEN], Error> {
     let mut buffer: [u8; MAGIC_MAX_LEN] = [0; MAGIC_MAX_LEN];
     let mut fp = File::open(file_name)?;
     let _ = fp.read(&mut buffer)?;
     Ok(buffer)
 }
 
-fn is_gzipped(file_name: &str) -> Result<bool> {
+fn is_gzipped(file_name: &String) -> Result<bool> {
     let buffer = magic_num(file_name)?;
     let gz_or_not = buffer[0] == GZ_MAGIC[0] && buffer[1] == GZ_MAGIC[1] && buffer[2] == GZ_MAGIC[2]; 
     Ok(gz_or_not || file_name.ends_with(".gz"))
 }
 
-fn is_bzipped(file_name: &str) -> Result<bool> {
+fn is_bzipped(file_name: &String) -> Result<bool> {
     let buffer = magic_num(file_name)?;
     let bz_or_not = buffer[0] == BZ_MAGIC[0] && buffer[1] == BZ_MAGIC[1] && buffer[2] == BZ_MAGIC[2];
     Ok(bz_or_not || file_name.ends_with(".bz2"))
 }
 
-fn is_xz(file_name: &str) -> Result<bool> {
+fn is_xz(file_name: &String) -> Result<bool> {
     let buffer = magic_num(file_name)?;
     let xz_or_not = 
            buffer[0] == XZ_MAGIC[0] && buffer[1] == XZ_MAGIC[1] 
@@ -42,12 +42,14 @@ fn is_xz(file_name: &str) -> Result<bool> {
 }
 
 
-pub fn file_reader(file_in: &Option<&str>) -> Result<Box<dyn BufRead>> {
+pub fn file_reader(file_in: Option<&String>) -> Result<Box<dyn BufRead>> {
     if let Some(file_name) = file_in {
-        let fp = File::open(file_name)?;
+        
         let gz_flag = is_gzipped(file_name)?;
         let bz_flag = is_bzipped(file_name)?;
         let zx_flag = is_xz(file_name)?;
+
+        let fp = File::open(file_name)?;
 
         if gz_flag {
             Ok(Box::new(BufReader::with_capacity(
@@ -78,11 +80,12 @@ pub fn file_reader(file_in: &Option<&str>) -> Result<Box<dyn BufRead>> {
 
 
 pub fn file_writer(
-    file_out: &Option<&str>,
+    file_out: Option<&String>,
     compression_level: u32,
 ) -> Result<Box<dyn Write>> {
     if let Some(file_name) = file_out {
         let fp = File::create(file_name)?;
+
         if file_name.ends_with(".gz") {
             Ok(Box::new(BufWriter::with_capacity(
                 BUFF_SIZE,
@@ -108,14 +111,14 @@ pub fn file_writer(
 
 
 pub fn file_writer_append(
-    file_out: &str,
+    file_out: &String,
     compression_level: u32,
 ) -> Result<Box<dyn Write>> {
     let fp = OpenOptions::new()
         .append(true)
         .create(true)
         .open(file_out)?;
-    
+
     if file_out.ends_with(".gz") {
         Ok(Box::new(BufWriter::with_capacity(
             BUFF_SIZE,

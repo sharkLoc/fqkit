@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.3.14",
+    version = "0.4.0",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -515,10 +515,10 @@ pub enum Subcli {
     /// split interleaved fastq file
     split {
         /// input fastq file, or read from stdin
-        #[arg(short = 'i', long = "input" ,value_name = "STR")]
+        //#[arg(short = 'i', long = "input" ,value_name = "STR")]
         input: Option<String>,
         /// output fastq file prefix name
-        #[arg(short = 'p', long = "prefix" ,value_name = "STR")]
+        #[arg(short = 'p', long = "prefix" , default_value_t = String::from("demo"), value_name = "STR")]
         pre: String,
         /// fastq file outdir
         #[arg(short = 'o', long = "out", default_value_t = String::from(".") ,value_name = "STR")]
@@ -533,8 +533,8 @@ pub enum Subcli {
         #[arg(short = '2', long = "read2" ,value_name = "STR")]
         read2: String,
         /// output interleaved fastq file name, eg. result.fq.bz2
-        #[arg(short = 'o', long = "out", default_value_t = String::from("interleaved.fq.gz") ,value_name = "STR")]
-        out: String,
+        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        out: Option<String>,
     },
     /// convert any low quality base to 'N' or other chars 
     mask {

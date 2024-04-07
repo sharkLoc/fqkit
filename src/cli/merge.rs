@@ -1,0 +1,34 @@
+use crate::utils::*;
+use bio::io::fastq;
+use anyhow::{Error, Ok};
+use log::*;
+use std::time::Instant;
+
+
+pub fn interleaved(
+    file1: &String,
+    file2: &String,
+    out: Option<&String>,
+    compression_level: u32,
+) -> Result<(), Error> {
+    
+    info!("reading from file: {}", file1);
+    info!("reading from file: {}", file2);
+    let start = Instant::now();
+
+    let mut num = 0usize;
+    let fq1_reader = fastq::Reader::new(file_reader(Some(file1))?);
+    let fq2_reader = fastq::Reader::new(file_reader(Some(file2))?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
+    
+    for (rec1, rec2) in fq1_reader.records().flatten().zip(fq2_reader.records().flatten()) {
+        num += 1;
+        fq_writer.write(rec1.id(), rec1.desc(), rec1.seq(), rec1.qual())?;
+        fq_writer.write(rec2.id(), rec2.desc(), rec2.seq(), rec2.qual())?;
+    }
+    fq_writer.flush()?;
+
+    info!("total PE reads number: {}",num);
+    info!("time elapsed is: {:?}",start.elapsed());
+    Ok(())
+}
