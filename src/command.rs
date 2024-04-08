@@ -4,7 +4,7 @@ use clap::{Parser,value_parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.0",
+    version = "0.4.1",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -155,18 +155,13 @@ pub enum Subcli {
         /// reads shorter than length required will be discarded
         #[arg(short = 'l', long = "length", default_value_t=30, value_name = "INT")]
         length: usize,
-        /// the complexity is defined as the percentage of base that is different from its next base (base[i] != base[i+1]),
-        ///a 51-bp sequence, with 3 bases that is different from its next base
-        ///seq = 'AAAATTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGCCCC',  and complexity = 3/(51-1) = 6%
-        ///the threshold for low complexity filter (0~100). 30 is recommended, which means 30% complexity is required.
-        #[arg(short = 'y', long = "complexity", default_value_t = 0,
-            value_parser = value_parser!(u32).range(0..=100),
-            verbatim_doc_comment, value_name = "INT"
-        )]
+        /// the complexity is defined as the percentage of base that is different from its next base (base[i] != base[i+1]), a 51-bp sequence, with 3 bases that is different from its next base
+        ///seq = 'AAAATTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGCCCC' and complexity = 3/(51-1) = 6%, the threshold for low complexity filter (0~100). 30 is recommended, which means 30% complexity is required.
+        #[arg(short = 'y', long = "complexity", default_value_t = 0, value_parser = value_parser!(u32).range(0..=100), value_name = "INT")]
         complexity: u32,
         /// if one read's average quality score < average qual, then this read pair is discarded,
         ///eg. Q20 error 0.01, Q30 error 0.001, averaging the probability of error is 0.0055 => Q value 22.59637
-        #[arg(short = 'Q', long = "average_qual", default_value_t = 20, verbatim_doc_comment, value_name = "INT")]
+        #[arg(short = 'Q', long = "average_qual", default_value_t = 20, value_name = "INT")]
         average_qual: u8,
         ///phred score 33 or 64
         #[arg(short = 'p', long = "phred", default_value_t = 33, value_name = "INT")]
@@ -206,9 +201,8 @@ pub enum Subcli {
     search {
         /// input fastq file, or read from stdin
         input: Option<String>,
-        /// specify pattern/motif, regular expression supported, e.g., -p "ATC{2,}" or -p "ATCCG"
-        ///for multiple motifs, -p "TTAGGG|CCCTAA"
-        #[arg(short = 'p', long = "pattern",verbatim_doc_comment, value_name = "STR")]
+        /// specify pattern/motif, regular expression supported, e.g., -p "ATC{2,}" or -p "ATCCG", for multiple motifs, -p "TTAGGG|CCCTAA"
+        #[arg(short = 'p', long = "pattern", value_name = "STR")]
         pat: String,
         /// if specified,  enable case insensitive matching for the entire pattern
         #[arg(short = 'i', long ="ignore-case", help_heading = Some("FLAGS"))]
@@ -219,9 +213,8 @@ pub enum Subcli {
         /// number of additional worker threads to use
         #[arg(short='@', long="thread", default_value_t = 1, value_name = "INT")]
         thread: usize,
-        /// output contain pattern/motif reads result fastq file or write to stdout,
-        ///file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", verbatim_doc_comment, value_name = "STR")]
+        /// output contain pattern/motif reads result fastq file or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short = 'o', long = "out", value_name = "STR")]
         out: Option<String>,
     },
     /// grep fastq sequence by read id or full name
@@ -234,9 +227,8 @@ pub enum Subcli {
         /// if specified, match read by full name instead of just id
         #[arg(short = 'f', long = "full-name", help_heading = Some("FLAGS"))]
         full: bool,
-        /// output matched reads result in fastq file or write to stdout,
-        ///file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", verbatim_doc_comment, value_name = "STR")]
+        /// output matched reads result in fastq file or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short = 'o', long = "out", value_name = "STR")]
         out: Option<String>,
     },
     /// summary for fastq format file
@@ -401,12 +393,11 @@ pub enum Subcli {
     flatten {
         /// input fastq file, or read from stdin
         input: Option<String>,
-        /// filed number, id:1, sequence:2, symbol:4, quality:8
-        ///eg. output id, sequence and quality value: 1 + 2 + 8 == 11 ,
-        #[arg(short = 'f', long = "field", default_value_t = 3, verbatim_doc_comment ,value_name = "INT")]
+        /// filed number, id:1, sequence:2, symbol:4, quality:8; eg. output id, sequence and quality value: 1 + 2 + 8 == 11
+        #[arg(short = 'f', long = "field", default_value_t = 3 ,value_name = "INT")]
         flag: u8,
         /// output seprater, can be ",",  ";", 
-        #[arg(short = 's', long = "sep", default_value_t='\t' ,value_name = "char")]
+        #[arg(short = 's', long = "sep", default_value_t='\t' ,value_name = "CHAR")]
         sep: char,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out" ,value_name = "STR")]
@@ -422,8 +413,8 @@ pub enum Subcli {
         #[arg(short = '2', long = "read2" ,value_name = "STR")]
         read2: String,
         /// barcode list file, format eg:
-        ///ATGCAGTG    sample1
-        ///TGCAGTAC    sample2
+        /// ATGCAGTG    sample1
+        /// TGCAGTAC    sample2
         #[arg(short = 'b', long = "barcode", verbatim_doc_comment ,value_name = "STR")] 
         bar: String,
         /// barcode position mode, 1:left, 2:right

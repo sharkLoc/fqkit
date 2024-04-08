@@ -1,10 +1,11 @@
 [package]
 name = "fqkit"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.65.0"
 homepage = "https://github.com/sharkLoc/fqkit"
+repository = "https://github.com/sharkLoc/fqkit"
 description = "fqkit: a simple and cross-platform program for fastq file manipulation"
 keywords = ["fastq", "reads","bio", "hts", "barcode"]
 readme = "README.md"
@@ -17,7 +18,7 @@ anyhow = "1.0.75"
 bio = "1.5.0"
 bzip2 = "0.4.4"
 chrono = "0.4.30"
-clap = { version = "4.4.7", features = ["derive"] }
+clap = { version = "4.4.7", features = ["derive", "wrap_help"] }
 colored = "2.0.4"
 crossbeam = { version = "0.8.2", features = ["crossbeam-channel"] }
 env_logger = "0.10.0"
