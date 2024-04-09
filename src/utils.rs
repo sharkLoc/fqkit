@@ -9,7 +9,7 @@ const GZ_MAGIC: [u8; 3] = [0x1f, 0x8b, 0x08];
 const BZ_MAGIC: [u8; 3] = [0x42, 0x5a, 0x68];
 const XZ_MAGIC: [u8; 6] = [0xfd, 0x37, 0x7a, 0x58, 0x5A, 0x00];
 //const ZSTD_MAGIC: [u8; 4] = [0x28, 0xb5, 0x2f, 0xfd]; // TODO
-const MAGIC_MAX_LEN: usize  = 6;
+const MAGIC_MAX_LEN: usize = 6;
 const BUFF_SIZE: usize = 1024 * 1024;
 
 
@@ -22,22 +22,26 @@ fn magic_num(file_name: &String) -> Result<[u8; MAGIC_MAX_LEN], Error> {
 
 fn is_gzipped(file_name: &String) -> Result<bool> {
     let buffer = magic_num(file_name)?;
-    let gz_or_not = buffer[0] == GZ_MAGIC[0] && buffer[1] == GZ_MAGIC[1] && buffer[2] == GZ_MAGIC[2]; 
+    let gz_or_not = 
+           buffer[0] == GZ_MAGIC[0] && buffer[1] == GZ_MAGIC[1] && buffer[2] == GZ_MAGIC[2]; 
     Ok(gz_or_not || file_name.ends_with(".gz"))
 }
 
 fn is_bzipped(file_name: &String) -> Result<bool> {
     let buffer = magic_num(file_name)?;
-    let bz_or_not = buffer[0] == BZ_MAGIC[0] && buffer[1] == BZ_MAGIC[1] && buffer[2] == BZ_MAGIC[2];
+    let bz_or_not = 
+           buffer[0] == BZ_MAGIC[0] && buffer[1] == BZ_MAGIC[1] && buffer[2] == BZ_MAGIC[2];
     Ok(bz_or_not || file_name.ends_with(".bz2"))
 }
 
 fn is_xz(file_name: &String) -> Result<bool> {
     let buffer = magic_num(file_name)?;
-    let xz_or_not = 
-           buffer[0] == XZ_MAGIC[0] && buffer[1] == XZ_MAGIC[1] 
-        && buffer[2] == XZ_MAGIC[2] && buffer[3] == XZ_MAGIC[3] 
-        && buffer[4] == XZ_MAGIC[4] && buffer[5] == XZ_MAGIC[5];
+    let xz_or_not = buffer[0] == XZ_MAGIC[0] 
+        && buffer[1] == XZ_MAGIC[1] 
+        && buffer[2] == XZ_MAGIC[2] 
+        && buffer[3] == XZ_MAGIC[3] 
+        && buffer[4] == XZ_MAGIC[4] 
+        && buffer[5] == XZ_MAGIC[5];
     Ok(xz_or_not || file_name.ends_with(".xz"))
 }
 
