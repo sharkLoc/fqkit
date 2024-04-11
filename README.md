@@ -66,6 +66,7 @@ Commands:
   subfq    subsample sequences from big fastq file [aliases: sample]
   select   select pair-end reads by read id
   trim     trim fastq reads by position
+  adapter  cut the adapter sequence on the reads
   filter   a simple filter for pair end fastq sqeuence
   range    print fastq records in a range
   search   search reads/motifs from fastq file
