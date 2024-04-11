@@ -30,3 +30,4 @@ pub mod plot;
 pub mod barcode;
 pub mod fq2fa;
 pub mod flatten;
+pub mod cutadapter;

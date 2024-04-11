@@ -8,9 +8,7 @@ mod utils;
 mod command;
 use command::*;
 mod cli;
-use cli::{length::*, rename::*, select::*, tail::*, top::*, filter::*, slide::*, flatten::*, fq2fa::*, fq2sam::*, fqscore::*,
-    grep::*, concat::*, shuffle::*, check::*, mask::*, range::*, sort::*, view::*, size::*, reverse::*, trimfq::*, gcplot::*, 
-    split::*, split2::*, search::*, subfq::*, merge::*, remove::*, stats::*, plot::*, barcode::*, 
+use cli::{barcode::*, check::*, concat::*, cutadapter::cut_adapter, filter::*, flatten::*, fq2fa::*, fq2sam::*, fqscore::*, gcplot::*, grep::*, length::*, mask::*, merge::*, plot::*, range::*, remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*, slide::*, sort::*, split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*, view::* 
 };
 
 fn main() -> Result<(), Error> {
@@ -36,6 +34,9 @@ fn main() -> Result<(), Error> {
         }
         Subcli::trim { input, left, right, len, out } => {
             trim_fq(input.as_ref(), left, right, len, out.as_ref(), arg.compression_level)?;
+        }
+        Subcli::adapter { input, fa, left, miss, out } => {
+            cut_adapter(input.as_ref(), &fa, left, miss, out.as_ref(), arg.compression_level)?;
         }
         Subcli::range { input, skip, take, out } => {
             range_fastq(input.as_ref(), skip, take, out.as_ref(), arg.compression_level)?;
@@ -89,7 +90,7 @@ fn main() -> Result<(), Error> {
         Subcli::concat { read1, read2, out1, out2 } => {
             concat_fqstq_lane(&read1, &read2, &out1, &out2, arg.compression_level)?;
         }
-        Subcli::remove { input, out, name , save, rm} => {
+        Subcli::remove { input, name , save, rm, out} => {
             remove_read(input.as_ref(), out.as_ref(), &name, &save, rm, arg.compression_level)?;
         }
         Subcli::rename { input, keep, prefix, label, before, output } => {
@@ -107,8 +108,8 @@ fn main() -> Result<(), Error> {
         Subcli::mask { input, phred, low, chars, out } => {
             mask_fastq(input.as_ref(), phred, low, chars,  out.as_ref(), arg.compression_level)?;
         }
-        Subcli::split2 { input, num, gzip, bzip2, xz, name } => {
-            split_chunk(input.as_ref(), num, gzip, bzip2, xz, &name, arg.compression_level)?;
+        Subcli::split2 { input, num, gzip, bzip2, xz, name, outdir } => {
+            split_chunk(input.as_ref(), num, gzip, bzip2, xz, &name, &outdir, arg.compression_level)?;
         }
         Subcli::gcplot { input, output, show, prefix, width, height, ylim, types } => {
             gc_content(input.as_ref(), output.as_ref(), show, prefix, width, height, ylim, &types, arg.compression_level)?;

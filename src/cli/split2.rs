@@ -12,6 +12,7 @@ pub fn split_chunk(
     bzip2: bool,
     xz: bool,
     out_pre: &str,
+    out_dir: &str,
     compression_level: u32,
 ) -> Result<(),Error> {
     let start = Instant::now();
@@ -37,13 +38,13 @@ pub fn split_chunk(
 
     let (mut flag, mut index) = (0usize, 0usize);
     let out = if gzip {
-        format!("{}{}.fastq.gz",out_pre,index)
+        format!("{}/{}{}.fastq.gz",out_dir,out_pre,index)
     } else if bzip2 {
-        format!("{}{}.fastq.bz2",out_pre,index)
+        format!("{}/{}{}.fastq.bz2",out_dir,out_pre,index)
     } else if xz {
-        format!("{}{}.fastq.xz",out_pre,index)
+        format!("{}/{}{}.fastq.xz",out_dir,out_pre,index)
     } else {
-        format!("{}{}.fastq",out_pre,index)
+        format!("{}/{}{}.fastq",out_dir,out_pre,index)
     };
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
@@ -58,13 +59,13 @@ pub fn split_chunk(
         } else {
             index += 1;
             let out = if gzip {
-                format!("{}{}.fastq.gz",out_pre,index)
+                format!("{}/{}{}.fastq.gz",out_dir,out_pre,index)
             } else if bzip2 {
-                format!("{}{}.fastq.bz2",out_pre,index)
+                format!("{}/{}{}.fastq.bz2",out_dir,out_pre,index)
             } else if xz {
-                format!("{}{}.fastq.xz",out_pre,index)
+                format!("{}/{}{}.fastq.xz",out_dir,out_pre,index)
             } else {
-                format!("{}{}.fastq",out_pre,index)
+                format!("{}/{}{}.fastq",out_dir,out_pre,index)
             };
             fh.push(fastq::Writer::new(file_writer(Some(&out), compression_level)?));
             let fhthis = fh.get_mut(index).unwrap();

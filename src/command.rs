@@ -29,22 +29,24 @@ Compression level:
 pub struct Args {
     #[clap(subcommand)]
     pub command: Subcli,
-    /// set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file,
-    /// just work with option -o/--out
+    
+    /// set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file, just work with option -o/--out
     #[arg(long = "compress-level", default_value_t = 6, global = true,
         value_parser = value_parser!(u32).range(1..=9), value_name = "INT",
         help_heading = Some("Global Arguments")
     )]
     pub compression_level: u32,
+    
     /// if file name specified, write log message to this file, or write to stderr
-    #[arg(long = "log", global = true, help_heading = Some("Global Arguments"), value_name = "STR")]
+    #[arg(long = "log", global = true, help_heading = Some("Global Arguments"), value_name = "FILE")]
     pub logfile: Option<String>,
+    
     /// control verbosity of logging, possible values: {error, warn, info, debug, trace}
     #[arg(short = 'v', long = "verbosity", global = true, value_name = "STR",
-        default_value_t = String::from("debug"),
-        help_heading = Some("Global Arguments")
+        default_value_t = String::from("debug"), help_heading = Some("Global Arguments")
     )]
     pub verbose: String,
+
     /// be quiet and do not show any extra information
     #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
     pub quiet: bool,
@@ -62,7 +64,7 @@ pub enum Subcli {
         #[arg(short = 'n', long = "num", default_value_t = 10, value_name = "INT")]
         num: usize,
         /// output fastq file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// get last N records from fastq file
@@ -73,22 +75,22 @@ pub enum Subcli {
         #[arg(short = 'n', long = "num", default_value_t = 10, value_name = "INT")]
         num: usize,
         /// output fastq file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// concat fastq files from different lanes
     concat {
         /// input read1 list file, one fastq file per line
-        #[arg(short = 'i', long = "input1", value_name = "STR")]
+        #[arg(short = 'i', long = "input1", value_name = "FILE")]
         read1: String,
         /// input read2 list file, one fastq file per line
-        #[arg(short = 'I', long = "input2", value_name = "STR")]
+        #[arg(short = 'I', long = "input2", value_name = "FILE")]
         read2: String,
         /// read1 output file name,  files ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out1", value_name = "STR")]
+        #[arg(short = 'o', long = "out1", value_name = "FILE")]
         out1: String,
         /// read2 output file name,  files ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'O', long = "out2", value_name = "STR")]
+        #[arg(short = 'O', long = "out2", value_name = "FILE")]
         out2: String,
     },
     /// subsample sequences from big fastq file.
@@ -106,22 +108,22 @@ pub enum Subcli {
         #[arg(short = 'r', long = "rdc", help_heading = Some("FLAGS"))]
         rdc: bool,
         /// fastq output file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// select pair-end reads by read id
     select {
         /// input read1 fastq file
-        #[arg(short = '1', long = "read1", value_name = "STR")]
+        #[arg(short = '1', long = "read1", value_name = "FILE")]
         read1: String,
         /// input read2 fastq file
-        #[arg(short = '2', long = "read2", value_name = "STR")]
+        #[arg(short = '2', long = "read2", value_name = "FILE")]
         read2: String,
         /// output selected  forward(read1) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short='f', long = "out1", value_name = "STR")]
+        #[arg(short='f', long = "out1", value_name = "FILE")]
         out1: String,
         /// output selected resverse(read2) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short='r', long = "out2", value_name = "STR")]
+        #[arg(short='r', long = "out2", value_name = "FILE")]
         out2: String,
     },
     /// trim fastq reads by position
@@ -138,16 +140,33 @@ pub enum Subcli {
         #[arg(short = 'd', long = "discard", default_value_t = 0, value_name = "INT")]
         len: usize,
         /// fastq output file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
+        out: Option<String>,
+    },
+    /// cut the adapter sequence on the reads
+    adapter {
+        /// input fastq file, or read from stdin
+        input: Option<String>,
+        /// adapter sequence file in Fasta format
+        #[arg(short = 'f', long = "fasta", value_name = "FILE")]
+        fa: String,
+        /// addpter on the left side of the read
+        #[arg(short, long, help_heading = Some("FLAGS"))]
+        left: bool,
+        /// max missmatch allowed
+        #[arg(short, long, default_value_t = 0, value_name = "INT")]
+        miss: usize,
+        /// fastq output file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// a simple filter for pair end fastq sqeuence
     filter {
         /// input read1 fastq file
-        #[arg(short = '1', long = "read1", value_name = "STR")]
+        #[arg(short = '1', long = "read1", value_name = "FILE")]
         read1: String,
         /// input read2 fastq file
-        #[arg(short = '2', long = "read2", value_name = "STR")]
+        #[arg(short = '2', long = "read2", value_name = "FILE")]
         read2: String,
         /// if one read number of N base is more then N base limit, then this read pair is discarded.
         #[arg(short = 'n', long = "n-limit", default_value_t=5, value_name = "INT")]
@@ -173,13 +192,13 @@ pub enum Subcli {
         #[arg(short='@', long="thread", default_value_t = 4, value_name = "INT")]
         thread: usize,
         /// specify the file to store reads(interleaved) that cannot pass the filters, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short='u', long = "failed", value_name = "STR")]
+        #[arg(short='u', long = "failed", value_name = "FILE")]
         failed: String,
         /// output pass filtered  forward(read1) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short='f', long = "out1", value_name = "STR")]
+        #[arg(short='f', long = "out1", value_name = "FILE")]
         out1: String,
         /// output pass filtered resverse(read2) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short='r', long = "out2", value_name = "STR")]
+        #[arg(short='r', long = "out2", value_name = "FILE")]
         out2: String,
     },
     /// print fastq records in a range
@@ -193,7 +212,7 @@ pub enum Subcli {
         #[arg(short = 't', long = "take", value_name = "INT")]
         take: usize,
         /// fastq output file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
 
     },
@@ -214,7 +233,7 @@ pub enum Subcli {
         #[arg(short='@', long="thread", default_value_t = 1, value_name = "INT")]
         thread: usize,
         /// output contain pattern/motif reads result fastq file or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// grep fastq sequence by read id or full name
@@ -222,13 +241,13 @@ pub enum Subcli {
         /// input fastq file, or read from stdin
         input: Option<String>,
         /// read name list file, one name per line and without read name prefix "@"
-        #[arg(short = 'i', long = "id-list", value_name = "STR")]
+        #[arg(short = 'i', long = "id-list", value_name = "FILE")]
         ids: String,
         /// if specified, match read by full name instead of just id
         #[arg(short = 'f', long = "full-name", help_heading = Some("FLAGS"))]
         full: bool,
         /// output matched reads result in fastq file or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// summary for fastq format file
@@ -240,10 +259,10 @@ pub enum Subcli {
         #[arg(short = 'p', long = "phred", default_value_t = 33, value_name = "INT")]
         phred: u8,
         /// specify a name for summary output file
-        #[arg(short='s',long="sumy",default_value_t=String::from("summary.txt"), value_name = "STR")]
+        #[arg(short='s',long="sumy",default_value_t=String::from("summary.txt"), value_name = "FILE")]
         sum: String,
         /// if not specified, cycle result write to stdout
-        #[arg(short = 'c', long = "cycle", value_name = "STR")]
+        #[arg(short = 'c', long = "cycle", value_name = "FILE")]
         cyc: Option<String>,
     },
     /// shuffle fastq sequences 
@@ -255,7 +274,7 @@ pub enum Subcli {
         #[arg(short = 's', long = "seed", default_value_t = 69, value_name = "INT")]
         seed: u64,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// report the number sequences and bases
@@ -269,7 +288,7 @@ pub enum Subcli {
         #[arg(short='@', long="thread", default_value_t = 3, value_name = "INT")]
         thread: usize,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
 
     },
@@ -287,7 +306,7 @@ pub enum Subcli {
         #[arg(short = 'S', long = "suffidx", default_value_t = String::from("_slide"), value_name = "STR")]
         suffix: String,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// sort fastq file by name/seq/gc/length
@@ -311,13 +330,13 @@ pub enum Subcli {
         #[arg(short = 'r', long = "reverse", help_heading = Some("FLAGS"))]
         reverse: bool,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// line plot for A T G C N percentage in read position
     plot {
         /// input cycle result data: fqkit stats cycle output
-        #[arg(short = 'd', long = "data", value_name = "STR")]
+        #[arg(short = 'd', long = "data", value_name = "FILE")]
         data: String,
         /// if specified, show line plot in terminal
         #[arg( short = 's', long ="show-terminal", help_heading = Some("FLAGS"))]
@@ -332,7 +351,7 @@ pub enum Subcli {
         #[arg(short = 'H', long = "height", default_value_t = 540, value_name = "INT")]
         height: usize,
         /// set max ylim (0~100)
-        #[arg(short = 'y', long = "ylim", default_value_t = 50.0, value_name = "float")]
+        #[arg(short = 'y', long = "ylim", default_value_t = 50.0, value_name = "FLOAT")]
         ylim: f32,
         /// figure type 'png' or 'svg'
         #[arg(short='t', long="types", default_value_t=String::from("png"), value_name = "STR")]
@@ -346,16 +365,16 @@ pub enum Subcli {
         #[arg(short='r', long="remove", help_heading = Some("FLAGS"))]
         remove: bool,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "STR")]
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
     },
     /// converts a fastq file to an unaligned SAM file
     fq2sam {
         /// input fastq file
-        #[arg(short = '1', long = "read1", value_name = "STR")]
+        #[arg(short = '1', long = "read1", value_name = "FILE")]
         r1: String,
         /// input fastq file for the second read of paired end data
-        #[arg(short = '2', long = "read2", help_heading = Some("Optional Arguments"), value_name = "STR")]
+        #[arg(short = '2', long = "read2", help_heading = Some("Optional Arguments"), value_name = "FILE")]
         r2: Option<String>,
         /// sample name to insert into the read group header
         #[arg(short = 's', long = "sample-name" ,value_name = "STR")]
@@ -370,7 +389,7 @@ pub enum Subcli {
         #[arg(short = 'p', long = "platform", help_heading = Some("Optional Arguments") ,value_name = "STR")]
         pl: Option<String>,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     },
     /// converts the fastq file quality scores
@@ -384,7 +403,7 @@ pub enum Subcli {
         #[arg(long = "to64", help_heading = Some("FLAGS"))]
         to64: bool,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
 
     },
@@ -400,22 +419,22 @@ pub enum Subcli {
         #[arg(short = 's', long = "sep", default_value_t='\t' ,value_name = "CHAR")]
         sep: char,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     },
     /// perform demultiplex for pair-end fastq reads
     #[command(visible_alias = "demux")]
     barcode {
         /// input read1 fastq file
-        #[arg(short = '1', long = "read1" ,value_name = "STR")]
+        #[arg(short = '1', long = "read1" ,value_name = "FILE")]
         read1: String,
         /// input read2 fastq file <barcode in this file>
-        #[arg(short = '2', long = "read2" ,value_name = "STR")]
+        #[arg(short = '2', long = "read2" ,value_name = "FILE")]
         read2: String,
         /// barcode list file, format eg:
         /// ATGCAGTG    sample1
         /// TGCAGTAC    sample2
-        #[arg(short = 'b', long = "barcode", verbatim_doc_comment ,value_name = "STR")] 
+        #[arg(short = 'b', long = "barcode", verbatim_doc_comment ,value_name = "FILE")] 
         bar: String,
         /// barcode position mode, 1:left, 2:right
         #[arg(short = 'm', long = "mode", default_value_t = 2 ,value_name = "INT")]
@@ -436,7 +455,7 @@ pub enum Subcli {
         #[arg(short = 'x', long = "xz", help_heading = Some("FLAGS"))]
         xz: bool,
         /// fastq file output dir.
-        #[arg(short = 'o', long = "outdir", default_value_t = String::from(".") ,value_name = "STR")]
+        #[arg(short = 'o', long = "outdir", default_value_t = String::from(".") ,value_name = "DIR")]
         outdir: String,
     },
     /// check the validity of a fastq record
@@ -451,25 +470,25 @@ pub enum Subcli {
         #[arg(short = 's', long = "save", help_heading = Some("FLAGS"))]
         save: bool, 
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     },
     /// remove reads by read name.
     remove {
         /// input fastq file, or read from stdin
         input: Option<String>,
-        /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
-        out: Option<String>,
         /// read name list file, one name per line and without read name prefix "@"
-        #[arg(short = 'n', long = "name" ,value_name = "STR")]
+        #[arg(short = 'n', long = "name" ,value_name = "FILE")]
         name: String,
         /// save removed reads in read name list
-        #[arg(short = 's', long = "save",default_value_t=String::from("rm.fq.gz") ,value_name = "STR")]
+        #[arg(short = 's', long = "save",default_value_t=String::from("rm.fq.gz") ,value_name = "FILE")]
         save: String,
         /// if set, do not output removed reads
-        #[arg(short = 'r', long = "remove")]
+        #[arg(short = 'r', long = "remove", help_heading = Some("FLAGS"))]
         rm: bool,
+        /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
+        out: Option<String>,
     },
     /// rename sequence id in fastq file
     rename {
@@ -485,7 +504,7 @@ pub enum Subcli {
         #[arg(short = 'l', long = "label", value_name = "STR")]
         label: Option<String>,
         /// if set, label before read id
-        #[arg(short = 'b', long = "before")]
+        #[arg(short = 'b', long = "before", help_heading = Some("FLAGS"))]
         before: bool,
         /// output fastq file name, or write to stdout, file name ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out" ,value_name = "STR")]
@@ -500,7 +519,7 @@ pub enum Subcli {
         #[arg(short = 'r', long = "reverse", help_heading = Some("FLAGS"))]
         rev: bool,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     },
     /// split interleaved fastq file
@@ -512,19 +531,19 @@ pub enum Subcli {
         #[arg(short = 'p', long = "prefix" , default_value_t = String::from("demo"), value_name = "STR")]
         pre: String,
         /// fastq file outdir
-        #[arg(short = 'o', long = "out", default_value_t = String::from(".") ,value_name = "STR")]
+        #[arg(short = 'o', long = "outdir", default_value_t = String::from(".") ,value_name = "DIR")]
         out: String,
     },
     /// merge PE reads as interleaved fastq file
     merge {
         /// input read1 fastq file.
-        #[arg(short = '1', long = "read1" ,value_name = "STR")]
+        #[arg(short = '1', long = "read1" ,value_name = "FILE")]
         read1: String,
         /// input read2 fastq file.
-        #[arg(short = '2', long = "read2" ,value_name = "STR")]
+        #[arg(short = '2', long = "read2" ,value_name = "FILE")]
         read2: String,
         /// output interleaved fastq file name, eg. result.fq.bz2
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     },
     /// convert any low quality base to 'N' or other chars 
@@ -538,10 +557,10 @@ pub enum Subcli {
         #[arg(short = 'l', long = "low-quality",default_value_t = 5 ,value_name = "INT")] 
         low: u8,
         /// mask low quality ( <= low quality) base with this char
-        #[arg(short = 'c', long = "char", default_value_t = 'N' ,value_name = "char")]
+        #[arg(short = 'c', long = "char", default_value_t = 'N' ,value_name = "CHAR")]
         chars: char,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     },
     /// split fastq file by records number
@@ -560,16 +579,19 @@ pub enum Subcli {
         /// if specified, output xz compressed file
         #[arg(short = 'x', long = "xz", help_heading = Some("FLAGS"))]
         xz: bool,
-        /// output prefix name
+        /// output file prefix name
         #[arg(short = 'p', long = "prefix", default_value_t = String::from("sub") ,value_name = "STR")]
         name: String,
+        /// fastq file output dir.
+        #[arg(short = 'o', long = "outdir", default_value_t = String::from(".") ,value_name = "DIR")]
+        outdir: String,
     },
     /// get GC content result and plot
     gcplot {
         /// input fastq file, or read from stdin
         input: Option<String>,
         /// output GC contnet result file name
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         output: Option<String>,
         /// if specified, show histogram graphs in terminal
         #[arg( short = 's', long ="show-terminal", help_heading = Some("FLAGS"))]
@@ -596,7 +618,7 @@ pub enum Subcli {
         /// input fastq file, or read from stdin
         input: Option<String>,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     },
     /// view fastq file page by page
@@ -604,7 +626,7 @@ pub enum Subcli {
         /// input fastq file
         input: Option<String>,
         /// output reads page by page, file name ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out" ,value_name = "STR")]
+        #[arg(short = 'o', long = "out" ,value_name = "FILE")]
         out: Option<String>,
     }
 }
