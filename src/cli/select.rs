@@ -1,12 +1,8 @@
 use crate::utils::*;
-use anyhow::{Result,Ok};
+use anyhow::{Ok, Result};
 use bio::io::fastq;
 use log::*;
-use std::{
-    time::Instant,
-    collections::HashMap,
-};
-
+use std::{collections::HashMap, time::Instant};
 
 pub fn select_pe_fastq(
     fq1: &String,
@@ -26,15 +22,14 @@ pub fn select_pe_fastq(
     let fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;
     let fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
 
-    for rec in fq_reader1.records().flatten() { 
+    for rec in fq_reader1.records().flatten() {
         let k = rec.id().to_owned();
-        read1_id.entry(k).or_insert(()); 
+        read1_id.entry(k).or_insert(());
     }
-    for rec in fq_reader2.records().flatten() { 
+    for rec in fq_reader2.records().flatten() {
         let k = rec.id().to_owned();
-        read2_id.entry(k).or_insert(()); 
+        read2_id.entry(k).or_insert(());
     }
-    
 
     let mut out_writer1 = file_writer(Some(out_r1), compression_level).map(fastq::Writer::new)?;
     let mut out_writer2 = file_writer(Some(out_r2), compression_level).map(fastq::Writer::new)?;
@@ -48,7 +43,7 @@ pub fn select_pe_fastq(
         }
     }
     out_writer1.flush()?;
-    
+
     let fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
     for rec in fq_reader2.records().flatten() {
         if read2_id.contains_key(rec.id()) && read1_id.contains_key(rec.id()) {
@@ -57,10 +52,10 @@ pub fn select_pe_fastq(
         }
     }
     out_writer2.flush()?;
-    assert_eq!(pe_r1,pe_r2);
+    assert_eq!(pe_r1, pe_r2);
 
     info!("total selected pe reads: {}", pe_r1);
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
 
     Ok(())
 }

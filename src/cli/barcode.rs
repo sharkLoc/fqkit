@@ -1,17 +1,14 @@
 use crate::utils::*;
+use anyhow::Result;
 use bio::io::fastq;
+use log::*;
 use std::collections::HashMap;
 use std::io::BufRead;
-use anyhow::Result;
 use std::path::Path;
 use std::time::Instant;
-use log::*;
 
-fn barcode_list(
-    file: &String,
-    rev_comp: bool,
-) -> Result<HashMap<String, String>> {
-    info!("reading from barcode list file: {}",file);
+fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>> {
+    info!("reading from barcode list file: {}", file);
 
     let fp = file_reader(Some(file))?;
     let mut maps = HashMap::new();
@@ -58,15 +55,14 @@ fn barcode_list(
                     'g' => 'G',
                     'c' => 'C',
                     _ => {
-                        warn!("invalid barcode base in sample {}, skipped",item[1]);
+                        warn!("invalid barcode base in sample {}, skipped", item[1]);
                         error_flag = "err";
                         'X'
                     }
                 })
                 .collect();
             if error_flag != "err" {
-                maps.entry(bar)
-                    .or_insert(item[1].to_string());
+                maps.entry(bar).or_insert(item[1].to_string());
             }
             error_flag = "";
         }
@@ -79,7 +75,7 @@ fn hamming_dis(bar: &str, seq: &[u8]) -> usize {
     let mut dist = 0usize;
     let bar = bar.as_bytes();
     for i in 0..bar.len() {
-        if bar[i] != seq[i]{
+        if bar[i] != seq[i] {
             dist += 1;
         }
     }
@@ -91,7 +87,7 @@ pub fn split_fq(
     big_fq2: &String,
     bar_file: &String,
     rev_comp: bool,
-    mode : usize,
+    mode: usize,
     mismatch: usize,
     outdir: &str,
     gzip: bool,
@@ -101,14 +97,14 @@ pub fn split_fq(
 ) -> Result<()> {
     let start = Instant::now();
 
-    if !Path::new(outdir).try_exists().unwrap(){
-        error!("invalid output dir: {}",outdir);
+    if !Path::new(outdir).try_exists().unwrap() {
+        error!("invalid output dir: {}", outdir);
         std::process::exit(1);
     }
     let mut n = 0;
     if gzip {
         n += 1;
-    } 
+    }
     if bzip2 {
         n += 1;
     }
@@ -119,18 +115,18 @@ pub fn split_fq(
         error!("only one of the flags --gzip, --xz and --bzip2 is allowed");
         std::process::exit(1);
     }
-    
+
     if let Ok(maps) = barcode_list(bar_file, rev_comp) {
         if maps.is_empty() {
-            error!("empty barcode list file: {}",bar_file);
+            error!("empty barcode list file: {}", bar_file);
             std::process::exit(1);
         }
 
         let mut fq_hand = Vec::new();
         for (bar_seq, name) in maps {
             let fq1 = if gzip {
-                format!("{}/{}_1.fq.gz", outdir, name) 
-            } else if bzip2 { 
+                format!("{}/{}_1.fq.gz", outdir, name)
+            } else if bzip2 {
                 format!("{}/{}_1.fq.bz2", outdir, name)
             } else if xz {
                 format!("{}/{}_1.fq.xz", outdir, name)
@@ -158,14 +154,14 @@ pub fn split_fq(
 
             let fh1 = fastq::Writer::new(file_writer_append(&fq1, compression_level)?);
             let fh2 = fastq::Writer::new(file_writer_append(&fq2, compression_level)?);
-            let fhb = fastq::Writer::new(file_writer_append(&bar, compression_level)?); 
+            let fhb = fastq::Writer::new(file_writer_append(&bar, compression_level)?);
             let len = bar_seq.len();
             fq_hand.push((bar_seq, len, fh1, fh2, fhb));
         }
-        
-        info!("reading from read1 file: {}",big_fq1);
-        info!("reading from read2 file: {}",big_fq2);
-        info!("barcode position mode: {}",mode);
+
+        info!("reading from read1 file: {}", big_fq1);
+        info!("reading from read2 file: {}", big_fq2);
+        info!("barcode position mode: {}", mode);
 
         let bar_count = fq_hand.len();
         let fq1_reader = fastq::Reader::new(file_reader(Some(big_fq1))?);
@@ -173,12 +169,16 @@ pub fn split_fq(
         let (mut read_pair, mut get_pair) = (0u64, 0u64);
 
         if mode == 2 {
-            for (rec1, rec2) in fq1_reader.records().flatten().zip(fq2_reader.records().flatten()){
+            for (rec1, rec2) in fq1_reader
+                .records()
+                .flatten()
+                .zip(fq2_reader.records().flatten())
+            {
                 let read_len = rec2.seq().len();
                 read_pair += 1;
                 for idx in 0..bar_count {
-                    if let Some((bar_seq, bar_len, fh1, fh2, fhb)) = fq_hand.get_mut(idx){
-                        let pos_index =  read_len - *bar_len; 
+                    if let Some((bar_seq, bar_len, fh1, fh2, fhb)) = fq_hand.get_mut(idx) {
+                        let pos_index = read_len - *bar_len;
                         let read_part1 = &rec2.seq()[0..pos_index];
                         let read_part2 = &rec2.seq()[pos_index..];
                         let qual_part1 = &rec2.qual()[0..pos_index];
@@ -190,14 +190,18 @@ pub fn split_fq(
                             fhb.write(rec2.id(), rec2.desc(), read_part2, qual_part2)?;
                             break;
                         }
-                    }   
+                    }
                 }
             }
         } else if mode == 1 {
-            for (rec1, rec2) in fq1_reader.records().flatten().zip(fq2_reader.records().flatten()){
+            for (rec1, rec2) in fq1_reader
+                .records()
+                .flatten()
+                .zip(fq2_reader.records().flatten())
+            {
                 read_pair += 1;
                 for idx in 0..bar_count {
-                    if let Some((bar_seq, bar_len, fh1, fh2, fhb)) = fq_hand.get_mut(idx){
+                    if let Some((bar_seq, bar_len, fh1, fh2, fhb)) = fq_hand.get_mut(idx) {
                         let pos_index = *bar_len;
                         let read_part1 = &rec2.seq()[0..pos_index];
                         let read_part2 = &rec2.seq()[pos_index..];
@@ -210,16 +214,19 @@ pub fn split_fq(
                             fhb.write(rec2.id(), rec2.desc(), read_part1, qual_part1)?;
                             break;
                         }
-                    }    
+                    }
                 }
             }
         } else {
             error!("invalid mode arg, must be 1 or 2 !");
             std::process::exit(1);
         }
-        info!("data split rate: {:.4}%",get_pair as f64 / read_pair as f64 * 100.0);
+        info!(
+            "data split rate: {:.4}%",
+            get_pair as f64 / read_pair as f64 * 100.0
+        );
     }
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

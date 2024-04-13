@@ -1,9 +1,8 @@
 use crate::utils::*;
+use anyhow::{Ok, Result};
 use bio::io::{fastq, fastq::Record};
-use anyhow::{Result, Ok};
 use log::*;
 use std::time::Instant;
-
 
 pub fn slide_fastq(
     file: Option<&String>,
@@ -33,25 +32,39 @@ pub fn slide_fastq(
         loop {
             if window < len {
                 let this_desc = if let Some(desc) = rec.desc() {
-                    format!("{}{}:{}-{}",desc, suffix, st+1, window)
+                    format!("{}{}:{}-{}", desc, suffix, st + 1, window)
                 } else {
-                    format!("{}:{}-{}",suffix, st+1, window)
+                    format!("{}:{}-{}", suffix, st + 1, window)
                 };
-                fq_writer.write_record(&Record::with_attrs(rec.id(), Some(this_desc.as_str()), &seq[st..window], &qual[st..window]))?;
+                fq_writer.write_record(&Record::with_attrs(
+                    rec.id(),
+                    Some(this_desc.as_str()),
+                    &seq[st..window],
+                    &qual[st..window],
+                ))?;
                 st += step;
                 window += step;
             } else {
                 if st < len {
                     let this_desc = if let Some(desc) = rec.desc() {
-                        format!("{}{}:{}-{}",desc, suffix, st+1, len)
+                        format!("{}{}:{}-{}", desc, suffix, st + 1, len)
                     } else {
-                        format!("{}:{}-{}",suffix, st+1, len)
+                        format!("{}:{}-{}", suffix, st + 1, len)
                     };
-                    fq_writer.write_record(&Record::with_attrs(rec.id(), Some(this_desc.as_str()), &seq[st..len], &qual[st..len]))?;
+                    fq_writer.write_record(&Record::with_attrs(
+                        rec.id(),
+                        Some(this_desc.as_str()),
+                        &seq[st..len],
+                        &qual[st..len],
+                    ))?;
                 } else {
-                    trace!("slice read start position: {} is bigger than read length: {}",st+1,len);
+                    trace!(
+                        "slice read start position: {} is bigger than read length: {}",
+                        st + 1,
+                        len
+                    );
                 }
-                // single read slice done, init window size with input value 
+                // single read slice done, init window size with input value
                 window = wind;
                 break;
             }
@@ -59,6 +72,6 @@ pub fn slide_fastq(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

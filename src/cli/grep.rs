@@ -1,10 +1,9 @@
-use std::io::BufRead;
-use anyhow::{Ok,Result};
+use crate::utils::*;
+use anyhow::{Ok, Result};
 use bio::io::fastq;
 use log::*;
-use crate::utils::*;
+use std::io::BufRead;
 use std::time::Instant;
-
 
 pub fn grep_fastq(
     fq: Option<&String>,
@@ -18,7 +17,7 @@ pub fn grep_fastq(
     } else {
         info!("reading from stdin");
     }
-    info!("reading reads id from file: {}",list);
+    info!("reading reads id from file: {}", list);
 
     let start = Instant::now();
     let mut num = 0usize;
@@ -29,7 +28,7 @@ pub fn grep_fastq(
         ids.push(id);
     }
     if ids.is_empty() {
-        error!("no reads id in file: {}",list);
+        error!("no reads id in file: {}", list);
         std::process::exit(1);
     }
     if let Some(out) = out {
@@ -43,12 +42,12 @@ pub fn grep_fastq(
     for rec in fq_reader.records().flatten() {
         let name = if full_name {
             if let Some(desc) = rec.desc() {
-                format!("{} {}",rec.id(),desc)
-            } else { 
-                String::from(rec.id()) 
+                format!("{} {}", rec.id(), desc)
+            } else {
+                String::from(rec.id())
             }
         } else {
-            String::from(rec.id()) 
+            String::from(rec.id())
         };
         if ids.contains(&name) {
             num += 1;
@@ -57,8 +56,7 @@ pub fn grep_fastq(
     }
     fo.flush()?;
 
- 
-    info!("total reads matched number: {}",num);
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("total reads matched number: {}", num);
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

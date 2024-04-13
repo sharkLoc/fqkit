@@ -1,9 +1,9 @@
 use crate::utils::*;
-use bio::io::fastq;
 use anyhow::{Error, Ok};
+use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 use std::io::BufRead;
+use std::time::Instant;
 
 pub fn remove_read(
     file: Option<&String>,
@@ -12,7 +12,7 @@ pub fn remove_read(
     save: &String,
     rm: bool,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     if let Some(file) = file {
         info!("reading reads from file: {}", file);
     } else {
@@ -26,10 +26,10 @@ pub fn remove_read(
 
     let mut ids = vec![];
     let list = file_reader(Some(name))?;
-    for i in list.lines().map_while(Result::ok){
+    for i in list.lines().map_while(Result::ok) {
         ids.push(i);
     }
-    
+
     if ids.is_empty() {
         error!("reads id list is empty");
         std::process::exit(1);
@@ -52,12 +52,12 @@ pub fn remove_read(
                 fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
             } else {
                 rm_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-            }    
+            }
         }
         fq_writer.flush()?;
         rm_writer.flush()?;
     }
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

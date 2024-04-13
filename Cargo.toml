@@ -1,9 +1,9 @@
 [package]
 name = "fqkit"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
-rust-version = "1.65.0"
+rust-version = "1.77.2"
 homepage = "https://github.com/sharkLoc/fqkit"
 repository = "https://github.com/sharkLoc/fqkit"
 description = "fqkit: a simple and cross-platform program for fastq file manipulation"

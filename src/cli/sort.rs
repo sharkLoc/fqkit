@@ -1,9 +1,8 @@
 use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
-use std::time::Instant;
 use log::*;
-
+use std::time::Instant;
 
 pub fn sort_fastq(
     file: Option<&String>,
@@ -14,7 +13,7 @@ pub fn sort_fastq(
     reverse: bool,
     out: Option<&String>,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
@@ -24,7 +23,7 @@ pub fn sort_fastq(
         info!("output reversed result");
     }
     let mut n = 0;
-    if sort_by_gc { 
+    if sort_by_gc {
         n += 1;
     }
     if sort_by_length {
@@ -32,7 +31,7 @@ pub fn sort_fastq(
     }
     if sort_by_name {
         n += 1;
-    } 
+    }
     if sort_by_seq {
         n += 1;
     }
@@ -56,44 +55,80 @@ pub fn sort_fastq(
     if sort_by_name {
         info!("sort read by name");
         if reverse {
-            vec_reads.sort_by(|a,b| {
-                let read_name1 = if let Some(des) = a.desc() { format!("{} {}",a.id(),des)} else {a.id().to_string()};
-                let read_name2 = if let Some(des) = b.desc() { format!("{} {}",a.id(),des)} else {b.id().to_string()};
+            vec_reads.sort_by(|a, b| {
+                let read_name1 = if let Some(des) = a.desc() {
+                    format!("{} {}", a.id(), des)
+                } else {
+                    a.id().to_string()
+                };
+                let read_name2 = if let Some(des) = b.desc() {
+                    format!("{} {}", a.id(), des)
+                } else {
+                    b.id().to_string()
+                };
                 read_name2.cmp(&read_name1)
             });
         } else {
-            vec_reads.sort_by(|a,b| {
-                let read_name1 = if let Some(des) = a.desc() { format!("{} {}",a.id(),des)} else {a.id().to_string()};
-                let read_name2 = if let Some(des) = b.desc() { format!("{} {}",a.id(),des)} else {b.id().to_string()};
+            vec_reads.sort_by(|a, b| {
+                let read_name1 = if let Some(des) = a.desc() {
+                    format!("{} {}", a.id(), des)
+                } else {
+                    a.id().to_string()
+                };
+                let read_name2 = if let Some(des) = b.desc() {
+                    format!("{} {}", a.id(), des)
+                } else {
+                    b.id().to_string()
+                };
                 read_name1.cmp(&read_name2)
             });
         }
     } else if sort_by_seq {
         info!("sort read by sequence");
         if reverse {
-            vec_reads.sort_by(|a,b| { b.seq().cmp(a.seq()) });
+            vec_reads.sort_by(|a, b| b.seq().cmp(a.seq()));
         } else {
-            vec_reads.sort_by(|a,b| { a.seq().cmp(b.seq()) });
+            vec_reads.sort_by(|a, b| a.seq().cmp(b.seq()));
         }
     } else if sort_by_length {
         info!("sort read by length");
         if reverse {
-            vec_reads.sort_by(|a,b| {b.seq().len().cmp(&a.seq().len())});
+            vec_reads.sort_by(|a, b| b.seq().len().cmp(&a.seq().len()));
         } else {
-            vec_reads.sort_by(|a,b| {a.seq().len().cmp(&b.seq().len())});
+            vec_reads.sort_by(|a, b| a.seq().len().cmp(&b.seq().len()));
         }
     } else if sort_by_gc {
         info!("sort read by gc content");
         if reverse {
-            vec_reads.sort_by(|a,b| {
-                let r1_gc = a.seq().iter().filter(|x| x == &&b'G' || x == &&b'C').count() as f64 / a.seq().len() as f64;
-                let r2_gc = b.seq().iter().filter(|x| x == &&b'G' || x == &&b'C').count() as f64 / b.seq().len() as f64;
+            vec_reads.sort_by(|a, b| {
+                let r1_gc = a
+                    .seq()
+                    .iter()
+                    .filter(|x| x == &&b'G' || x == &&b'C')
+                    .count() as f64
+                    / a.seq().len() as f64;
+                let r2_gc = b
+                    .seq()
+                    .iter()
+                    .filter(|x| x == &&b'G' || x == &&b'C')
+                    .count() as f64
+                    / b.seq().len() as f64;
                 r2_gc.partial_cmp(&r1_gc).unwrap()
             });
         } else {
-            vec_reads.sort_by(|a,b| {
-                let r1_gc = a.seq().iter().filter(|x| x == &&b'G' || x == &&b'C').count() as f64 / a.seq().len() as f64;
-                let r2_gc = b.seq().iter().filter(|x| x == &&b'G' || x == &&b'C').count() as f64 / b.seq().len() as f64;
+            vec_reads.sort_by(|a, b| {
+                let r1_gc = a
+                    .seq()
+                    .iter()
+                    .filter(|x| x == &&b'G' || x == &&b'C')
+                    .count() as f64
+                    / a.seq().len() as f64;
+                let r2_gc = b
+                    .seq()
+                    .iter()
+                    .filter(|x| x == &&b'G' || x == &&b'C')
+                    .count() as f64
+                    / b.seq().len() as f64;
                 r1_gc.partial_cmp(&r2_gc).unwrap()
             });
         }
@@ -106,6 +141,6 @@ pub fn sort_fastq(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

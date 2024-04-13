@@ -1,16 +1,16 @@
 use crate::utils::*;
-use bio::io::fastq;
 use anyhow::{Error, Ok};
+use bio::io::fastq;
 use log::*;
 use std::time::Instant;
 
 pub fn flatten_fq(
-    file: Option<&String>, 
+    file: Option<&String>,
     out: Option<&String>,
     flag: u8,
     sep: char,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     let start = Instant::now();
     if let Some(file) = file {
         info!("reading from file: {}", file);
@@ -19,16 +19,16 @@ pub fn flatten_fq(
     }
     info!("flag value is: {}", flag);
 
-    if flag == 0 || flag>15 {
-        error!("error flag numer: {}, flag range [1..15]",flag);
+    if flag == 0 || flag > 15 {
+        error!("error flag numer: {}, flag range [1..15]", flag);
         std::process::exit(1);
     }
-    
+
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     let mut out_writer = file_writer(out, compression_level)?;
-    let flags = format!("{:b}",flag).chars().rev().collect::<Vec<char>>();
+    let flags = format!("{:b}", flag).chars().rev().collect::<Vec<char>>();
     let mut fields = vec![];
-    for (i,k) in flags.iter().enumerate() {
+    for (i, k) in flags.iter().enumerate() {
         if k == &'1' {
             fields.push(i);
         }
@@ -45,7 +45,7 @@ pub fn flatten_fq(
         out_writer.write_all("\n".as_bytes())?;
     }
     out_writer.flush()?;
-    
-    info!("time elapsed is: {:?}",start.elapsed());
+
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

@@ -1,6 +1,6 @@
 use crate::utils::*;
-use bio::io::fastq;
 use anyhow::{Error, Ok};
+use bio::io::fastq;
 use log::*;
 use std::time::Instant;
 
@@ -9,7 +9,7 @@ pub fn split_interleaved(
     out_dir: &String,
     out_pre: &String,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     let start = Instant::now();
 
     let pre1 = format!("{}/{}_r1.fq.gz", out_dir, out_pre);
@@ -17,13 +17,13 @@ pub fn split_interleaved(
     let mut fh1 = fastq::Writer::new(file_writer_append(&pre1, compression_level)?);
     let mut fh2 = fastq::Writer::new(file_writer_append(&pre2, compression_level)?);
 
-    if let Some(file) =file {
+    if let Some(file) = file {
         info!("reading from file: {}", file);
-    }else {
+    } else {
         info!("reading from stdin");
     }
-    info!("read1 output file: {}",pre1);
-    info!("read2 output file: {}",pre2);
+    info!("read1 output file: {}", pre1);
+    info!("read2 output file: {}", pre2);
 
     let mut num = 0usize;
     let mut flag = true;
@@ -42,6 +42,6 @@ pub fn split_interleaved(
     fh2.flush()?;
 
     info!("total split PE reads number: {}", num);
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

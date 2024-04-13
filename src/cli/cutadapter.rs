@@ -1,10 +1,9 @@
 use crate::utils::*;
-use std::time::Instant;
-use std::collections::HashMap;
+use anyhow::{Error, Ok, Result};
+use bio::io::{fasta, fastq};
 use log::*;
-use bio::io::{fastq,fasta};
-use anyhow::{Result,Ok,Error};
-
+use std::collections::HashMap;
+use std::time::Instant;
 
 pub fn cut_adapter(
     input: Option<&String>,
@@ -13,7 +12,7 @@ pub fn cut_adapter(
     miss: usize,
     out: Option<&String>,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     let start = Instant::now();
     if let Some(file) = input {
         info!("reading seq from file: {}", seqfile);
@@ -24,15 +23,16 @@ pub fn cut_adapter(
 
     let mut seqs = HashMap::new();
     let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
-    
+
     let mut iters = seqfile_reader.records();
-    while let Some(each) =  iters.next() {
+    while let Some(each) = iters.next() {
         let rec = each?;
         if seqs.contains_key(&rec.id().to_owned()) {
             warn!("found duplicate sequence id: {}, keep first one", rec.id());
             continue;
         } else {
-            seqs.entry(rec.id().to_owned()).or_insert(rec.seq().to_owned());
+            seqs.entry(rec.id().to_owned())
+                .or_insert(rec.seq().to_owned());
         }
     }
     if seqs.is_empty() {
@@ -54,10 +54,15 @@ pub fn cut_adapter(
                         .iter()
                         .zip(rec.seq().iter())
                         .enumerate()
-                        .filter(|(_,(y,z))| {y != z})
+                        .filter(|(_, (y, z))| y != z)
                         .count();
                     if hanming <= miss {
-                        fq_writer.write(rec.id(), rec.desc(), &rec.seq()[pat.len()..], &rec.qual()[pat.len()..])?;
+                        fq_writer.write(
+                            rec.id(),
+                            rec.desc(),
+                            &rec.seq()[pat.len()..],
+                            &rec.qual()[pat.len()..],
+                        )?;
                         flag = true;
                         break;
                     }
@@ -67,10 +72,15 @@ pub fn cut_adapter(
                         .iter()
                         .zip(rec.seq()[idx..].iter())
                         .enumerate()
-                        .filter(|(_,(y,z))| {y != z})
+                        .filter(|(_, (y, z))| y != z)
                         .count();
                     if hanming <= miss {
-                        fq_writer.write(rec.id(), rec.desc(), &rec.seq()[0..idx], &rec.qual()[0..idx])?;
+                        fq_writer.write(
+                            rec.id(),
+                            rec.desc(),
+                            &rec.seq()[0..idx],
+                            &rec.qual()[0..idx],
+                        )?;
                         flag = true;
                         break;
                     }
@@ -86,6 +96,6 @@ pub fn cut_adapter(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

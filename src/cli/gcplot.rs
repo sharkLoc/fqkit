@@ -1,23 +1,23 @@
-use anyhow::{Ok, Error};
-use bio::io::fastq;
-use std::collections::HashMap;
-use log::*;
-use plotters::prelude::*;
-use lowcharts::plot;
 use crate::utils::*;
+use anyhow::{Error, Ok};
+use bio::io::fastq;
+use log::*;
+use lowcharts::plot;
+use plotters::prelude::*;
+use std::collections::HashMap;
 use std::time::Instant;
 
 pub fn gc_content(
     fqin: Option<&String>,
     output: Option<&String>,
     show: bool,
-    prefix: String, 
-    width: usize, 
+    prefix: String,
+    width: usize,
     height: usize,
     ylim: usize,
     types: &str,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     if let Some(inp) = fqin {
         info!("reading from file: {}", inp);
     } else {
@@ -27,13 +27,16 @@ pub fn gc_content(
 
     let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
     let mut fo = file_writer(output, compression_level)?;
-    let mut df_hash = HashMap::new() ;
+    let mut df_hash = HashMap::new();
 
     for rec in fq_reader.records().flatten() {
-        let gc_count = rec.seq().iter().filter(|x| *x ==&b'G'|| *x==&b'C').count();
-        let gc_ratio = (gc_count as f64 / rec.seq().len() as f64 *100.0).round() as u64;
-        *df_hash.entry(gc_ratio).or_insert(0) +=1usize;
-       
+        let gc_count = rec
+            .seq()
+            .iter()
+            .filter(|x| *x == &b'G' || *x == &b'C')
+            .count();
+        let gc_ratio = (gc_count as f64 / rec.seq().len() as f64 * 100.0).round() as u64;
+        *df_hash.entry(gc_ratio).or_insert(0) += 1usize;
     }
 
     fo.write_all("GC(%)\tReads\tRatio(%)\n".as_bytes())?;
@@ -43,36 +46,45 @@ pub fn gc_content(
 
     for i in 0..=100 {
         let num = *df_hash.get(&i).unwrap_or(&0);
-        let v = (num as f32 *10000.0 / total ).round() / 100.0;
+        let v = (num as f32 * 10000.0 / total).round() / 100.0;
         df_ret.push(v);
         fo.write_all(format!("{}\t{}\t{}\n", i, num, v).as_bytes())?;
         if show {
-            for _ in 0..num{
+            for _ in 0..num {
                 df_num.push(i as f64)
             }
         }
     }
     fo.flush()?;
-    
+
     //plot_gc(df_ret, prefix, width, height, ylim, types, quiet)?;
     if show {
-        info!("{}",plot::Histogram::new(&df_num, plot::HistogramOptions { intervals: 20, ..Default::default() }));
+        info!(
+            "{}",
+            plot::Histogram::new(
+                &df_num,
+                plot::HistogramOptions {
+                    intervals: 20,
+                    ..Default::default()
+                }
+            )
+        );
     }
     plot_gc(df_ret, prefix, width, height, ylim, types)?;
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 
 // GC content line plot
 fn plot_gc(
-    data: Vec<f32>, 
-    prefix: String, 
-    width: usize, 
+    data: Vec<f32>,
+    prefix: String,
+    width: usize,
     height: usize,
     ylim: usize,
     types: &str,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     if !["svg", "png"].contains(&types) {
         error!("invalid args types.");
         std::process::exit(1);
@@ -81,8 +93,12 @@ fn plot_gc(
         error!("invalid args ylim.");
         std::process::exit(1);
     }
-    let name = if types == "png" {format!("{}.png",prefix)} else {format!("{}.svg",prefix)};
-    info!("output gc content plot: {}",name);
+    let name = if types == "png" {
+        format!("{}.png", prefix)
+    } else {
+        format!("{}.svg", prefix)
+    };
+    info!("output gc content plot: {}", name);
 
     if types == "png" {
         let png = BitMapBackend::new(&name, (width as u32, height as u32)).into_drawing_area();
@@ -94,21 +110,27 @@ fn plot_gc(
             .x_label_area_size(40)
             .y_label_area_size(40)
             //.build_cartesian_2d(0..100, 0..ylim)?;
-            .build_cartesian_2d(0.0..100f32 , 0.0..ylim as f32)?;
+            .build_cartesian_2d(0.0..100f32, 0.0..ylim as f32)?;
 
         charts
             .configure_mesh()
             .x_labels(20)
             .x_desc("GC CONTENT")
-            .x_label_formatter(&|x| format!("{:.0}%",x))
+            .x_label_formatter(&|x| format!("{:.0}%", x))
             .y_labels(20)
             .y_label_formatter(&|x| format!("{:.0}%", x))
             .y_desc("percent")
             .draw()?;
 
-        charts.draw_series(
-            AreaSeries::new((0..).zip(data.iter()).map(|(x,y)| (x as f32, *y)), 0., &GREEN.mix(0.5)).border_style(&GREEN),
-        )?
+        charts
+            .draw_series(
+                AreaSeries::new(
+                    (0..).zip(data.iter()).map(|(x, y)| (x as f32, *y)),
+                    0.,
+                    &GREEN.mix(0.5),
+                )
+                .border_style(&GREEN),
+            )?
             .label("GC content")
             .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &GREEN));
 
@@ -120,7 +142,6 @@ fn plot_gc(
             .border_style(&BLACK)
             .position(SeriesLabelPosition::UpperRight)
             .draw()?;
-
     } else {
         let svg = SVGBackend::new(&name, (width as u32, height as u32)).into_drawing_area();
         svg.fill(&WHITE)?;
@@ -130,21 +151,27 @@ fn plot_gc(
             .caption("GC distrbution plot", ("sans-serif", 30).into_font())
             .x_label_area_size(40)
             .y_label_area_size(40)
-            .build_cartesian_2d(0.0..100f32 , 0.0..ylim as f32)?;
+            .build_cartesian_2d(0.0..100f32, 0.0..ylim as f32)?;
 
         charts
             .configure_mesh()
             .x_labels(20)
             .x_desc("GC CONTENT")
-            .x_label_formatter(&|x| format!("{:.0}%",x))
+            .x_label_formatter(&|x| format!("{:.0}%", x))
             .y_labels(20)
             .y_label_formatter(&|x| format!("{:.0}%", x))
             .y_desc("percent")
             .draw()?;
 
-        charts.draw_series(
-            AreaSeries::new((0..).zip(data.iter()).map(|(x,y)| (x as f32, *y)), 0., &GREEN.mix(0.5)).border_style(&GREEN),
-        )?
+        charts
+            .draw_series(
+                AreaSeries::new(
+                    (0..).zip(data.iter()).map(|(x, y)| (x as f32, *y)),
+                    0.,
+                    &GREEN.mix(0.5),
+                )
+                .border_style(&GREEN),
+            )?
             .label("GC content")
             .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &GREEN));
 

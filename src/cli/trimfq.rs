@@ -1,9 +1,8 @@
 use crate::utils::*;
-use bio::io::fastq;
 use anyhow::Result;
-use std::time::Instant;
+use bio::io::fastq;
 use log::*;
-
+use std::time::Instant;
 
 pub fn trim_fq(
     file: Option<&String>,
@@ -19,15 +18,20 @@ pub fn trim_fq(
     } else {
         info!("reading from stdin");
     }
-    
+
     let length = right + left;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
-    
-    for (idx,rec) in fq_reader.records().flatten().enumerate() {
+
+    for (idx, rec) in fq_reader.records().flatten().enumerate() {
         let rlen = rec.seq().len();
-        if left >= rlen || right>= rlen || length >= rlen {
-            warn!("read: {} in order {} is short than {} , skip", rec.id(), idx+1, length);
+        if left >= rlen || right >= rlen || length >= rlen {
+            warn!(
+                "read: {} in order {} is short than {} , skip",
+                rec.id(),
+                idx + 1,
+                length
+            );
             continue;
         }
 
@@ -41,6 +45,6 @@ pub fn trim_fq(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

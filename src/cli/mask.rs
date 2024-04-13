@@ -1,9 +1,8 @@
 use crate::utils::*;
-use bio::io::{fastq,fastq::Record};
 use anyhow::{Ok, Result};
+use bio::io::{fastq, fastq::Record};
 use log::*;
 use std::time::Instant;
-
 
 pub fn mask_fastq(
     file: Option<&String>,
@@ -22,10 +21,10 @@ pub fn mask_fastq(
     info!("mask low quality bases with: {}", nt);
     let start = Instant::now();
 
-    let (mut mask_base, mut mask_read) = (0,0);
+    let (mut mask_base, mut mask_read) = (0, 0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
     let mut fp_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
-    
+
     for rec in fp_reader.records().flatten() {
         let score_min = rec.qual().iter().min().unwrap() - phred;
         if score_min > qual_limit {
@@ -35,7 +34,7 @@ pub fn mask_fastq(
             mask_read += 1;
 
             let mut seq = String::new();
-            for (s,q) in rec.seq().iter().zip(rec.qual().iter()) {
+            for (s, q) in rec.seq().iter().zip(rec.qual().iter()) {
                 if q - phred <= qual_limit {
                     seq.push(nt);
                     mask_base += 1;
@@ -49,8 +48,7 @@ pub fn mask_fastq(
     }
     fp_writer.flush()?;
 
-    
     info!("total mask {} bases from {} reads", mask_base, mask_read);
-    info!("time elapsed is: {:?}",start.elapsed()); 
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

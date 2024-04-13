@@ -1,26 +1,25 @@
 use crate::utils::*;
-use bio::io::fastq;
 use anyhow::{Error, Ok};
+use bio::io::fastq;
 use log::*;
 use rand::{prelude::*, Rng};
 use rand_pcg::Pcg64;
 use std::time::Instant;
 
-
 // reduce much memory but cost more time
 fn select_fastq(
-    file: Option<&String>, 
-    n: usize, 
-    seed: u64, 
+    file: Option<&String>,
+    n: usize,
+    seed: u64,
     out: Option<&String>,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
-    info!("rand seed: {}",seed);
+    info!("rand seed: {}", seed);
     info!("subseq number: {}", n);
     info!("reduce much memory but cost more time");
     let start = Instant::now();
@@ -50,24 +49,24 @@ fn select_fastq(
     }
     w.flush()?;
 
-    info!("time elapsed is: {:?}",start.elapsed());
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 
 // fast mode but cost more memory
 fn select_fastq2(
-    file: Option<&String>, 
-    n: usize, 
-    seed: u64, 
+    file: Option<&String>,
+    n: usize,
+    seed: u64,
     out: Option<&String>,
     compression_level: u32,
-) -> Result<(),Error> {
+) -> Result<(), Error> {
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
-    info!("rand seed: {}",seed);
+    info!("rand seed: {}", seed);
     info!("subseq num: {}", n);
     info!("fast mode but cost more memory");
     let start = Instant::now();
@@ -93,17 +92,16 @@ fn select_fastq2(
         w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
     }
     w.flush()?;
-    
-    info!("time elapsed is: {:?}",start.elapsed());
+
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 
-
 pub fn subset_fastq(
     rdc: bool,
-    file: Option<&String>, 
-    n: usize, 
-    seed: u64, 
+    file: Option<&String>,
+    n: usize,
+    seed: u64,
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<(), Error> {

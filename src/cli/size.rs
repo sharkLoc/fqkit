@@ -1,8 +1,8 @@
-use bio::io::fastq;
-use anyhow::Result;
-use log::*;
-use crossbeam::channel::unbounded;
 use crate::utils::*;
+use anyhow::Result;
+use bio::io::fastq;
+use crossbeam::channel::unbounded;
+use log::*;
 use std::time::Instant;
 
 #[derive(Clone, Copy)]
@@ -17,7 +17,14 @@ struct Base {
 
 impl Base {
     pub fn new() -> Self {
-        Base { a: 0, t: 0, g: 0, c: 0, n: 0, read: 0 }
+        Base {
+            a: 0,
+            t: 0,
+            g: 0,
+            c: 0,
+            n: 0,
+            read: 0,
+        }
     }
 }
 
@@ -25,7 +32,7 @@ pub fn size_fastq(
     fq: Option<&String>,
     ncpu: usize,
     chunk: usize,
-    out: Option<&String>, 
+    out: Option<&String>,
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
@@ -43,7 +50,10 @@ pub fn size_fastq(
 
     let mut chunk = chunk;
     if chunk == 0 {
-        warn!("read conut in chunk can't be: {}, changed to default value.",chunk);
+        warn!(
+            "read conut in chunk can't be: {}, changed to default value.",
+            chunk
+        );
         chunk = 5000;
     }
     let fq = fastq::Reader::new(file_reader(fq)?);
@@ -56,54 +66,57 @@ pub fn size_fastq(
             base.read += 1;
             for nt in rec.seq().iter() {
                 match *nt {
-                    b'A' => base.a +=1,
-                    b'T' => base.t +=1,
-                    b'G' => base.g +=1,
-                    b'C' => base.c +=1,
-                    b'N' => base.n +=1,
+                    b'A' => base.a += 1,
+                    b'T' => base.t += 1,
+                    b'G' => base.g += 1,
+                    b'C' => base.c += 1,
+                    b'N' => base.n += 1,
                     _ => unreachable!(),
                 }
-            };
+            }
         }
-        bases = base.a + base.t + base.g + base.c + base.n; 
+        bases = base.a + base.t + base.g + base.c + base.n;
     } else {
         let (tx, rx) = unbounded();
         let mut fqiter = fq.records();
         loop {
             let chunk: Vec<_> = fqiter.by_ref().take(chunk).flatten().collect();
-            if chunk.is_empty() { break; }
+            if chunk.is_empty() {
+                break;
+            }
             tx.send(chunk).unwrap();
         }
         drop(tx);
-    
+
         crossbeam::scope(|s| {
             let (tx2, rx2) = unbounded();
-            let _handles: Vec<_> = (0..ncpu).map(|_| {
-                let rx_tmp = rx.clone();
-                let tx_tmp = tx2.clone();
-                s.spawn(move |_| {
-                    for vrec in rx_tmp {
-                        let mut base = Base::new();
-                        for rec in vrec {
-                            base.read += 1;
-                            for nt in rec.seq().iter() {
-                                match *nt {
-                                    b'A' => base.a +=1,
-                                    b'T' => base.t +=1,
-                                    b'G' => base.g +=1,
-                                    b'C' => base.c +=1,
-                                    b'N' => base.n +=1,
-                                    _ => unreachable!(),
+            let _handles: Vec<_> = (0..ncpu)
+                .map(|_| {
+                    let rx_tmp = rx.clone();
+                    let tx_tmp = tx2.clone();
+                    s.spawn(move |_| {
+                        for vrec in rx_tmp {
+                            let mut base = Base::new();
+                            for rec in vrec {
+                                base.read += 1;
+                                for nt in rec.seq().iter() {
+                                    match *nt {
+                                        b'A' => base.a += 1,
+                                        b'T' => base.t += 1,
+                                        b'G' => base.g += 1,
+                                        b'C' => base.c += 1,
+                                        b'N' => base.n += 1,
+                                        _ => unreachable!(),
+                                    }
                                 }
                             }
-                        };
-                        tx_tmp.send(base).unwrap();
-                    }
-                });
-          
-            }).collect();
+                            tx_tmp.send(base).unwrap();
+                        }
+                    });
+                })
+                .collect();
             drop(tx2);
-    
+
             for data in rx2.iter() {
                 base.read += data.read;
                 base.a += data.a;
@@ -112,13 +125,20 @@ pub fn size_fastq(
                 base.c += data.c;
                 base.n += data.n;
             }
-            bases = base.a + base.t + base.g + base.c + base.n; 
-        }).unwrap();      
+            bases = base.a + base.t + base.g + base.c + base.n;
+        })
+        .unwrap();
     }
 
-    fo.write_all(format!("reads:{}\tbases:{}\tA:{}\tT:{}\tG:{}\tC:{}\tN:{}\n", base.read,bases,base.a,base.t,base.g,base.c,base.n).as_bytes())?;
+    fo.write_all(
+        format!(
+            "reads:{}\tbases:{}\tA:{}\tT:{}\tG:{}\tC:{}\tN:{}\n",
+            base.read, bases, base.a, base.t, base.g, base.c, base.n
+        )
+        .as_bytes(),
+    )?;
     fo.flush()?;
-    
-    info!("time elapsed is: {:?}",start.elapsed());
+
+    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
