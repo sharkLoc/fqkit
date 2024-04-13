@@ -2,7 +2,7 @@ use crate::utils::file_reader;
 use anyhow::Result;
 use colored::*;
 use log::*;
-use plotters::prelude::*;
+use plotters::{style::Color,prelude::*};
 use std::collections::BTreeMap;
 use std::io::BufRead;
 use std::time::Instant;
