@@ -9,7 +9,7 @@ use std::{
 const GZ_MAGIC: [u8; 3] = [0x1f, 0x8b, 0x08];
 const BZ_MAGIC: [u8; 3] = [0x42, 0x5a, 0x68];
 const XZ_MAGIC: [u8; 6] = [0xfd, 0x37, 0x7a, 0x58, 0x5A, 0x00];
-//const ZSTD_MAGIC: [u8; 4] = [0x28, 0xb5, 0x2f, 0xfd]; // TODO
+
 const MAGIC_MAX_LEN: usize = 6;
 const BUFF_SIZE: usize = 1024 * 1024;
 
