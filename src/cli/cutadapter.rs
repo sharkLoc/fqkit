@@ -14,6 +14,8 @@ pub fn cut_adapter(
     compression_level: u32,
 ) -> Result<(), Error> {
     let start = Instant::now();
+
+    let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
     if let Some(file) = input {
         info!("reading seq from file: {}", seqfile);
         info!("reading from file: {}", file);
@@ -22,8 +24,6 @@ pub fn cut_adapter(
     }
 
     let mut seqs = HashMap::new();
-    let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
-
     let mut iters = seqfile_reader.records();
     while let Some(each) = iters.next() {
         let rec = each?;

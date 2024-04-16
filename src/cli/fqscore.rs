@@ -11,6 +11,9 @@ pub fn phred_score(
     to64: bool,
     compression_level: u32,
 ) -> Result<()> {
+    let start = Instant::now();
+    
+    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(r) = file {
         info!("read file from: {}", r);
     } else {
@@ -33,10 +36,7 @@ pub fn phred_score(
         std::process::exit(1);
     }
 
-    let start = Instant::now();
-    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
-
     for rec in fq_reader.records().flatten() {
         let mut qual = vec![];
         if to33 {

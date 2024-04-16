@@ -361,8 +361,8 @@ fn main() -> Result<(), Error> {
         Subcli::reverse { input, rev, out } => {
             reverse_comp_seq(input.as_ref(), out.as_ref(), rev, arg.compression_level)?;
         }
-        Subcli::split { input, pre, out } => {
-            split_interleaved(input.as_ref(), &out, &pre, arg.compression_level)?;
+        Subcli::split { input, gzip, bzip2, xz, pre, out } => {
+            split_interleaved(input.as_ref(), &out, &pre, gzip, bzip2, xz, arg.compression_level)?;
         }
         Subcli::merge { read1, read2, out } => {
             interleaved(&read1, &read2, out.as_ref(), arg.compression_level)?;

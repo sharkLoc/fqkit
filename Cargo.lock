@@ -880,6 +880,7 @@ name = "fqkit"
 version = "0.4.2"
 dependencies = [
  "anyhow",
+ "atty",
  "bio",
  "bzip2",
  "chrono",

@@ -4,15 +4,16 @@ use bio::io::fastq;
 use log::*;
 use std::collections::HashMap;
 use std::io::BufRead;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>> {
-    info!("reading from barcode list file: {}", file);
 
-    let fp = file_reader(Some(file))?;
     let mut maps = HashMap::new();
     let mut error_flag = "";
+    let fp = file_reader(Some(file))?;
+    info!("reading from barcode list file: {}", file);
+
     if rev_comp {
         for line in fp.lines().map_while(std::io::Result::ok) {
             let item = line.split('\t').collect::<Vec<&str>>(); // barcode => sample
@@ -125,31 +126,31 @@ pub fn split_fq(
         let mut fq_hand = Vec::new();
         for (bar_seq, name) in maps {
             let fq1 = if gzip {
-                format!("{}/{}_1.fq.gz", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_1.fq.gz",name))
             } else if bzip2 {
-                format!("{}/{}_1.fq.bz2", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_1.fq.bz2",name))
             } else if xz {
-                format!("{}/{}_1.fq.xz", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_1.fq.xz",name))
             } else {
-                format!("{}/{}_1.fq", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_1.fq",name))
             };
             let fq2 = if gzip {
-                format!("{}/{}_2.fq.gz", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_2.fq.gz",name))
             } else if bzip2 {
-                format!("{}/{}_2.fq.bz2", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_2.fq.bz2",name))
             } else if xz {
-                format!("{}/{}_2.fq.xz", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_2.fq.xz",name))
             } else {
-                format!("{}/{}_2.fq", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_2.fq",name))
             };
             let bar = if gzip {
-                format!("{}/{}_barcode.fq.gz", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_barcode.fq.gz",name))
             } else if bzip2 {
-                format!("{}/{}_barcode.fq.bz2", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_barcode.fq.bz2",name))
             } else if xz {
-                format!("{}/{}_barcode.fq.xz", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_barcode.fq.xz",name))
             } else {
-                format!("{}/{}_barcode.fq", outdir, name)
+                PathBuf::from(outdir).join(format!("{}_barcode.fq",name))
             };
 
             let fh1 = fastq::Writer::new(file_writer_append(&fq1, compression_level)?);
@@ -159,14 +160,14 @@ pub fn split_fq(
             fq_hand.push((bar_seq, len, fh1, fh2, fhb));
         }
 
-        info!("reading from read1 file: {}", big_fq1);
-        info!("reading from read2 file: {}", big_fq2);
-        info!("barcode position mode: {}", mode);
-
         let bar_count = fq_hand.len();
         let fq1_reader = fastq::Reader::new(file_reader(Some(big_fq1))?);
         let fq2_reader = fastq::Reader::new(file_reader(Some(big_fq2))?);
         let (mut read_pair, mut get_pair) = (0u64, 0u64);
+        
+        info!("reading from read1 file: {}", big_fq1);
+        info!("reading from read2 file: {}", big_fq2);
+        info!("barcode position mode: {}", mode);
 
         if mode == 2 {
             for (rec1, rec2) in fq1_reader

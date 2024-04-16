@@ -10,15 +10,16 @@ pub fn tail_n_records(
     output: Option<&String>,
     compression_level: u32,
 ) -> Result<()> {
+    let start = Instant::now();
+
+    let fp = fastq::Reader::new(file_reader(input)?);
     if let Some(file) = input {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
     info!("get tail {} records", number);
-    let start = Instant::now();
-
-    let fp = fastq::Reader::new(file_reader(input)?);
+    
     let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
     let mut total = 0usize;
 

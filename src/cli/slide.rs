@@ -12,6 +12,10 @@ pub fn slide_fastq(
     suffix: &str,
     compression_level: u32,
 ) -> Result<()> {
+    
+    let start = Instant::now();
+
+    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
@@ -19,9 +23,6 @@ pub fn slide_fastq(
     }
     info!("window size : {}", wind);
     info!("step size: {}", step);
-    let start = Instant::now();
-
-    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
     let mut window = wind;
     for rec in fq_reader.records().flatten() {

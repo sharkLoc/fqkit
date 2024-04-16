@@ -16,21 +16,19 @@ pub fn search_fq(
     compression_level: u32,
 ) -> Result<(), Error> {
     let start = Instant::now();
+
+    let fq_reader = file_reader(fq).map(fastq::Reader::new).unwrap();
     if let Some(file) = fq {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
+    
     info!("regex pattern is: {}", pat);
     if ncpu == 1 || ncpu == 0 {
         info!("thread num is: {}", ncpu);
     } else {
         info!("additional thread num is: {}", ncpu);
-    }
-    if let Some(out) = out {
-        info!("reads write to file: {}", out);
-    } else {
-        info!("reads write to stdout");
     }
 
     let mut chunk = chunk;
@@ -43,7 +41,12 @@ pub fn search_fq(
     }
     let mut num = 0usize;
     let mut fo = file_writer(out, compression_level).map(fastq::Writer::new)?;
-    let fq_reader = file_reader(fq).map(fastq::Reader::new).unwrap();
+    if let Some(out) = out {
+        info!("reads write to file: {}", out);
+    } else {
+        info!("reads write to stdout");
+    }
+    
 
     if ncpu == 1 || ncpu == 0 {
         let re = RegexBuilder::new(pat)

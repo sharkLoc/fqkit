@@ -12,18 +12,19 @@ pub fn grep_fastq(
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<()> {
+    let start = Instant::now();
+
+    let fq_reader = file_reader(fq).map(fastq::Reader::new)?;
     if let Some(file) = fq {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
-    info!("reading reads id from file: {}", list);
 
-    let start = Instant::now();
     let mut num = 0usize;
     let mut ids = vec![];
-
     let fp_id = file_reader(Some(list))?;
+    info!("reading reads id from file: {}", list);
     for id in fp_id.lines().map_while(std::io::Result::ok) {
         ids.push(id);
     }
@@ -31,14 +32,13 @@ pub fn grep_fastq(
         error!("no reads id in file: {}", list);
         std::process::exit(1);
     }
+    
     if let Some(out) = out {
         info!("reads write to file: {}", out);
     } else {
         info!("reads write to stdout");
     }
-
     let mut fo = file_writer(out, compression_level).map(fastq::Writer::new)?;
-    let fq_reader = file_reader(fq).map(fastq::Reader::new)?;
     for rec in fq_reader.records().flatten() {
         let name = if full_name {
             if let Some(desc) = rec.desc() {

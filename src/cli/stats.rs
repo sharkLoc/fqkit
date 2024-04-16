@@ -91,11 +91,13 @@ pub fn stat_fq(
     phred: u8,
     compression_level: u32,
 ) -> Result<()> {
+    let start = Instant::now();
     if ![33u8, 64u8].contains(&phred) {
         error!("invalid phred value");
         std::process::exit(1);
     }
-    let start = Instant::now();
+    
+    let fq = fastq::Reader::new(file_reader(inp)?);
     if let Some(inp) = inp {
         info!("reading from file: {}", inp);
     } else {
@@ -108,7 +110,7 @@ pub fn stat_fq(
         info!("cycle result write to stdout");
     }
 
-    let fq = fastq::Reader::new(file_reader(inp)?);
+    
     let mut fo = file_writer(Some(pre_sum), compression_level)?;
     let mut fc = file_writer(pre_cyc, compression_level)?;
 

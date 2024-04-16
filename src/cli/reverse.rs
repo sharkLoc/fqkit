@@ -12,6 +12,8 @@ pub fn reverse_comp_seq(
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
+
+    let fq_reader = file_reader(input).map(fastq::Reader::new)?;
     if let Some(file) = input {
         info!("reading from file: {}", file);
     } else {
@@ -25,7 +27,6 @@ pub fn reverse_comp_seq(
         (b'C', b'G'),
         (b'N', b'N'),
     ]);
-    let fq_reader = file_reader(input).map(fastq::Reader::new)?;
     let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
 
     for rec in fq_reader.records().flatten() {

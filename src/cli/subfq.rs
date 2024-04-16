@@ -14,6 +14,12 @@ fn select_fastq(
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<(), Error> {
+    let start = Instant::now();
+
+    let mut rng = Pcg64::seed_from_u64(seed);
+    let mut get: Vec<usize> = Vec::with_capacity(n);
+
+    let fq_reader = fastq::Reader::new(file_reader(file)?);
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
@@ -22,12 +28,7 @@ fn select_fastq(
     info!("rand seed: {}", seed);
     info!("subseq number: {}", n);
     info!("reduce much memory but cost more time");
-    let start = Instant::now();
-
-    let mut rng = Pcg64::seed_from_u64(seed);
-    let mut get: Vec<usize> = Vec::with_capacity(n);
-
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
+    
     for (order, _) in fq_reader.records().flatten().enumerate() {
         if order < n {
             get.push(order);

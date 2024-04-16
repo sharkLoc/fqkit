@@ -10,15 +10,15 @@ pub fn interleaved(
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<(), Error> {
-    info!("reading from file: {}", file1);
-    info!("reading from file: {}", file2);
     let start = Instant::now();
 
     let mut num = 0usize;
     let fq1_reader = fastq::Reader::new(file_reader(Some(file1))?);
     let fq2_reader = fastq::Reader::new(file_reader(Some(file2))?);
+    info!("reading from file: {}", file1);
+    info!("reading from file: {}", file2);
+    
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
-
     for (rec1, rec2) in fq1_reader
         .records()
         .flatten()

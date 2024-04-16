@@ -12,17 +12,17 @@ pub fn shuffle_fastq(
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<()> {
+    let start = Instant::now();
+
+    let mut rng = Pcg64::seed_from_u64(seed);
+    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
     info!("rand seed: {}", seed);
-    let start = Instant::now();
-
-    let mut rng = Pcg64::seed_from_u64(seed);
-    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
-
+    
     let mut vec_reads = vec![];
     for rec in fq_reader.records().flatten() {
         vec_reads.push(rec);

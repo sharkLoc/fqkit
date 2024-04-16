@@ -544,6 +544,15 @@ pub enum Subcli {
         /// input fastq file, or read from stdin
         //#[arg(short = 'i', long = "input" ,value_name = "STR")]
         input: Option<String>,
+        /// if specified, output gzip compressed file
+        #[arg(short = 'z', long = "gzip", help_heading = Some("FLAGS"))]
+        gzip: bool,
+        /// if specified, output bzip2 compressed file
+        #[arg(short = 'Z', long = "bzip2", help_heading = Some("FLAGS"))]
+        bzip2: bool,
+        /// if specified, output xz compressed file
+        #[arg(short = 'x', long = "xz", help_heading = Some("FLAGS"))]
+        xz: bool,
         /// output fastq file prefix name
         #[arg(short = 'p', long = "prefix" , default_value_t = String::from("demo"), value_name = "STR")]
         pre: String,

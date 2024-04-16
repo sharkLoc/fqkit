@@ -11,16 +11,14 @@ pub fn concat_fqstq_lane(
     out_r2: &String,
     compression_level: u32,
 ) -> Result<(), Error> {
-    info!("read forward reads for lane list: {}", r1_list);
-    info!("read forward reads for lane list: {}", r2_list);
-    info!("outout read1 in file: {}", out_r1);
-    info!("outout read1 in file: {}", out_r2);
     let start = Instant::now();
 
     let mut vec1 = vec![];
     let mut vec2 = vec![];
     let fp1 = file_reader(Some(r1_list))?;
     let fp2 = file_reader(Some(r2_list))?;
+    info!("read forward reads for lane list: {}", r1_list);
+    info!("read forward reads for lane list: {}", r2_list); 
 
     for r1 in fp1.lines().map_while(Result::ok) {
         vec1.push(r1);
@@ -35,6 +33,9 @@ pub fn concat_fqstq_lane(
         );
         std::process::exit(1);
     }
+    
+    info!("outout read1 in file: {}", out_r1);
+    info!("outout read1 in file: {}", out_r2);
 
     let mut out_writer1 = file_writer(Some(out_r1), compression_level).map(fastq::Writer::new)?;
     let mut out_writer2 = file_writer(Some(out_r2), compression_level).map(fastq::Writer::new)?;

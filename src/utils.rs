@@ -1,4 +1,5 @@
 use anyhow::{Error, Ok, Result};
+use log::*;
 use std::{
     fs::{File, OpenOptions},
     io::{self, prelude::*, BufRead, BufReader, BufWriter, Write},
@@ -74,6 +75,10 @@ where
             Ok(Box::new(BufReader::with_capacity(BUFF_SIZE, fp)))
         }
     } else {
+        if atty::is(atty::Stream::Stdin) { 
+            error!("stdin not detected");
+            std::process::exit(1);
+        }
         let fp = BufReader::new(io::stdin());
         Ok(Box::new(fp))
     }

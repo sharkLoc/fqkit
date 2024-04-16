@@ -10,15 +10,16 @@ pub fn check_fastq(
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<()> {
+    let start = Instant::now();
+
+    let (mut total, mut ok_read, mut err_read) = (0, 0, 0);
+    let fp_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
 
-    let start = Instant::now();
-    let (mut total, mut ok_read, mut err_read) = (0, 0, 0);
-    let fp_reader = file_reader(file).map(fastq::Reader::new)?;
     if save {
         let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
         for rec in fp_reader.records().flatten() {

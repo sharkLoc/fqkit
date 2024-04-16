@@ -18,14 +18,15 @@ pub fn gc_content(
     types: &str,
     compression_level: u32,
 ) -> Result<(), Error> {
+    let start = Instant::now();
+
+    let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
     if let Some(inp) = fqin {
         info!("reading from file: {}", inp);
     } else {
         info!("reading from stdin");
     }
-    let start = Instant::now();
-
-    let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
+    
     let mut fo = file_writer(output, compression_level)?;
     let mut df_hash = HashMap::new();
 

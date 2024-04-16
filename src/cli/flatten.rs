@@ -12,6 +12,8 @@ pub fn flatten_fq(
     compression_level: u32,
 ) -> Result<(), Error> {
     let start = Instant::now();
+
+    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
@@ -23,8 +25,7 @@ pub fn flatten_fq(
         error!("error flag numer: {}, flag range [1..15]", flag);
         std::process::exit(1);
     }
-
-    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
+    
     let mut out_writer = file_writer(out, compression_level)?;
     let flags = format!("{:b}", flag).chars().rev().collect::<Vec<char>>();
     let mut fields = vec![];

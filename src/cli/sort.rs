@@ -14,14 +14,8 @@ pub fn sort_fastq(
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<(), Error> {
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
-    if reverse {
-        info!("output reversed result");
-    }
+    let start = Instant::now();
+    
     let mut n = 0;
     if sort_by_gc {
         n += 1;
@@ -43,9 +37,17 @@ pub fn sort_fastq(
         error!("please specifiy one of the flags: -l, -n, -g, -s");
         std::process::exit(1);
     }
-    let start = Instant::now();
 
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
+    if let Some(file) = file {
+        info!("reading from file: {}", file);
+    } else {
+        info!("reading from stdin");
+    }
+    if reverse {
+        info!("output reversed result");
+    }
+
     let mut vec_reads = vec![];
     for rec in fq_reader.records().flatten() {
         vec_reads.push(rec);

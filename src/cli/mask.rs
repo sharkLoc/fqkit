@@ -12,6 +12,10 @@ pub fn mask_fastq(
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<()> {
+    let start = Instant::now();
+
+    let (mut mask_base, mut mask_read) = (0, 0);
+    let fp_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
@@ -19,12 +23,8 @@ pub fn mask_fastq(
     }
     info!("low quality value： {}", qual_limit);
     info!("mask low quality bases with: {}", nt);
-    let start = Instant::now();
-
-    let (mut mask_base, mut mask_read) = (0, 0);
-    let fp_reader = file_reader(file).map(fastq::Reader::new)?;
+    
     let mut fp_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
-
     for rec in fp_reader.records().flatten() {
         let score_min = rec.qual().iter().min().unwrap() - phred;
         if score_min > qual_limit {

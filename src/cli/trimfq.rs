@@ -13,16 +13,16 @@ pub fn trim_fq(
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
+
+    let length = right + left;
+    let fq_reader = fastq::Reader::new(file_reader(file)?);
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
 
-    let length = right + left;
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
-
     for (idx, rec) in fq_reader.records().flatten().enumerate() {
         let rlen = rec.seq().len();
         if left >= rlen || right >= rlen || length >= rlen {

@@ -36,18 +36,15 @@ pub fn size_fastq(
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
+    
+    let fq_reader = fastq::Reader::new(file_reader(fq)?);
     if let Some(inp) = fq {
         info!("reading from file: {}", inp);
     } else {
         info!("reading from stdin");
     }
     info!("additional worker threads is: {}", ncpu);
-    if let Some(file) = out {
-        info!("output result write to file: {}", file);
-    } else {
-        info!("output result write to stdout");
-    }
-
+    
     let mut chunk = chunk;
     if chunk == 0 {
         warn!(
@@ -56,13 +53,19 @@ pub fn size_fastq(
         );
         chunk = 5000;
     }
-    let fq = fastq::Reader::new(file_reader(fq)?);
+
+    if let Some(file) = out {
+        info!("output result write to file: {}", file);
+    } else {
+        info!("output result write to stdout");
+    }
     let mut fo = file_writer(out, compression_level)?;
+    
     let mut base = Base::new();
     let mut bases = 0usize;
 
     if ncpu == 0 || ncpu == 1 {
-        for rec in fq.records().flatten() {
+        for rec in fq_reader.records().flatten() {
             base.read += 1;
             for nt in rec.seq().iter() {
                 match *nt {
@@ -78,7 +81,7 @@ pub fn size_fastq(
         bases = base.a + base.t + base.g + base.c + base.n;
     } else {
         let (tx, rx) = unbounded();
-        let mut fqiter = fq.records();
+        let mut fqiter = fq_reader.records();
         loop {
             let chunk: Vec<_> = fqiter.by_ref().take(chunk).flatten().collect();
             if chunk.is_empty() {

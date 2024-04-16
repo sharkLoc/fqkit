@@ -14,13 +14,14 @@ pub fn rename_fastq(
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
+
+    let fp = fastq::Reader::new(file_reader(input)?);
     if let Some(file) = input {
         info!("reading from file: {}", file);
     } else {
         info!("reading from stdin");
     }
 
-    let fp = fastq::Reader::new(file_reader(input)?);
     let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
     let mut n: usize = 0;
 

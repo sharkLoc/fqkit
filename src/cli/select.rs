@@ -11,16 +11,14 @@ pub fn select_pe_fastq(
     out_r2: &String,
     compression_level: u32,
 ) -> Result<()> {
-    info!("read forward reads from file: {}", fq1);
-    info!("read reverse reads from file: {}", fq2);
-    info!("output selected read1 file: {}", out_r1);
-    info!("output selected read2 file: {}", out_r2);
     let start = Instant::now();
 
     let mut read1_id = HashMap::new();
-    let mut read2_id = HashMap::new();
+    let mut read2_id = HashMap::new();    
     let fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;
     let fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
+    info!("read forward reads from file: {}", fq1);
+    info!("read reverse reads from file: {}", fq2);
 
     for rec in fq_reader1.records().flatten() {
         let k = rec.id().to_owned();
@@ -30,7 +28,8 @@ pub fn select_pe_fastq(
         let k = rec.id().to_owned();
         read2_id.entry(k).or_insert(());
     }
-
+    info!("output selected read1 file: {}", out_r1);
+    info!("output selected read2 file: {}", out_r2);
     let mut out_writer1 = file_writer(Some(out_r1), compression_level).map(fastq::Writer::new)?;
     let mut out_writer2 = file_writer(Some(out_r2), compression_level).map(fastq::Writer::new)?;
     let (mut pe_r1, mut pe_r2) = (0usize, 0usize);
