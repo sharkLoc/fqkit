@@ -10,6 +10,7 @@ pub fn search_fq(
     fq: Option<&String>,
     pat: &str,
     case: bool,
+    invert_match: bool,
     chunk: usize,
     out: Option<&String>,
     ncpu: usize,
@@ -55,9 +56,16 @@ pub fn search_fq(
             .unwrap();
         for rec in fq_reader.records().flatten() {
             let fq_str = std::str::from_utf8(rec.seq()).unwrap();
-            if re.is_match(fq_str) {
-                num += 1;
-                fo.write_record(&rec)?;
+            if invert_match {
+                if !re.is_match(fq_str) {
+                    num += 1;
+                    fo.write_record(&rec)?;
+                }
+            } else {
+                if re.is_match(fq_str) {
+                    num += 1;
+                    fo.write_record(&rec)?;
+                }
             }
         }
         fo.flush()?;
@@ -83,15 +91,23 @@ pub fn search_fq(
                         .case_insensitive(case)
                         .build()
                         .unwrap();
+
                     s.spawn(move |_| {
                         for vrec in rx_tmp {
                             let mut matchs = vec![];
                             let mut count = 0;
                             for rec in vrec {
                                 let fq_str = std::str::from_utf8(rec.seq()).unwrap();
-                                if re.is_match(fq_str) {
-                                    matchs.push(rec);
-                                    count += 1;
+                                if invert_match {
+                                    if !re.is_match(fq_str) {
+                                        matchs.push(rec);
+                                        count += 1;
+                                    }
+                                } else {
+                                    if re.is_match(fq_str) {
+                                        matchs.push(rec);
+                                        count += 1;
+                                    }
                                 }
                             }
                             tx_tmp.send((matchs, count)).unwrap();
@@ -112,7 +128,7 @@ pub fn search_fq(
         .unwrap();
     }
 
-    info!("total reads matched number: {}", num);
+    info!("total reads number: {}", num);
     info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

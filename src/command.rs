@@ -4,7 +4,7 @@ use clap::{value_parser, Parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.2",
+    version = "0.4.3",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -225,9 +225,12 @@ pub enum Subcli {
         /// specify pattern/motif, regular expression supported, e.g., -p "ATC{2,}" or -p "ATCCG", for multiple motifs, -p "TTAGGG|CCCTAA"
         #[arg(short = 'p', long = "pattern", value_name = "STR")]
         pat: String,
-        /// if specified,  enable case insensitive matching for the entire pattern
-        #[arg(short = 'i', long ="ignore-case", help_heading = Some("FLAGS"))]
+        /// if specified, enable case insensitive matching for the entire pattern
+        #[arg(short = 'i', long = "ignore-case", help_heading = Some("FLAGS"))]
         case: bool,
+        /// invert the sense of matching, to select non-matching reads
+        #[arg(short = 'u', long = "invert-match", help_heading = Some("FLAGS"))]
+        invert: bool,
         /// the number of reads in the chunk on each thread
         #[arg(short, long, default_value_t = 5000, value_name = "INT")]
         chunk: usize,
