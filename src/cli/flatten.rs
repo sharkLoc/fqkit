@@ -9,6 +9,9 @@ pub fn flatten_fq(
     out: Option<&String>,
     flag: u8,
     sep: char,
+    gap: bool,
+    len: bool,
+    gc: bool,
     compression_level: u32,
 ) -> Result<(), Error> {
     let start = Instant::now();
@@ -37,10 +40,29 @@ pub fn flatten_fq(
 
     for rec in fq_reader.records().flatten() {
         let read = vec![rec.id().as_bytes(), rec.seq(), "+".as_bytes(), rec.qual()];
-        let res = fields.iter().map(|idx| read[*idx]).collect::<Vec<&[u8]>>();
+        let res = fields
+            .iter()
+            .map(|idx| read[*idx])
+            .collect::<Vec<&[u8]>>();
+
         let mut out = Vec::new();
         for x in res {
             out.push(std::str::from_utf8(x)?.to_string());
+        }
+        if gap {
+            out.push(rec.seq().iter().filter(|x| *x == &b'N').count().to_string());
+        }
+        if len {
+            out.push(rec.seq().len().to_string());
+        }
+        if gc {
+            let gc_count = rec
+            .seq()
+            .iter()
+            .filter(|x| *x == &b'G' || *x == &b'C')
+            .count();
+            let gc_ratio = format!("{:.2}",gc_count as f64 / rec.seq().len() as f64 * 100.0);
+            out.push(gc_ratio);
         }
         out_writer.write_all(out.join(sep.to_string().as_str()).as_bytes())?;
         out_writer.write_all("\n".as_bytes())?;

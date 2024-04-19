@@ -170,6 +170,9 @@ fn main() -> Result<(), Error> {
             input,
             flag,
             sep,
+            gap,
+            len,
+            gc,
             out,
         } => {
             flatten_fq(
@@ -177,6 +180,9 @@ fn main() -> Result<(), Error> {
                 out.as_ref(),
                 flag,
                 sep,
+                gap,
+                len,
+                gc,
                 arg.compression_level,
             )?;
         }
