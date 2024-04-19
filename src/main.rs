@@ -22,8 +22,8 @@ fn main() -> Result<(), Error> {
         Subcli::topn { input, num, out } => {
             top_n_records(input.as_ref(), num, out.as_ref(), arg.compression_level)?;
         }
-        Subcli::tail { input, num, out } => {
-            tail_n_records(input.as_ref(), num, out.as_ref(), arg.compression_level)?;
+        Subcli::tail { input, num, rdc, out } => {
+            tail_n_records(input.as_ref(), num, rdc, out.as_ref(), arg.compression_level)?;
         }
         Subcli::subfq {
             input,
