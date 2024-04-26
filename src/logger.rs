@@ -52,7 +52,7 @@ pub fn logger<P: AsRef<Path>>(
         }
         writeln!(
             buf,
-            "[{} {} - {}] {}",
+            "{} {} - {} {}",
             Local::now().format("%Y-%m-%dT%H:%M:%S"),
             style.value(record.level()),
             buf.style()

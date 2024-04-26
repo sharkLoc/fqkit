@@ -433,8 +433,8 @@ fn main() -> Result<(), Error> {
                 arg.compression_level,
             )?;
         }
-        Subcli::length { input, out } => {
-            fq_length(input.as_ref(), out.as_ref(), arg.compression_level)?;
+        Subcli::length { input, reverse, out } => {
+            fq_length(input.as_ref(), reverse, out.as_ref(), arg.compression_level)?;
         }
         Subcli::view { input, out } => {
             view_fq(input.as_ref(), out.as_ref(), arg.compression_level)?;

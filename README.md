@@ -40,7 +40,7 @@ cargo install --git https://github.com/sharkLoc/fqkit.git
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.4.3
+Version: 0.4.4
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
@@ -109,64 +109,5 @@ Global FLAGS:
 
 Use "fqkit help [command]" for more information about a command
 ```
-
-## change log
-<details>
-<summary>timeline</summary>
-
-2023.11.03:
- - update to version 0.2.12
- - add subcommand trim
- - update cmd help information
-
-2023.11.08:
- - update to version 0.2.13
- - add subcommand reverse
-
-2023.11.10:
- - update to version 0.2.14
- - add subcommand view
- - rebuilt some command interface
-
-2023.11.29:
- - update to version 0.2.15
- - recode func in stats subcommand
-
-2023.12.04
- - update to version 0.2.16
- - add subcommand size
-
-2023.12.05
- - update to version 0.2.17
- - update code for subcommand size and search
- - add subcommand fq2sam
- - add log information options verbosity
-
-2023.12.09
- - update to version 0.2.18
- - add subcommand sort, range, check and mask
- - update to version 0.2.19
- - add subcommand shuffle
-
-2023.12.10
- - update to version 0.3.0
- - add glob option --compress-level for gzip output file
-
-2023.12.11
-- update to version 0.3.1
-- add subcommand grep and fqscore
-
-2023.12.11
-- update to version 0.3.2
-- add subcommand slide
-
-2023.12.19
-- update to version 0.3.5
-- add subcommand filter
-
-2024.03.27
-- remove subcommand join
-
-</details>
 
 #### ** any bugs please report issues **💖

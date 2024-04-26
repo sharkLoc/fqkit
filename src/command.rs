@@ -4,7 +4,7 @@ use clap::{value_parser, Parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.3",
+    version = "0.4.4",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -674,6 +674,9 @@ pub enum Subcli {
     length {
         /// input fastq file, or read from stdin
         input: Option<String>,
+        /// output reversed result
+        #[arg(short = 'r', long = "reverse", help_heading = Some("FLAGS"))]
+        reverse: bool,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,

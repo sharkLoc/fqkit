@@ -7,6 +7,7 @@ use std::time::Instant;
 
 pub fn fq_length(
     file: Option<&String>,
+    rev: bool,
     out: Option<&String>,
     compression_level: u32,
 ) -> Result<(), Error> {
@@ -29,7 +30,11 @@ pub fn fq_length(
     }
 
     let mut sort_len: Vec<(&usize, &usize)> = reads_len.iter().collect();
-    sort_len.sort_by_key(|x| x.0);
+    if rev {
+        sort_len.sort_by(|x,y|y.0.cmp(x.0));
+    } else {
+        sort_len.sort_by_key(|x| x.0);
+    }
 
     fo.write_all("lenth\tcount\n".as_bytes())?;
     for (k, v) in sort_len.iter() {
