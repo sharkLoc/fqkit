@@ -133,7 +133,7 @@ where
             BUFF_SIZE,
             bzip2::write::BzEncoder::new(fp, bzip2::Compression::new(compression_level)),
         )))
-    } else if file_out.as_ref().ends_with("xz") {
+    } else if file_out.as_ref().ends_with(".xz") {
         Ok(Box::new(BufWriter::with_capacity(
             BUFF_SIZE,
             xz2::write::XzEncoder::new(fp, compression_level),
