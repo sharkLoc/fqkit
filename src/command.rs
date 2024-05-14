@@ -9,7 +9,7 @@ use clap::{ArgAction, value_parser, Parser};
     long_about = None,
     next_line_help = false,
     disable_help_flag = true,
-    disable_version_flag = true,
+    disable_version_flag = false,
     before_help = r"Fqkit supports reading and writing gzip (.gz) format.
 Bzip2 (.bz2) format is supported since v0.3.8.
 Xz (.xz) format is supported since v0.3.9.
@@ -54,10 +54,12 @@ pub struct Args {
 
     /// prints help information
     #[arg(short = 'h', long, action = ArgAction::Help, global= true, help_heading = Some("Global FLAGS"))]
-    pub help: bool,
+    pub help: Option<String>,
+    /* 
     /// prints version information
     #[arg(short = 'V', long, action = ArgAction::Version, global= true, help_heading = Some("Global FLAGS"))]
-    pub version: bool,
+    pub version: Option<String>,
+    */
 }
 
 #[derive(Parser, Debug)]
