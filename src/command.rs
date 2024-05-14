@@ -1,13 +1,15 @@
-use clap::{value_parser, Parser};
+use clap::{ArgAction, value_parser, Parser};
 
 #[derive(Parser, Debug)]
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.4",
+    version = "0.4.5",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
+    disable_help_flag = true,
+    disable_version_flag = true,
     before_help = r"Fqkit supports reading and writing gzip (.gz) format.
 Bzip2 (.bz2) format is supported since v0.3.8.
 Xz (.xz) format is supported since v0.3.9.
@@ -23,7 +25,8 @@ Compression level:
     \n\nAuthors: {author} <mmtinfo@163.com>\
     \nSource code: https://github.com/sharkLoc/fqkit.git\
     \n\n{before-help}
-{usage-heading} {usage}\n\n{all-args}\n\nUse \"fqkit help [command]\" for more information about a command")]
+{usage-heading} {usage}\n\n{all-args}\n\nUse \"fqkit help [command]\" for more information about a command"
+)]
 pub struct Args {
     #[clap(subcommand)]
     pub command: Subcli,
@@ -48,6 +51,13 @@ pub struct Args {
     /// be quiet and do not show any extra information
     #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
     pub quiet: bool,
+
+    /// prints help information
+    #[arg(short = 'h', long, action = ArgAction::Help, global= true, help_heading = Some("Global FLAGS"))]
+    pub help: bool,
+    /// prints version information
+    #[arg(short = 'V', long, action = ArgAction::Version, global= true, help_heading = Some("Global FLAGS"))]
+    pub version: bool,
 }
 
 #[derive(Parser, Debug)]

@@ -81,7 +81,7 @@ Commands:
   fq2sam   converts a fastq file to an unaligned SAM file
   fqscore  converts the fastq file quality scores
   flatten  flatten fastq sequences [aliases: flat]
-  barcode  perform demultiplex for pair-end fastq reads
+  barcode  perform demultiplex for pair-end fastq reads [aliases: demux]
   check    check the validity of a fastq record
   remove   remove reads by read name
   rename   rename sequence id in fastq file
@@ -91,21 +91,19 @@ Commands:
   mask     convert any low quality base to 'N' or other chars
   split2   split fastq file by records number
   gcplot   get GC content result and plot
-  length   get reads length count
+  length   get reads length count [aliases: len]
   view     view fastq file page by page
   help     Print this message or the help of the given subcommand(s)
 
-Options:
-  -h, --help     Print help
-  -V, --version  Print version
-
 Global Arguments:
-      --compress-level <int>  set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file, just work with option -o/--out [default: 6]
-      --log <str>             if file name specified, write log message to this file, or write to stderr
-  -v, --verbosity <str>       control verbosity of logging, possible values: {error, warn, info, debug, trace} [default: debug]
+      --compress-level <INT>  set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file, just work with option -o/--out [default: 6]
+      --log <FILE>            if file name specified, write log message to this file, or write to stderr
+  -v, --verbosity <STR>       control verbosity of logging, possible values: {error, warn, info, debug, trace} [default: debug]
 
 Global FLAGS:
-  -q, --quiet  be quiet and do not show any extra information
+  -q, --quiet    be quiet and do not show any extra information
+  -h, --help     prints help information
+  -V, --version  prints version information
 
 Use "fqkit help [command]" for more information about a command
 ```
