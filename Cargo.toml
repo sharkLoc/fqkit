@@ -1,6 +1,6 @@
 [package]
 name = "fqkit"
-version = "0.4.5"
+version = "0.4.6"
 edition = "2021"
 authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.77.2"
@@ -34,6 +34,7 @@ regex = "1.9.5"
 rgb = "0.8.36"
 term_size = "0.3.2"
 textplots = "0.8.4"
+thiserror = "1.0.60"
 xz2 = "0.1.7"
 
 

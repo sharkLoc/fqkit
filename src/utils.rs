@@ -5,6 +5,7 @@ use std::{
     io::{self, prelude::*, BufRead, BufReader, BufWriter, Write},
     path::Path,
 };
+use crate::error::FqkitError;
 
 const GZ_MAGIC: [u8; 3] = [0x1f, 0x8b, 0x08];
 const BZ_MAGIC: [u8; 3] = [0x42, 0x5a, 0x68];
@@ -15,7 +16,8 @@ const BUFF_SIZE: usize = 1024 * 1024;
 
 fn magic_num<P: AsRef<Path> + Copy>(file_name: P) -> Result<[u8; MAGIC_MAX_LEN], Error> {
     let mut buffer: [u8; MAGIC_MAX_LEN] = [0; MAGIC_MAX_LEN];
-    let mut fp = File::open(file_name)?;
+    let mut fp = File::open(file_name)
+        .map_err(FqkitError::IoError)?;
     let _ = fp.read(&mut buffer)?;
     Ok(buffer)
 }
@@ -54,7 +56,8 @@ where
         let bz_flag = is_bzipped(file_name)?;
         let zx_flag = is_xz(file_name)?;
 
-        let fp = File::open(file_name)?;
+        let fp = File::open(file_name)
+            .map_err(FqkitError::IoError)?;
 
         if gz_flag {
             Ok(Box::new(BufReader::with_capacity(
@@ -76,7 +79,7 @@ where
         }
     } else {
         if atty::is(atty::Stream::Stdin) { 
-            error!("stdin not detected");
+            error!("{}", FqkitError::StdinNotDetected);
             std::process::exit(1);
         }
         let fp = BufReader::new(io::stdin());
@@ -89,7 +92,8 @@ where
     P: AsRef<Path> + Copy,
 {
     if let Some(file_name) = file_out {
-        let fp = File::create(file_name)?;
+        let fp = File::create(file_name)
+            .map_err(FqkitError::IoError)?;
 
         if file_name.as_ref().ends_with(".gz") {
             Ok(Box::new(BufWriter::with_capacity(
@@ -121,7 +125,8 @@ where
     let fp = OpenOptions::new()
         .append(true)
         .create(true)
-        .open(file_out)?;
+        .open(file_out)
+        .map_err(FqkitError::IoError)?;
 
     if file_out.as_ref().ends_with(".gz") {
         Ok(Box::new(BufWriter::with_capacity(

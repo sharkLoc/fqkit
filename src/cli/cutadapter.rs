@@ -1,3 +1,4 @@
+use crate::error::FqkitError;
 use crate::utils::*;
 use anyhow::{Error, Ok, Result};
 use bio::io::{fasta, fastq};
@@ -36,7 +37,7 @@ pub fn cut_adapter(
         }
     }
     if seqs.is_empty() {
-        error!("file {} is empty", seqfile);
+        error!("{}", FqkitError::EmptyFile(seqfile.to_string()));
         std::process::exit(1);
     }
 

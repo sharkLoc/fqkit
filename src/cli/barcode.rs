@@ -1,3 +1,4 @@
+use crate::error::FqkitError;
 use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
@@ -99,7 +100,7 @@ pub fn split_fq(
     let start = Instant::now();
 
     if !Path::new(outdir).try_exists().unwrap() {
-        error!("invalid output dir: {}", outdir);
+        error!("{}",FqkitError::InvalidOutputDir(outdir.to_string()));
         std::process::exit(1);
     }
     let mut n = 0;
@@ -119,7 +120,7 @@ pub fn split_fq(
 
     if let Ok(maps) = barcode_list(bar_file, rev_comp) {
         if maps.is_empty() {
-            error!("empty barcode list file: {}", bar_file);
+            error!("{}", FqkitError::EmptyFile(bar_file.to_string()));
             std::process::exit(1);
         }
 

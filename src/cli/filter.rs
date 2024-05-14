@@ -1,4 +1,4 @@
-use crate::utils::*;
+use crate::{error::FqkitError, utils::*};
 use anyhow::{Ok, Result};
 use bio::io::fastq;
 use crossbeam::channel::unbounded;
@@ -24,7 +24,7 @@ pub fn filter_fastq(
     info!("read forward reads from file: {}", read1);
     info!("read reverse reads from file: {}", read2);
     if ![33u8, 64u8].contains(&phred) {
-        error!("invalid phred value");
+        error!("{}", FqkitError::InvalidPhredValue);
         std::process::exit(1);
     }
     if ncpu <= 1 {

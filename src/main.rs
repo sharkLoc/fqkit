@@ -5,6 +5,7 @@ mod logger;
 use logger::*;
 mod command;
 mod utils;
+mod error;
 use command::*;
 mod cli;
 use cli::{
