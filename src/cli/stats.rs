@@ -1,3 +1,4 @@
+use crate::error::FqkitError;
 use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
@@ -93,7 +94,7 @@ pub fn stat_fq(
 ) -> Result<()> {
     let start = Instant::now();
     if ![33u8, 64u8].contains(&phred) {
-        error!("invalid phred value");
+        error!("{}",FqkitError::InvalidPhredValue);
         std::process::exit(1);
     }
     

@@ -1,6 +1,7 @@
 use std::io;
 use thiserror::Error;
 
+
 #[derive(Debug,Error)]
 pub enum FqkitError {
     #[error("stdin not detected")]
@@ -18,4 +19,6 @@ pub enum FqkitError {
     #[error("invalid phred value")]
     InvalidPhredValue,
 
+    #[error("invalid figure types")]
+    InvalidFigureType,
 }

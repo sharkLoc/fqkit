@@ -1,3 +1,4 @@
+use crate::error::FqkitError;
 use crate::utils::*;
 use anyhow::{Ok, Result};
 use bio::io::fastq;
@@ -29,7 +30,7 @@ pub fn grep_fastq(
         ids.push(id);
     }
     if ids.is_empty() {
-        error!("no reads id in file: {}", list);
+        error!("{}",FqkitError::EmptyFile(list.to_string()));
         std::process::exit(1);
     }
     

@@ -1,3 +1,4 @@
+use crate::error::FqkitError;
 use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
@@ -87,7 +88,7 @@ fn plot_gc(
     types: &str,
 ) -> Result<(), Error> {
     if !["svg", "png"].contains(&types) {
-        error!("invalid args types.");
+        error!("{}", FqkitError::InvalidFigureType);
         std::process::exit(1);
     }
     if ylim > 100 {
