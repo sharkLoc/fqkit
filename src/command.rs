@@ -1,17 +1,17 @@
 use clap::{ArgAction, value_parser, Parser};
 
-const VERSION: &str = "0.4.6";
 
 #[derive(Parser, Debug)]
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = VERSION,
+    version = "0.4.7",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
     disable_help_flag = true,
     disable_version_flag = true,
+    propagate_version = true,
     before_help = r"Fqkit supports reading and writing gzip (.gz) format.
 Bzip2 (.bz2) format is supported since v0.3.8.
 Xz (.xz) format is supported since v0.3.9.
@@ -67,7 +67,7 @@ pub struct Args {
 #[allow(non_camel_case_types)]
 pub enum Subcli {
     /// get first N records from fastq file
-    #[command(visible_alias = "head", version = VERSION)]
+    #[command(visible_alias = "head")]
     topn {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -79,7 +79,7 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// get last N records from fastq file
-    #[command(version = VERSION, before_help = "note: if the -r parameter is not specified, all data will be read into memory")]
+    #[command(before_help = "note: if the -r parameter is not specified, all data will be read into memory")]
     tail {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -94,7 +94,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// concat fastq files from different lanes
-    #[command(version = VERSION)]
     concat {
         /// input read1 list file, one fastq file per line
         #[arg(short = 'i', long = "input1", value_name = "FILE")]
@@ -110,7 +109,7 @@ pub enum Subcli {
         out2: String,
     },
     /// subsample sequences from big fastq file.
-    #[command(visible_alias = "sample", version = VERSION)]
+    #[command(visible_alias = "sample")]
     subfq {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -128,7 +127,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// select pair-end reads by read id
-    #[command(version = VERSION)]
     select {
         /// input read1 fastq file
         #[arg(short = '1', long = "read1", value_name = "FILE")]
@@ -144,7 +142,6 @@ pub enum Subcli {
         out2: String,
     },
     /// trim fastq reads by position
-    #[command(version = VERSION)]
     trim {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -162,7 +159,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// cut the adapter sequence on the reads
-    #[command(version = VERSION)]
     adapter {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -180,7 +176,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// a simple filter for pair end fastq sqeuence
-    #[command(version = VERSION)]
     filter {
         /// input read1 fastq file
         #[arg(short = '1', long = "read1", value_name = "FILE")]
@@ -227,7 +222,6 @@ pub enum Subcli {
         out2: String,
     },
     /// print fastq records in a range
-    #[command(version = VERSION)]
     range {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -242,7 +236,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// search reads/motifs from fastq file
-    #[command(version = VERSION)]
     search {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -266,7 +259,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// grep fastq sequence by read id or full name
-    #[command(version = VERSION)]
     grep {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -281,7 +273,7 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// summary for fastq format file
-    #[command(visible_alias = "stat", version = VERSION, subcommand_help_heading = Some("Statistics"))]
+    #[command(visible_alias = "stat", subcommand_help_heading = Some("Statistics"))]
     stats {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -296,7 +288,7 @@ pub enum Subcli {
         cyc: Option<String>,
     },
     /// shuffle fastq sequences
-    #[command(version = VERSION, before_help = "note: all records will be readed into memory")]
+    #[command(before_help = "note: all records will be readed into memory")]
     shuffle {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -308,7 +300,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// report the number sequences and bases
-    #[command(version = VERSION)]
     size {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -323,7 +314,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// extract subsequences in sliding windows
-    #[command(version = VERSION)]
     slide {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -341,7 +331,7 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// sort fastq file by name/seq/gc/length
-    #[command(version = VERSION, before_help = "note: all records will be readed into memory")]
+    #[command(before_help = "note: all records will be readed into memory")]
     sort {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -365,7 +355,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// line plot for A T G C N percentage in read position
-    #[command(version = VERSION)]
     plot {
         /// input cycle result data: fqkit stats cycle output
         #[arg(short = 'd', long = "data", value_name = "FILE")]
@@ -400,7 +389,6 @@ pub enum Subcli {
         types: String,
     },
     /// translate fastq to fasta
-    #[command(version = VERSION)]
     fq2fa {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -412,7 +400,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// converts a fastq file to an unaligned SAM file
-    #[command(version = VERSION)]
     fq2sam {
         /// input fastq file
         #[arg(short = '1', long = "read1", value_name = "FILE")]
@@ -437,7 +424,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// converts the fastq file quality scores
-    #[command(version = VERSION)]
     fqscore {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -452,7 +438,7 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// flatten fastq sequences
-    #[command(visible_alias = "flat", version = VERSION)]
+    #[command(visible_alias = "flat")]
     flatten {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -476,7 +462,7 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// perform demultiplex for pair-end fastq reads
-    #[command(visible_alias = "demux", version = VERSION)]
+    #[command(visible_alias = "demux")]
     barcode {
         /// input read1 fastq file
         #[arg(short = '1', long = "read1", value_name = "FILE")]
@@ -517,7 +503,7 @@ pub enum Subcli {
         outdir: String,
     },
     /// check the validity of a fastq record
-    #[command(version = VERSION,
+    #[command(
         before_help = "note: this function will return an Err if one of the following conditions is met\n
       1. the record identifier is empty.
       2. there is a non-ASCII character found in either the sequence or quality strings.
@@ -534,7 +520,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// remove reads by read name.
-    #[command(version = VERSION)]
     remove {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -552,7 +537,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// rename sequence id in fastq file
-    #[command(version = VERSION)]
     rename {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -573,7 +557,7 @@ pub enum Subcli {
         output: Option<String>,
     },
     /// get a reverse-complement of fastq file.
-    #[command(visible_alias = "rev", version = VERSION)]
+    #[command(visible_alias = "rev")]
     reverse {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -585,7 +569,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// split interleaved fastq file
-    #[command(version = VERSION)]
     split {
         /// input fastq file, or read from stdin
         //#[arg(short = 'i', long = "input" ,value_name = "STR")]
@@ -607,7 +590,6 @@ pub enum Subcli {
         out: String,
     },
     /// merge PE reads as interleaved fastq file
-    #[command(version = VERSION)]
     merge {
         /// input read1 fastq file.
         #[arg(short = '1', long = "read1", value_name = "FILE")]
@@ -620,7 +602,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// convert any low quality base to 'N' or other chars
-    #[command(version = VERSION)]
     mask {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -643,7 +624,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// split fastq file by records number
-    #[command(version = VERSION)]
     split2 {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -672,7 +652,6 @@ pub enum Subcli {
         outdir: String,
     },
     /// get GC content result and plot
-    #[command(version = VERSION)]
     gcplot {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -704,7 +683,7 @@ pub enum Subcli {
         types: String,
     },
     /// get reads length count
-    #[command(visible_alias = "len", version = VERSION)]
+    #[command(visible_alias = "len")]
     length {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -716,7 +695,6 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// view fastq file page by page
-    #[command(version = VERSION)]
     view {
         /// input fastq file
         input: Option<String>,
