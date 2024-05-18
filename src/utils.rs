@@ -71,8 +71,8 @@ where
             )))
         } else if zx_flag {
             Ok(Box::new(BufReader::with_capacity(
-                BUFF_SIZE,
-                xz2::read::XzDecoder::new(fp),
+                BUFF_SIZE,                
+                xz2::read::XzDecoder::new_multi_decoder(fp),
             )))
         } else {
             Ok(Box::new(BufReader::with_capacity(BUFF_SIZE, fp)))
@@ -107,7 +107,7 @@ where
             )))
         } else if file_name.as_ref().extension().is_some_and(|ext| ext == "xz") {
             Ok(Box::new(BufWriter::with_capacity(
-                BUFF_SIZE,
+                BUFF_SIZE, 
                 xz2::write::XzEncoder::new(fp, compression_level),
             )))
         } else {
