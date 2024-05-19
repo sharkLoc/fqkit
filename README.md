@@ -40,7 +40,7 @@ cargo install --git https://github.com/sharkLoc/fqkit.git
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.4.7
+Version: 0.4.8
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
@@ -98,7 +98,7 @@ Commands:
 Global Arguments:
       --compress-level <INT>  set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file, just work with option -o/--out [default: 6]
       --log <FILE>            if file name specified, write log message to this file, or write to stderr
-  -v, --verbosity <STR>       control verbosity of logging, possible values: {error, warn, info, debug, trace} [default: debug]
+  -v, --verbosity...          control verbosity of logging, [-v: Error, -vv: Warn, -vvv: Info, -vvvv: Debug, -vvvvv: Trace, defalut: Debug]
 
 Global FLAGS:
   -q, --quiet    be quiet and do not show any extra information

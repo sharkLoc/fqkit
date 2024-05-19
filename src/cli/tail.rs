@@ -20,7 +20,7 @@ pub fn tail_n_records(
         info!("reading from stdin");
     }
     info!("get tail {} records", number);
-    
+
     let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
     if rdc {
         let mut total = 0usize;
@@ -39,7 +39,7 @@ pub fn tail_n_records(
         for rec in fp.records().map_while(Result::ok) {
             tail.push(rec);
         }
-        for rec in tail.iter().rev().take(number).rev(){
+        for rec in tail.iter().rev().take(number).rev() {
             fo.write_record(rec)?;
         }
     }

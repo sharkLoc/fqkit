@@ -94,10 +94,10 @@ pub fn stat_fq(
 ) -> Result<()> {
     let start = Instant::now();
     if ![33u8, 64u8].contains(&phred) {
-        error!("{}",FqkitError::InvalidPhredValue);
+        error!("{}", FqkitError::InvalidPhredValue);
         std::process::exit(1);
     }
-    
+
     let fq = fastq::Reader::new(file_reader(inp)?);
     if let Some(inp) = inp {
         info!("reading from file: {}", inp);
@@ -111,7 +111,6 @@ pub fn stat_fq(
         info!("cycle result write to stdout");
     }
 
-    
     let mut fo = file_writer(Some(pre_sum), compression_level)?;
     let mut fc = file_writer(pre_cyc, compression_level)?;
 
@@ -156,7 +155,52 @@ pub fn stat_fq(
                 }
             }
 
-            if each.contains_key(&pos) {
+            if let std::collections::hash_map::Entry::Vacant(e) = each.entry(pos) {
+                let cap = this_q as usize + 1 + 5;
+                let mut v_tmp = vec![0usize; cap];
+                v_tmp[idx + 5] += 1;
+                if sf == &b'A' {
+                    v_tmp[0] += 1;
+                }
+                if sf == &b'T' {
+                    v_tmp[1] += 1;
+                }
+                if sf == &b'G' {
+                    v_tmp[2] += 1;
+                }
+                if sf == &b'C' {
+                    v_tmp[3] += 1;
+                }
+                if sf == &b'N' {
+                    v_tmp[4] += 1;
+                }
+                e.insert(v_tmp);
+            } else {
+                let tf = each.get_mut(&pos).unwrap();
+                let gap = (idx + 5 + 1) as i32 - tf.len() as i32;
+                if gap > 0 {
+                    for _ in 0..gap {
+                        tf.insert(tf.len(), 0);
+                    }
+                }
+                tf[idx + 5] += 1;
+                if sf == &b'A' {
+                    tf[0] += 1;
+                }
+                if sf == &b'T' {
+                    tf[1] += 1;
+                }
+                if sf == &b'G' {
+                    tf[2] += 1;
+                }
+                if sf == &b'C' {
+                    tf[3] += 1;
+                }
+                if sf == &b'N' {
+                    tf[4] += 1;
+                }
+            }
+            /*if each.contains_key(&pos) {
                 let tf = each.get_mut(&pos).unwrap();
                 let gap = (idx + 5 + 1) as i32 - tf.len() as i32;
                 if gap > 0 {
@@ -204,7 +248,7 @@ pub fn stat_fq(
                     v_tmp[4] += 1;
                 }
                 each.insert(pos, v_tmp);
-            }
+            }*/
         }
     }
 

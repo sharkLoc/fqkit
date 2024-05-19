@@ -5,6 +5,7 @@ use crossbeam::channel::unbounded;
 use log::*;
 use std::time::Instant;
 
+#[allow(clippy::too_many_arguments)]
 pub fn filter_fastq(
     read1: &String,
     read2: &String,
@@ -192,8 +193,8 @@ pub fn filter_fastq(
                 }
                 for (rec1, rec2) in vec_failed.iter() {
                     pe_fail += 1;
-                    failed_writer.write_record(&rec1).unwrap();
-                    failed_writer.write_record(&rec2).unwrap();
+                    failed_writer.write_record(rec1).unwrap();
+                    failed_writer.write_record(rec2).unwrap();
                 }
             }
         })

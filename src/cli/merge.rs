@@ -17,7 +17,7 @@ pub fn interleaved(
     let fq2_reader = fastq::Reader::new(file_reader(Some(file2))?);
     info!("reading from file: {}", file1);
     info!("reading from file: {}", file2);
-    
+
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
     for (rec1, rec2) in fq1_reader
         .records()

@@ -21,7 +21,7 @@ pub fn fq_length(
     } else {
         info!("reading from stdin");
     }
-    
+
     let mut fo = file_writer(out, compression_level)?;
     for rec in fp_reader.records().flatten() {
         let rlen = rec.seq().len();
@@ -31,7 +31,7 @@ pub fn fq_length(
 
     let mut sort_len: Vec<(&usize, &usize)> = reads_len.iter().collect();
     if rev {
-        sort_len.sort_by(|x,y|y.0.cmp(x.0));
+        sort_len.sort_by(|x, y| y.0.cmp(x.0));
     } else {
         sort_len.sort_by_key(|x| x.0);
     }

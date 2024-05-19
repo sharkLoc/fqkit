@@ -22,7 +22,7 @@ pub fn shuffle_fastq(
         info!("reading from stdin");
     }
     info!("rand seed: {}", seed);
-    
+
     let mut vec_reads = vec![];
     for rec in fq_reader.records().flatten() {
         vec_reads.push(rec);

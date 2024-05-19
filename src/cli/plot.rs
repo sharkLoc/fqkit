@@ -2,7 +2,7 @@ use crate::{error::FqkitError, utils::file_reader};
 use anyhow::Result;
 use colored::*;
 use log::*;
-use plotters::{style::Color,prelude::*};
+use plotters::{prelude::*, style::Color};
 use std::collections::BTreeMap;
 use std::io::BufRead;
 use std::time::Instant;
@@ -49,7 +49,7 @@ pub fn plot_line(
     let start = Instant::now();
 
     if !["svg", "png"].contains(&types) {
-        error!("{}",FqkitError::InvalidFigureType);
+        error!("{}", FqkitError::InvalidFigureType);
         std::process::exit(1);
     }
     let max_len = *data[0].iter().last().unwrap().0 as f32;
@@ -181,8 +181,8 @@ pub fn plot_line(
 
         charts
             .configure_series_labels()
-            .background_style(&WHITE.mix(0.9))
-            .border_style(&BLACK)
+            .background_style(WHITE.mix(0.9))
+            .border_style(BLACK)
             .position(SeriesLabelPosition::UpperRight)
             .draw()?;
     } else {
@@ -303,8 +303,8 @@ pub fn plot_line(
 
         charts
             .configure_series_labels()
-            .background_style(&WHITE.mix(0.9))
-            .border_style(&BLACK)
+            .background_style(WHITE.mix(0.9))
+            .border_style(BLACK)
             .position(SeriesLabelPosition::UpperRight)
             .draw()?;
     }

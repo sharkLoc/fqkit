@@ -1,11 +1,10 @@
-use clap::{ArgAction, value_parser, Parser};
-
+use clap::{value_parser, ArgAction, Parser};
 
 #[derive(Parser, Debug)]
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.7",
+    version = "0.4.8",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -27,8 +26,7 @@ Compression level:
     \n\nAuthors: {author} <mmtinfo@163.com>\
     \nSource code: https://github.com/sharkLoc/fqkit.git\
     \n\n{before-help}
-{usage-heading} {usage}\n\n{all-args}\n\nUse \"fqkit help [command]\" for more information about a command"
-)]
+{usage-heading} {usage}\n\n{all-args}\n\nUse \"fqkit help [command]\" for more information about a command")]
 pub struct Args {
     #[clap(subcommand)]
     pub command: Subcli,
@@ -44,11 +42,11 @@ pub struct Args {
     #[arg(long = "log", global = true, help_heading = Some("Global Arguments"), value_name = "FILE")]
     pub logfile: Option<String>,
 
-    /// control verbosity of logging, possible values: {error, warn, info, debug, trace}
-    #[arg(short = 'v', long = "verbosity", global = true, value_name = "STR",
-        default_value_t = String::from("debug"), help_heading = Some("Global Arguments")
+    /// control verbosity of logging, [-v: Error, -vv: Warn, -vvv: Info, -vvvv: Debug, -vvvvv: Trace, defalut: Debug]
+    #[arg(short = 'v', long = "verbosity", action = ArgAction::Count, global = true,
+        default_value_t = 4, help_heading = Some("Global Arguments")
     )]
-    pub verbose: String,
+    pub verbose: u8,
 
     /// be quiet and do not show any extra information
     #[arg(short = 'q', long = "quiet", global= true, help_heading = Some("Global FLAGS"))]
@@ -79,7 +77,9 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// get last N records from fastq file
-    #[command(before_help = "note: if the -r parameter is not specified, all data will be read into memory")]
+    #[command(
+        before_help = "note: if the -r parameter is not specified, all data will be read into memory"
+    )]
     tail {
         /// input fastq file, or read from stdin
         input: Option<String>,

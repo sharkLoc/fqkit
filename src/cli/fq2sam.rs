@@ -4,6 +4,7 @@ use bio::io::fastq;
 use log::*;
 use std::time::Instant;
 
+#[allow(clippy::too_many_arguments)]
 pub fn fastq2sam(
     r1: &String,
     r2: Option<&String>,

@@ -28,7 +28,7 @@ fn select_fastq(
     info!("rand seed: {}", seed);
     info!("subseq number: {}", n);
     info!("reduce much memory but cost more time");
-    
+
     for (order, _) in fq_reader.records().flatten().enumerate() {
         if order < n {
             get.push(order);

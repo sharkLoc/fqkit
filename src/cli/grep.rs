@@ -30,10 +30,10 @@ pub fn grep_fastq(
         ids.push(id);
     }
     if ids.is_empty() {
-        error!("{}",FqkitError::EmptyFile(list.to_string()));
+        error!("{}", FqkitError::EmptyFile(list.to_string()));
         std::process::exit(1);
     }
-    
+
     if let Some(out) = out {
         info!("reads write to file: {}", out);
     } else {

@@ -8,6 +8,7 @@ use plotters::prelude::*;
 use std::collections::HashMap;
 use std::time::Instant;
 
+#[allow(clippy::too_many_arguments)]
 pub fn gc_content(
     fqin: Option<&String>,
     output: Option<&String>,
@@ -27,7 +28,7 @@ pub fn gc_content(
     } else {
         info!("reading from stdin");
     }
-    
+
     let mut fo = file_writer(output, compression_level)?;
     let mut df_hash = HashMap::new();
 
@@ -129,19 +130,19 @@ fn plot_gc(
                 AreaSeries::new(
                     (0..).zip(data.iter()).map(|(x, y)| (x as f32, *y)),
                     0.,
-                    &GREEN.mix(0.5),
+                    GREEN.mix(0.5),
                 )
-                .border_style(&GREEN),
+                .border_style(GREEN),
             )?
             .label("GC content")
-            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &GREEN));
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], GREEN));
 
         //charts.draw_series( LineSeries::new((0..).zip(data.iter()).map(|(x,y)| (x as f32, *y)), &BLACK) )?;
 
         charts
             .configure_series_labels()
-            .background_style(&WHITE.mix(0.9))
-            .border_style(&BLACK)
+            .background_style(WHITE.mix(0.9))
+            .border_style(BLACK)
             .position(SeriesLabelPosition::UpperRight)
             .draw()?;
     } else {
@@ -170,17 +171,17 @@ fn plot_gc(
                 AreaSeries::new(
                     (0..).zip(data.iter()).map(|(x, y)| (x as f32, *y)),
                     0.,
-                    &GREEN.mix(0.5),
+                    GREEN.mix(0.5),
                 )
-                .border_style(&GREEN),
+                .border_style(GREEN),
             )?
             .label("GC content")
-            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &GREEN));
+            .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], GREEN));
 
         charts
             .configure_series_labels()
-            .background_style(&WHITE.mix(0.9))
-            .border_style(&BLACK)
+            .background_style(WHITE.mix(0.9))
+            .border_style(BLACK)
             .position(SeriesLabelPosition::UpperRight)
             .draw()?;
     }

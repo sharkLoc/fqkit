@@ -6,6 +6,7 @@ use log::*;
 use regex::RegexBuilder;
 use std::time::Instant;
 
+#[allow(clippy::too_many_arguments)]
 pub fn search_fq(
     fq: Option<&String>,
     pat: &str,
@@ -24,7 +25,7 @@ pub fn search_fq(
     } else {
         info!("reading from stdin");
     }
-    
+
     info!("regex pattern is: {}", pat);
     if ncpu == 1 || ncpu == 0 {
         info!("thread num is: {}", ncpu);
@@ -47,7 +48,6 @@ pub fn search_fq(
     } else {
         info!("reads write to stdout");
     }
-    
 
     if ncpu == 1 || ncpu == 0 {
         let re = RegexBuilder::new(pat)
@@ -61,11 +61,9 @@ pub fn search_fq(
                     num += 1;
                     fo.write_record(&rec)?;
                 }
-            } else {
-                if re.is_match(fq_str) {
-                    num += 1;
-                    fo.write_record(&rec)?;
-                }
+            } else if re.is_match(fq_str) {
+                num += 1;
+                fo.write_record(&rec)?;
             }
         }
         fo.flush()?;
@@ -103,11 +101,9 @@ pub fn search_fq(
                                         matchs.push(rec);
                                         count += 1;
                                     }
-                                } else {
-                                    if re.is_match(fq_str) {
-                                        matchs.push(rec);
-                                        count += 1;
-                                    }
+                                } else if re.is_match(fq_str) {
+                                    matchs.push(rec);
+                                    count += 1;
                                 }
                             }
                             tx_tmp.send((matchs, count)).unwrap();

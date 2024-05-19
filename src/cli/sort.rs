@@ -4,6 +4,7 @@ use bio::io::fastq;
 use log::*;
 use std::time::Instant;
 
+#[allow(clippy::too_many_arguments)]
 pub fn sort_fastq(
     file: Option<&String>,
     sort_by_name: bool,
@@ -15,7 +16,7 @@ pub fn sort_fastq(
     compression_level: u32,
 ) -> Result<(), Error> {
     let start = Instant::now();
-    
+
     let mut n = 0;
     if sort_by_gc {
         n += 1;
@@ -95,9 +96,11 @@ pub fn sort_fastq(
     } else if sort_by_length {
         info!("sort read by length");
         if reverse {
-            vec_reads.sort_by(|a, b| b.seq().len().cmp(&a.seq().len()));
+            //vec_reads.sort_by(|a, b| b.seq().len().cmp(&a.seq().len()));
+            vec_reads.sort_by_key(|b| std::cmp::Reverse(b.seq().len()))
         } else {
-            vec_reads.sort_by(|a, b| a.seq().len().cmp(&b.seq().len()));
+            //vec_reads.sort_by(|a, b| a.seq().len().cmp(&b.seq().len()));
+            vec_reads.sort_by_key(|a| a.seq().len())
         }
     } else if sort_by_gc {
         info!("sort read by gc content");

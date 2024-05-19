@@ -20,7 +20,7 @@ pub fn fq2fa(
     } else {
         info!("reading from stdin");
     }
-    
+
     let mut fo = fasta::Writer::new(file_writer(out, compression_level)?);
     if remove {
         for rec in fq_reader.records().flatten() {

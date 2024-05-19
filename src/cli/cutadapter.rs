@@ -25,10 +25,11 @@ pub fn cut_adapter(
     }
 
     let mut seqs = HashMap::new();
-    let mut iters = seqfile_reader.records();
-    while let Some(each) = iters.next() {
-        let rec = each?;
-        if seqs.contains_key(&rec.id().to_owned()) {
+    let iters = seqfile_reader.records();
+    for rec in iters.flatten() {
+        //while let Some(each) = iters.next() {
+        //let rec = each?;
+        if seqs.contains_key(rec.id()) {
             warn!("found duplicate sequence id: {}, keep first one", rec.id());
             continue;
         } else {
@@ -47,7 +48,7 @@ pub fn cut_adapter(
     for rec in fq_reader.records().map_while(Result::ok) {
         let read_len = rec.seq().len();
         for (_, seq) in seqs.iter() {
-            let pat = seq.as_slice();
+            let pat = seq;
 
             if read_len >= pat.len() {
                 if left {

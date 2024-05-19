@@ -312,6 +312,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap-verbosity-flag"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb9b20c0dd58e4c2e991c8d203bbeb76c11304d1011659686b5b644bc29aa478"
+dependencies = [
+ "clap 4.4.7",
+ "log",
+]
+
+[[package]]
 name = "clap_builder"
 version = "4.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -877,7 +887,7 @@ checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 
 [[package]]
 name = "fqkit"
-version = "0.4.7"
+version = "0.4.8"
 dependencies = [
  "anyhow",
  "atty",
@@ -885,6 +895,7 @@ dependencies = [
  "bzip2",
  "chrono",
  "clap 4.4.7",
+ "clap-verbosity-flag",
  "colored",
  "crossbeam",
  "env_logger",

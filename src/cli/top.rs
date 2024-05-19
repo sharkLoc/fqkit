@@ -19,7 +19,7 @@ pub fn top_n_records(
         info!("reading from stdin");
     }
     info!("get top {} records", number);
-    
+
     let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
     for rec in fp.records().take(number).flatten() {
         fo.write_record(&rec)?;

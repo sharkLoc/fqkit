@@ -9,7 +9,6 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>> {
-
     let mut maps = HashMap::new();
     let mut error_flag = "";
     let fp = file_reader(Some(file))?;
@@ -84,6 +83,7 @@ fn hamming_dis(bar: &str, seq: &[u8]) -> usize {
     dist
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn split_fq(
     big_fq1: &String,
     big_fq2: &String,
@@ -100,7 +100,7 @@ pub fn split_fq(
     let start = Instant::now();
 
     if !Path::new(outdir).try_exists().unwrap() {
-        error!("{}",FqkitError::InvalidOutputDir(outdir.to_string()));
+        error!("{}", FqkitError::InvalidOutputDir(outdir.to_string()));
         std::process::exit(1);
     }
     let mut n = 0;
@@ -127,31 +127,31 @@ pub fn split_fq(
         let mut fq_hand = Vec::new();
         for (bar_seq, name) in maps {
             let fq1 = if gzip {
-                PathBuf::from(outdir).join(format!("{}_1.fq.gz",name))
+                PathBuf::from(outdir).join(format!("{}_1.fq.gz", name))
             } else if bzip2 {
-                PathBuf::from(outdir).join(format!("{}_1.fq.bz2",name))
+                PathBuf::from(outdir).join(format!("{}_1.fq.bz2", name))
             } else if xz {
-                PathBuf::from(outdir).join(format!("{}_1.fq.xz",name))
+                PathBuf::from(outdir).join(format!("{}_1.fq.xz", name))
             } else {
-                PathBuf::from(outdir).join(format!("{}_1.fq",name))
+                PathBuf::from(outdir).join(format!("{}_1.fq", name))
             };
             let fq2 = if gzip {
-                PathBuf::from(outdir).join(format!("{}_2.fq.gz",name))
+                PathBuf::from(outdir).join(format!("{}_2.fq.gz", name))
             } else if bzip2 {
-                PathBuf::from(outdir).join(format!("{}_2.fq.bz2",name))
+                PathBuf::from(outdir).join(format!("{}_2.fq.bz2", name))
             } else if xz {
-                PathBuf::from(outdir).join(format!("{}_2.fq.xz",name))
+                PathBuf::from(outdir).join(format!("{}_2.fq.xz", name))
             } else {
-                PathBuf::from(outdir).join(format!("{}_2.fq",name))
+                PathBuf::from(outdir).join(format!("{}_2.fq", name))
             };
             let bar = if gzip {
-                PathBuf::from(outdir).join(format!("{}_barcode.fq.gz",name))
+                PathBuf::from(outdir).join(format!("{}_barcode.fq.gz", name))
             } else if bzip2 {
-                PathBuf::from(outdir).join(format!("{}_barcode.fq.bz2",name))
+                PathBuf::from(outdir).join(format!("{}_barcode.fq.bz2", name))
             } else if xz {
-                PathBuf::from(outdir).join(format!("{}_barcode.fq.xz",name))
+                PathBuf::from(outdir).join(format!("{}_barcode.fq.xz", name))
             } else {
-                PathBuf::from(outdir).join(format!("{}_barcode.fq",name))
+                PathBuf::from(outdir).join(format!("{}_barcode.fq", name))
             };
 
             let fh1 = fastq::Writer::new(file_writer_append(&fq1, compression_level)?);
@@ -165,7 +165,7 @@ pub fn split_fq(
         let fq1_reader = fastq::Reader::new(file_reader(Some(big_fq1))?);
         let fq2_reader = fastq::Reader::new(file_reader(Some(big_fq2))?);
         let (mut read_pair, mut get_pair) = (0u64, 0u64);
-        
+
         info!("reading from read1 file: {}", big_fq1);
         info!("reading from read2 file: {}", big_fq2);
         info!("barcode position mode: {}", mode);

@@ -14,7 +14,7 @@ pub fn split_interleaved(
     compression_level: u32,
 ) -> Result<(), Error> {
     let start = Instant::now();
-    
+
     let mut n = 0;
     if gzip {
         n += 1;
@@ -35,26 +35,26 @@ pub fn split_interleaved(
     } else {
         info!("reading from stdin");
     }
-    
+
     //let pre1 = format!("{}/{}_r1.fq.gz", out_dir, out_pre);
     let pre1 = if gzip {
-        PathBuf::from(out_dir).join(format!("{}_r1.fq.gz",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r1.fq.gz", out_pre))
     } else if bzip2 {
-        PathBuf::from(out_dir).join(format!("{}_r1.fq.bz2",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r1.fq.bz2", out_pre))
     } else if xz {
-        PathBuf::from(out_dir).join(format!("{}_r1.fq.xz",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r1.fq.xz", out_pre))
     } else {
-        PathBuf::from(out_dir).join(format!("{}_r1.fq",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r1.fq", out_pre))
     };
     //let pre2 = format!("{}/{}_r2.fq.gz", out_dir, out_pre);
     let pre2 = if gzip {
-        PathBuf::from(out_dir).join(format!("{}_r2.fq.gz",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r2.fq.gz", out_pre))
     } else if bzip2 {
-        PathBuf::from(out_dir).join(format!("{}_r2.fq.bz2",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r2.fq.bz2", out_pre))
     } else if xz {
-        PathBuf::from(out_dir).join(format!("{}_r2.fq.xz",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r2.fq.xz", out_pre))
     } else {
-        PathBuf::from(out_dir).join(format!("{}_r2.fq",out_pre))
+        PathBuf::from(out_dir).join(format!("{}_r2.fq", out_pre))
     };
     let mut fh1 = fastq::Writer::new(file_writer_append(&pre1, compression_level)?);
     info!("read1 output file: {:?}", pre1);

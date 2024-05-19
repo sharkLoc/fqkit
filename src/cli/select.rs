@@ -14,7 +14,7 @@ pub fn select_pe_fastq(
     let start = Instant::now();
 
     let mut read1_id = HashMap::new();
-    let mut read2_id = HashMap::new();    
+    let mut read2_id = HashMap::new();
     let fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;
     let fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
     info!("read forward reads from file: {}", fq1);

@@ -21,7 +21,7 @@ pub fn range_fastq(
     }
     info!("skip first {} records", skip);
     info!("get {} records", take);
-    
+
     let mut fp_writer = file_writer(output, compression_level).map(fastq::Writer::new)?;
     for rec in fp_reader.records().skip(skip).take(take).flatten() {
         fp_writer.write_record(&rec)?;

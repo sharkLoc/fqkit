@@ -36,7 +36,7 @@ pub fn size_fastq(
     compression_level: u32,
 ) -> Result<()> {
     let start = Instant::now();
-    
+
     let fq_reader = fastq::Reader::new(file_reader(fq)?);
     if let Some(inp) = fq {
         info!("reading from file: {}", inp);
@@ -44,7 +44,7 @@ pub fn size_fastq(
         info!("reading from stdin");
     }
     info!("additional worker threads is: {}", ncpu);
-    
+
     let mut chunk = chunk;
     if chunk == 0 {
         warn!(
@@ -60,7 +60,7 @@ pub fn size_fastq(
         info!("output result write to stdout");
     }
     let mut fo = file_writer(out, compression_level)?;
-    
+
     let mut base = Base::new();
     let mut bases = 0usize;
 

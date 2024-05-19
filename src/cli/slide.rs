@@ -12,7 +12,6 @@ pub fn slide_fastq(
     suffix: &str,
     compression_level: u32,
 ) -> Result<()> {
-    
     let start = Instant::now();
 
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;

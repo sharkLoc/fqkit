@@ -18,7 +18,7 @@ pub fn concat_fqstq_lane(
     let fp1 = file_reader(Some(r1_list))?;
     let fp2 = file_reader(Some(r2_list))?;
     info!("read forward reads for lane list: {}", r1_list);
-    info!("read forward reads for lane list: {}", r2_list); 
+    info!("read forward reads for lane list: {}", r2_list);
 
     for r1 in fp1.lines().map_while(Result::ok) {
         vec1.push(r1);
@@ -33,7 +33,7 @@ pub fn concat_fqstq_lane(
         );
         std::process::exit(1);
     }
-    
+
     info!("outout read1 in file: {}", out_r1);
     info!("outout read1 in file: {}", out_r2);
 

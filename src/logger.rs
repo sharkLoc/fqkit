@@ -9,19 +9,19 @@ use std::{
 };
 
 pub fn logger<P: AsRef<Path>>(
-    verbose: String,
+    verbose: u8,
     logfile: Option<P>,
     quiet: bool,
 ) -> Result<(), anyhow::Error> {
-    let mut level = if verbose == *"error" {
+    let mut level = if verbose == 1 {
         LevelFilter::Error
-    } else if verbose == *"warn" {
+    } else if verbose == 2 {
         LevelFilter::Warn
-    } else if verbose == *"info" {
+    } else if verbose == 3 {
         LevelFilter::Info
-    } else if verbose == *"debug" {
+    } else if verbose == 4 {
         LevelFilter::Debug
-    } else if verbose == *"trace" {
+    } else if verbose == 5 {
         LevelFilter::Trace
     } else {
         LevelFilter::Off
@@ -50,6 +50,7 @@ pub fn logger<P: AsRef<Path>>(
                 style.set_color(Color::Magenta).set_bold(true);
             }
         }
+
         writeln!(
             buf,
             "{} {} - {} {}",

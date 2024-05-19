@@ -4,8 +4,8 @@ use clap::Parser;
 mod logger;
 use logger::*;
 mod command;
-mod utils;
 mod error;
+mod utils;
 use command::*;
 mod cli;
 use cli::{
@@ -23,8 +23,19 @@ fn main() -> Result<(), Error> {
         Subcli::topn { input, num, out } => {
             top_n_records(input.as_ref(), num, out.as_ref(), arg.compression_level)?;
         }
-        Subcli::tail { input, num, rdc, out } => {
-            tail_n_records(input.as_ref(), num, rdc, out.as_ref(), arg.compression_level)?;
+        Subcli::tail {
+            input,
+            num,
+            rdc,
+            out,
+        } => {
+            tail_n_records(
+                input.as_ref(),
+                num,
+                rdc,
+                out.as_ref(),
+                arg.compression_level,
+            )?;
         }
         Subcli::subfq {
             input,
@@ -370,8 +381,23 @@ fn main() -> Result<(), Error> {
         Subcli::reverse { input, rev, out } => {
             reverse_comp_seq(input.as_ref(), out.as_ref(), rev, arg.compression_level)?;
         }
-        Subcli::split { input, gzip, bzip2, xz, pre, out } => {
-            split_interleaved(input.as_ref(), &out, &pre, gzip, bzip2, xz, arg.compression_level)?;
+        Subcli::split {
+            input,
+            gzip,
+            bzip2,
+            xz,
+            pre,
+            out,
+        } => {
+            split_interleaved(
+                input.as_ref(),
+                &out,
+                &pre,
+                gzip,
+                bzip2,
+                xz,
+                arg.compression_level,
+            )?;
         }
         Subcli::merge { read1, read2, out } => {
             interleaved(&read1, &read2, out.as_ref(), arg.compression_level)?;
@@ -434,7 +460,11 @@ fn main() -> Result<(), Error> {
                 arg.compression_level,
             )?;
         }
-        Subcli::length { input, reverse, out } => {
+        Subcli::length {
+            input,
+            reverse,
+            out,
+        } => {
             fq_length(input.as_ref(), reverse, out.as_ref(), arg.compression_level)?;
         }
         Subcli::view { input, out } => {

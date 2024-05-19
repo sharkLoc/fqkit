@@ -32,11 +32,11 @@ pub fn remove_read(
     } else {
         info!("reading reads from stdin");
     }
-    
+
     if !rm {
         info!("removed reads in file: {}", save);
     }
-    
+
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
     if rm {
         for rec in fq_reader.records().flatten() {

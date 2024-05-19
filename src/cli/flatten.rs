@@ -4,6 +4,7 @@ use bio::io::fastq;
 use log::*;
 use std::time::Instant;
 
+#[allow(clippy::too_many_arguments)]
 pub fn flatten_fq(
     file: Option<&String>,
     out: Option<&String>,
@@ -28,7 +29,7 @@ pub fn flatten_fq(
         error!("error flag numer: {}, flag range [1..15]", flag);
         std::process::exit(1);
     }
-    
+
     let mut out_writer = file_writer(out, compression_level)?;
     let flags = format!("{:b}", flag).chars().rev().collect::<Vec<char>>();
     let mut fields = vec![];
@@ -39,11 +40,8 @@ pub fn flatten_fq(
     }
 
     for rec in fq_reader.records().flatten() {
-        let read = vec![rec.id().as_bytes(), rec.seq(), "+".as_bytes(), rec.qual()];
-        let res = fields
-            .iter()
-            .map(|idx| read[*idx])
-            .collect::<Vec<&[u8]>>();
+        let read = [rec.id().as_bytes(), rec.seq(), "+".as_bytes(), rec.qual()];
+        let res = fields.iter().map(|idx| read[*idx]).collect::<Vec<&[u8]>>();
 
         let mut out = Vec::new();
         for x in res {
@@ -57,11 +55,11 @@ pub fn flatten_fq(
         }
         if gc {
             let gc_count = rec
-            .seq()
-            .iter()
-            .filter(|x| *x == &b'G' || *x == &b'C')
-            .count();
-            let gc_ratio = format!("{:.2}",gc_count as f64 / rec.seq().len() as f64 * 100.0);
+                .seq()
+                .iter()
+                .filter(|x| *x == &b'G' || *x == &b'C')
+                .count();
+            let gc_ratio = format!("{:.2}", gc_count as f64 / rec.seq().len() as f64 * 100.0);
             out.push(gc_ratio);
         }
         out_writer.write_all(out.join(sep.to_string().as_str()).as_bytes())?;
