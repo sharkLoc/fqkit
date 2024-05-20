@@ -16,10 +16,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build
+    
+      name: Build
     - run: echo "start run cargo build"
     - run: cargo build --verbose
-    - name: Run tests
+
+      name: Run tests
     - run: echo "start run cargo test"
     - run: cargo test --verbose
     - run: echo "This job's status is ${{ job.status }}."

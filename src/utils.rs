@@ -172,3 +172,23 @@ where
         Ok(Box::new(BufWriter::with_capacity(BUFF_SIZE, fp)))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn gz_or_not() {
+        assert_eq!(is_gzipped("example/mini2k.fq.gz").unwrap(), true);
+    }
+
+    #[test]
+    fn xz_or_not() {
+        assert_eq!(is_xz("example/mini2k.fq.xz").unwrap(), true);
+    }
+
+    #[test]
+    fn bzip2_or_not() {
+        assert_eq!(is_bzipped("example/mini2k.fq.bz2").unwrap(), true);
+    }
+}

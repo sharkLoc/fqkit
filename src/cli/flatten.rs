@@ -30,14 +30,8 @@ pub fn flatten_fq(
         std::process::exit(1);
     }
 
+    let fields = get_flag(flag);
     let mut out_writer = file_writer(out, compression_level)?;
-    let flags = format!("{:b}", flag).chars().rev().collect::<Vec<char>>();
-    let mut fields = vec![];
-    for (i, k) in flags.iter().enumerate() {
-        if k == &'1' {
-            fields.push(i);
-        }
-    }
 
     for rec in fq_reader.records().flatten() {
         let read = [rec.id().as_bytes(), rec.seq(), "+".as_bytes(), rec.qual()];
@@ -69,4 +63,33 @@ pub fn flatten_fq(
 
     info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
+}
+
+fn get_flag(num: u8) -> Vec<usize> {
+    let flags = format!("{:b}", num).chars().rev().collect::<Vec<char>>();
+
+    let mut fields = vec![];
+    for (i, k) in flags.iter().enumerate() {
+        if k == &'1' {
+            fields.push(i);
+        }
+    }
+    fields
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // 1, 2, 4, 8
+    #[test]
+    fn flag3() {
+        // 3 = 1 + 2, index: [0,1]
+        assert_eq!(get_flag(3), vec![0, 1]);
+    }
+
+    #[test]
+    fn flag7() {
+        assert_eq!(get_flag(7), vec![0, 1, 2]);
+    }
 }
