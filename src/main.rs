@@ -10,9 +10,10 @@ use command::*;
 mod cli;
 use cli::{
     barcode::*, check::*, concat::*, cutadapter::cut_adapter, filter::*, flatten::*, fq2fa::*,
-    fq2sam::*, fqscore::*, gcplot::*, grep::*, length::*, mask::*, merge::*, plot::*, range::*,
-    remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*, slide::*, sort::*,
-    split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*, view::*, kmer::*,
+    fq2sam::*, fqscore::*, gcplot::*, grep::*, kmer::*, length::*, mask::*, merge::*, plot::*,
+    range::*, remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*,
+    slide::*, sort::*, split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*,
+    view::*,
 };
 
 fn main() -> Result<(), Error> {
@@ -470,8 +471,19 @@ fn main() -> Result<(), Error> {
         Subcli::view { input, out } => {
             view_fq(input.as_ref(), out.as_ref(), arg.compression_level)?;
         }
-        Subcli::kmer { input, size, header, out } => {
-            kmer_count(input.as_ref(), size, header, out.as_ref(), arg.compression_level)?;
+        Subcli::kmer {
+            input,
+            size,
+            header,
+            out,
+        } => {
+            kmer_count(
+                input.as_ref(),
+                size,
+                header,
+                out.as_ref(),
+                arg.compression_level,
+            )?;
         }
     }
 

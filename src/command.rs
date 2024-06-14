@@ -292,7 +292,12 @@ pub enum Subcli {
         /// input fastq file, or read from stdin
         input: Option<String>,
         /// set kmer size
-        #[arg(short = 'k', long = "kmer-size", default_value_t = 21, value_name = "INT")]
+        #[arg(
+            short = 'k',
+            long = "kmer-size",
+            default_value_t = 21,
+            value_name = "INT"
+        )]
         size: usize,
         /// add header info in output file
         #[arg(short = 'H', long, help_heading = Some("FLAGS"))]
