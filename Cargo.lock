@@ -887,7 +887,7 @@ checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 
 [[package]]
 name = "fqkit"
-version = "0.4.8"
+version = "0.4.9"
 dependencies = [
  "anyhow",
  "atty",
@@ -902,6 +902,7 @@ dependencies = [
  "flate2",
  "log",
  "lowcharts",
+ "nthash",
  "plotters",
  "rand",
  "rand_pcg",
@@ -1297,6 +1298,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac8cd24d9f185bb7223958d8c1ff7a961b74b1953fd05dba7cc568a63b3861ec"
 dependencies = [
  "rustc_version 0.1.7",
+]
+
+[[package]]
+name = "nthash"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "752ed59e65983a1ba3166fcdf684107b9f43913a937d3250aa98f26ce586c2d0"
+dependencies = [
+ "thiserror",
 ]
 
 [[package]]

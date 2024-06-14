@@ -40,7 +40,7 @@ cargo install --git https://github.com/sharkLoc/fqkit.git
 ```bash
 FqKit -- A simple and cross-platform program for fastq file manipulation
 
-Version: 0.4.8
+Version: 0.4.9
 
 Authors: sharkLoc <mmtinfo@163.com>
 Source code: https://github.com/sharkLoc/fqkit.git
@@ -72,6 +72,7 @@ Commands:
   search   search reads/motifs from fastq file
   grep     grep fastq sequence by read id or full name
   stats    summary for fastq format file [aliases: stat]
+  kmer     sample kmer count
   shuffle  shuffle fastq sequences
   size     report the number sequences and bases
   slide    extract subsequences in sliding windows

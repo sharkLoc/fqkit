@@ -4,7 +4,7 @@ use clap::{value_parser, ArgAction, Parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.8",
+    version = "0.4.9",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,
@@ -286,6 +286,20 @@ pub enum Subcli {
         /// if not specified, cycle result write to stdout
         #[arg(short = 'c', long = "cycle", value_name = "FILE")]
         cyc: Option<String>,
+    },
+    /// sample kmer count
+    kmer {
+        /// input fastq file, or read from stdin
+        input: Option<String>,
+        /// set kmer size
+        #[arg(short = 'k', long = "kmer-size", default_value_t = 21, value_name = "INT")]
+        size: usize,
+        /// add header info in output file
+        #[arg(short = 'H', long, help_heading = Some("FLAGS"))]
+        header: bool,
+        /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
+        #[arg(short = 'o', long = "out", value_name = "FILE")]
+        out: Option<String>,
     },
     /// shuffle fastq sequences
     #[command(before_help = "note: all records will be readed into memory")]

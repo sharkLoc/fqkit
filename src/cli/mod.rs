@@ -31,3 +31,4 @@ pub mod tail;
 pub mod top;
 pub mod trimfq;
 pub mod view;
+pub mod kmer;
