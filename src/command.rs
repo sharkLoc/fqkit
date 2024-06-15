@@ -287,7 +287,7 @@ pub enum Subcli {
         #[arg(short = 'c', long = "cycle", value_name = "FILE")]
         cyc: Option<String>,
     },
-    /// sample kmer count
+    /// a simple kmer counter
     kmer {
         /// input fastq file, or read from stdin
         input: Option<String>,
