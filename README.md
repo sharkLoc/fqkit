@@ -72,7 +72,7 @@ Commands:
   search   search reads/motifs from fastq file
   grep     grep fastq sequence by read id or full name
   stats    summary for fastq format file [aliases: stat]
-  kmer     sample kmer count
+  kmer     a simple kmer counter
   shuffle  shuffle fastq sequences
   size     report the number sequences and bases
   slide    extract subsequences in sliding windows
