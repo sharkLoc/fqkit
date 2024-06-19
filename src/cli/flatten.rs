@@ -33,7 +33,7 @@ pub fn flatten_fq(
     let fields = get_flag(flag);
     let mut out_writer = file_writer(out, compression_level)?;
 
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         let read = [rec.id().as_bytes(), rec.seq(), "+".as_bytes(), rec.qual()];
         let res = fields.iter().map(|idx| read[*idx]).collect::<Vec<&[u8]>>();
 

@@ -54,7 +54,7 @@ pub fn search_fq(
             .case_insensitive(case)
             .build()
             .unwrap();
-        for rec in fq_reader.records().flatten() {
+        for rec in fq_reader.records().map_while(Result::ok) {
             let fq_str = std::str::from_utf8(rec.seq()).unwrap();
             if invert_match {
                 if !re.is_match(fq_str) {
@@ -71,7 +71,7 @@ pub fn search_fq(
         let (tx, rx) = unbounded();
         let mut fqiter = fq_reader.records();
         loop {
-            let chunks: Vec<_> = fqiter.by_ref().take(chunk).flatten().collect();
+            let chunks: Vec<_> = fqiter.by_ref().take(chunk).map_while(Result::ok).collect();
             if chunks.is_empty() {
                 break;
             }

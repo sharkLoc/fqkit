@@ -46,8 +46,8 @@ pub fn concat_fqstq_lane(
         let fq_reader2 = file_reader(Some(pe.1)).map(fastq::Reader::new)?;
         for (rec1, rec2) in fq_reader1
             .records()
-            .flatten()
-            .zip(fq_reader2.records().flatten())
+            .map_while(Result::ok)
+            .zip(fq_reader2.records().map_while(Result::ok))
         {
             out_writer1.write_record(&rec1)?;
             out_writer2.write_record(&rec2)?;

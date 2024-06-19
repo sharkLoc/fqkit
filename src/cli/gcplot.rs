@@ -32,7 +32,7 @@ pub fn gc_content(
     let mut fo = file_writer(output, compression_level)?;
     let mut df_hash = HashMap::new();
 
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         let gc_count = rec
             .seq()
             .iter()

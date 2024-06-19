@@ -39,7 +39,7 @@ pub fn remove_read(
 
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
     if rm {
-        for rec in fq_reader.records().flatten() {
+        for rec in fq_reader.records().map_while(Result::ok) {
             if !ids.contains(&rec.id().to_string()) {
                 fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
             }
@@ -47,7 +47,7 @@ pub fn remove_read(
         fq_writer.flush()?;
     } else {
         let mut rm_writer = fastq::Writer::new(file_writer(Some(save), compression_level)?);
-        for rec in fq_reader.records().flatten() {
+        for rec in fq_reader.records().map_while(Result::ok) {
             if !ids.contains(&rec.id().to_string()) {
                 fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
             } else {

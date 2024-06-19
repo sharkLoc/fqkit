@@ -22,7 +22,7 @@ pub fn check_fastq(
 
     if save {
         let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
-        for rec in fp_reader.records().flatten() {
+        for rec in fp_reader.records().map_while(Result::ok) {
             total += 1;
             match rec.check() {
                 Ok(_) => {
@@ -37,7 +37,7 @@ pub fn check_fastq(
         }
         out_writer.flush()?;
     } else {
-        for rec in fp_reader.records().flatten() {
+        for rec in fp_reader.records().map_while(Result::ok) {
             total += 1;
             match rec.check() {
                 Ok(_) => {

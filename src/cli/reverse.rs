@@ -29,7 +29,7 @@ pub fn reverse_comp_seq(
     ]);
     let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
 
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         let rev_seq = rec.seq().iter().copied().rev().collect::<Vec<u8>>();
         let rev_qual = rec.qual().iter().copied().rev().collect::<Vec<u8>>();
 

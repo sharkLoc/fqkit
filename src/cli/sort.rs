@@ -50,7 +50,7 @@ pub fn sort_fastq(
     }
 
     let mut vec_reads = vec![];
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         vec_reads.push(rec);
     }
     info!("all records has been readed into memory, start sort ...");

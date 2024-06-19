@@ -15,7 +15,7 @@ fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>
     info!("reading from barcode list file: {}", file);
 
     if rev_comp {
-        for line in fp.lines().map_while(std::io::Result::ok) {
+        for line in fp.lines().map_while(Result::ok) {
             let item = line.split('\t').collect::<Vec<&str>>(); // barcode => sample
             let bar: String = item[0]
                 .chars()
@@ -42,7 +42,7 @@ fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>
             error_flag = "";
         }
     } else {
-        for line in fp.lines().map_while(std::io::Result::ok) {
+        for line in fp.lines().map_while(Result::ok) {
             let item = line.split('\t').collect::<Vec<&str>>();
             let bar: String = item[0]
                 .chars()

@@ -17,7 +17,7 @@ pub fn view_fq(file: Option<&String>, out: Option<&String>, compression_level: u
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
 
-    let mut iter_fq = fq_reader.records().flatten().peekable();
+    let mut iter_fq = fq_reader.records().map_while(Result::ok).peekable();
     let (mut page, mut start, mut end) = (0usize, 1usize, 0usize);
 
     loop {

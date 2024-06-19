@@ -24,7 +24,7 @@ pub fn slide_fastq(
     info!("step size: {}", step);
     let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
     let mut window = wind;
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         let seq = rec.seq();
         let qual = rec.qual();
         let len = seq.len();

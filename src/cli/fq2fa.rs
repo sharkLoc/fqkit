@@ -23,7 +23,7 @@ pub fn fq2fa(
 
     let mut fo = fasta::Writer::new(file_writer(out, compression_level)?);
     if remove {
-        for rec in fq_reader.records().flatten() {
+        for rec in fq_reader.records().map_while(Result::ok) {
             num += 1;
             fo.write(rec.id(), None, rec.seq())?;
         }

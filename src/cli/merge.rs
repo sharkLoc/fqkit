@@ -21,8 +21,8 @@ pub fn interleaved(
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
     for (rec1, rec2) in fq1_reader
         .records()
-        .flatten()
-        .zip(fq2_reader.records().flatten())
+        .map_while(Result::ok)
+        .zip(fq2_reader.records().map_while(Result::ok))
     {
         num += 1;
         fq_writer.write(rec1.id(), rec1.desc(), rec1.seq(), rec1.qual())?;

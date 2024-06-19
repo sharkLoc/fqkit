@@ -4,7 +4,7 @@ use clap::{value_parser, ArgAction, Parser};
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.9",
+    version = "0.4.10",
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,

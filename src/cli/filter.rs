@@ -48,7 +48,7 @@ pub fn filter_fastq(
         for (rec1, rec2) in fq_reader1
             .records()
             .flatten()
-            .zip(fq_reader2.records().flatten())
+            .zip(fq_reader2.records().map_while(Result::ok))
         {
             if rec1.seq().iter().filter(|v| v == &&b'N').count() > nbase
                 || rec2.seq().iter().filter(|v| v == &&b'N').count() > nbase
@@ -117,8 +117,8 @@ pub fn filter_fastq(
             let pe_vec: Vec<_> = fq_iter1
                 .by_ref()
                 .take(chunk)
-                .flatten()
-                .zip(fq_iter2.by_ref().take(chunk).flatten())
+                .map_while(Result::ok)
+                .zip(fq_iter2.by_ref().take(chunk).map_while(Result::ok))
                 .collect();
             if pe_vec.is_empty() {
                 break;

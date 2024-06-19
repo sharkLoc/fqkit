@@ -118,7 +118,7 @@ pub fn stat_fq(
     let mut max_qva = 0;
     let mut min_len: Option<usize> = None;
     let mut each: HashMap<usize, Vec<usize>> = HashMap::new();
-    for rec in fq.records().flatten() {
+    for rec in fq.records().map_while(Result::ok) {
         let this_q = *rec.qual().iter().max().unwrap() - phred;
         if this_q > max_qva {
             max_qva = this_q;

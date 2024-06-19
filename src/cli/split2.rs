@@ -59,7 +59,7 @@ pub fn split_chunk(
     )?)];
 
     info!("start to write file: {:?}", out);
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         if flag < num {
             let fhthis = fh.get_mut(index).unwrap();
             fhthis.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;

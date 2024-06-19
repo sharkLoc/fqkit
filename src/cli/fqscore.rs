@@ -37,7 +37,7 @@ pub fn phred_score(
     }
 
     let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         let mut qual = vec![];
         if to33 {
             for q in rec.qual() {

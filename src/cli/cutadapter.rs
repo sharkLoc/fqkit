@@ -26,7 +26,7 @@ pub fn cut_adapter(
 
     let mut seqs = HashMap::new();
     let iters = seqfile_reader.records();
-    for rec in iters.flatten() {
+    for rec in iters.map_while(Result::ok) {
         //while let Some(each) = iters.next() {
         //let rec = each?;
         if seqs.contains_key(rec.id()) {

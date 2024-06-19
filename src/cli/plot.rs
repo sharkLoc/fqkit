@@ -16,7 +16,7 @@ pub fn cycle_data(file: Option<&String>) -> Result<Vec<BTreeMap<usize, f64>>> {
         cyc.push(BTreeMap::new());
     }
 
-    for (idx, line) in fp.lines().map_while(std::io::Result::ok).enumerate() {
+    for (idx, line) in fp.lines().map_while(Result::ok).enumerate() {
         if idx == 0 {
             continue;
         }

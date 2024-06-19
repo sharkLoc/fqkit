@@ -23,7 +23,7 @@ pub fn trim_fq(
     }
 
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
-    for (idx, rec) in fq_reader.records().flatten().enumerate() {
+    for (idx, rec) in fq_reader.records().map_while(Result::ok).enumerate() {
         let rlen = rec.seq().len();
         if left >= rlen || right >= rlen || length >= rlen {
             warn!(

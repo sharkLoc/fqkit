@@ -23,7 +23,7 @@ pub fn fq_length(
     }
 
     let mut fo = file_writer(out, compression_level)?;
-    for rec in fp_reader.records().flatten() {
+    for rec in fp_reader.records().map_while(Result::ok) {
         let rlen = rec.seq().len();
         *reads_len.entry(rlen).or_insert(0usize) += 1;
         total += 1;

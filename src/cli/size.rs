@@ -65,7 +65,7 @@ pub fn size_fastq(
     let mut bases = 0usize;
 
     if ncpu == 0 || ncpu == 1 {
-        for rec in fq_reader.records().flatten() {
+        for rec in fq_reader.records().map_while(Result::ok) {
             base.read += 1;
             for nt in rec.seq().iter() {
                 match *nt {
@@ -83,7 +83,7 @@ pub fn size_fastq(
         let (tx, rx) = unbounded();
         let mut fqiter = fq_reader.records();
         loop {
-            let chunk: Vec<_> = fqiter.by_ref().take(chunk).flatten().collect();
+            let chunk: Vec<_> = fqiter.by_ref().take(chunk).map_while(Result::ok).collect();
             if chunk.is_empty() {
                 break;
             }

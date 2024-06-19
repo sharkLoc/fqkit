@@ -26,7 +26,7 @@ pub fn rename_fastq(
     let mut n: usize = 0;
 
     if let Some(pre) = prefix {
-        for rec in fp.records().flatten() {
+        for rec in fp.records().map_while(Result::ok) {
             n += 1;
             /*let newid = match label {
                 Some(x) => {
@@ -53,7 +53,7 @@ pub fn rename_fastq(
         }
         fo.flush()?;
     } else {
-        for rec in fp.records().flatten() {
+        for rec in fp.records().map_while(Result::ok) {
             n += 1;
             /*let newid = if let Some(x) = label {
                 if before {

@@ -47,7 +47,11 @@ pub fn fastq2sam(
     if let Some(r2) = r2 {
         let fq1 = file_reader(Some(r1)).map(fastq::Reader::new)?;
         let fq2 = file_reader(Some(r2)).map(fastq::Reader::new)?;
-        for (rec1, rec2) in fq1.records().flatten().zip(fq2.records().flatten()) {
+        for (rec1, rec2) in fq1
+            .records()
+            .map_while(Result::ok)
+            .zip(fq2.records().map_while(Result::ok))
+        {
             sam.write_fmt(format_args!(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\tRG:Z:{}\n",
                 rec1.id(),
@@ -81,7 +85,7 @@ pub fn fastq2sam(
         }
     } else {
         let fq = file_reader(Some(r1)).map(fastq::Reader::new)?;
-        for rec in fq.records().flatten() {
+        for rec in fq.records().map_while(Result::ok) {
             sam.write_fmt(format_args!(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\tRG:Z:{}\n",
                 rec.id(),

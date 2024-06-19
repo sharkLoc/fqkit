@@ -63,7 +63,7 @@ pub fn split_interleaved(
 
     let mut num = 0usize;
     let mut flag = true;
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         num += 1;
         if flag {
             fh1.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;

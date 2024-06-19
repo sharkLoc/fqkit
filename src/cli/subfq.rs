@@ -29,7 +29,7 @@ fn select_fastq(
     info!("subseq number: {}", n);
     info!("reduce much memory but cost more time");
 
-    for (order, _) in fq_reader.records().flatten().enumerate() {
+    for (order, _) in fq_reader.records().map_while(Result::ok).enumerate() {
         if order < n {
             get.push(order);
         } else {
@@ -43,7 +43,7 @@ fn select_fastq(
     let fo = file_writer(out, compression_level)?;
     let mut w = fastq::Writer::new(fo);
     let fq_reader2 = fastq::Reader::new(file_reader(file)?);
-    for (order, rec) in fq_reader2.records().flatten().enumerate() {
+    for (order, rec) in fq_reader2.records().map_while(Result::ok).enumerate() {
         if get.contains(&order) {
             w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
         }
@@ -76,7 +76,7 @@ fn select_fastq2(
     let mut get: Vec<fastq::Record> = Vec::with_capacity(n);
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    for (order, rec) in fq_reader.records().flatten().enumerate() {
+    for (order, rec) in fq_reader.records().map_while(Result::ok).enumerate() {
         if order < n {
             get.push(rec);
         } else {

@@ -23,11 +23,11 @@ pub fn kmer_count(
     let mut writer = file_writer(output, compression_level)?;
     let mut kmers = HashMap::new();
 
-    for rec in reader.records().flatten() {
+    for rec in reader.records().map_while(Result::ok) {
         let (mut sidx, mut eidx) = (0, kmer_len);
         let khash = nthash(rec.seq(), kmer_len);
         let len = rec.seq().len();
-        
+
         while eidx <= len {
             let kseq = &rec.seq()[sidx..eidx];
             let khash_this = nthash(kseq, kmer_len)[0];

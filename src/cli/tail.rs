@@ -31,7 +31,7 @@ pub fn tail_n_records(
 
         let skip_n = total - number;
         let fp2 = fastq::Reader::new(file_reader(input)?);
-        for rec in fp2.records().skip(skip_n).flatten() {
+        for rec in fp2.records().skip(skip_n).map_while(Result::ok) {
             fo.write_record(&rec)?;
         }
     } else {

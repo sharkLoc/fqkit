@@ -26,7 +26,7 @@ pub fn grep_fastq(
     let mut ids = vec![];
     let fp_id = file_reader(Some(list))?;
     info!("reading reads id from file: {}", list);
-    for id in fp_id.lines().map_while(std::io::Result::ok) {
+    for id in fp_id.lines().map_while(Result::ok) {
         ids.push(id);
     }
     if ids.is_empty() {
@@ -40,7 +40,7 @@ pub fn grep_fastq(
         info!("reads write to stdout");
     }
     let mut fo = file_writer(out, compression_level).map(fastq::Writer::new)?;
-    for rec in fq_reader.records().flatten() {
+    for rec in fq_reader.records().map_while(Result::ok) {
         let name = if full_name {
             if let Some(desc) = rec.desc() {
                 format!("{} {}", rec.id(), desc)

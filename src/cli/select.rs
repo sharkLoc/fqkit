@@ -20,11 +20,11 @@ pub fn select_pe_fastq(
     info!("read forward reads from file: {}", fq1);
     info!("read reverse reads from file: {}", fq2);
 
-    for rec in fq_reader1.records().flatten() {
+    for rec in fq_reader1.records().map_while(Result::ok) {
         let k = rec.id().to_owned();
         read1_id.entry(k).or_insert(());
     }
-    for rec in fq_reader2.records().flatten() {
+    for rec in fq_reader2.records().map_while(Result::ok) {
         let k = rec.id().to_owned();
         read2_id.entry(k).or_insert(());
     }
@@ -35,7 +35,7 @@ pub fn select_pe_fastq(
     let (mut pe_r1, mut pe_r2) = (0usize, 0usize);
 
     let fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;
-    for rec in fq_reader1.records().flatten() {
+    for rec in fq_reader1.records().map_while(Result::ok) {
         if read1_id.contains_key(rec.id()) && read2_id.contains_key(rec.id()) {
             pe_r1 += 1;
             out_writer1.write_record(&rec)?;
@@ -44,7 +44,7 @@ pub fn select_pe_fastq(
     out_writer1.flush()?;
 
     let fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
-    for rec in fq_reader2.records().flatten() {
+    for rec in fq_reader2.records().map_while(Result::ok) {
         if read2_id.contains_key(rec.id()) && read1_id.contains_key(rec.id()) {
             pe_r2 += 1;
             out_writer2.write_record(&rec)?;

@@ -25,7 +25,7 @@ pub fn mask_fastq(
     info!("mask low quality bases with: {}", nt);
 
     let mut fp_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
-    for rec in fp_reader.records().flatten() {
+    for rec in fp_reader.records().map_while(Result::ok) {
         let score_min = rec.qual().iter().min().unwrap() - phred;
         if score_min > qual_limit {
             fp_writer.write_record(&rec)?;
