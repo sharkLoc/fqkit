@@ -11,6 +11,7 @@ pub fn shuffle_fastq(
     seed: u64,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -32,7 +33,7 @@ pub fn shuffle_fastq(
     vec_reads.shuffle(&mut rng);
     info!("shuffle done, start write to output ...");
 
-    let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
     for rec in vec_reads {
         fq_writer.write_record(&rec)?;
     }

@@ -14,6 +14,7 @@ pub fn fastq2sam(
     pl: Option<String>,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
     if let Some(r2) = r2 {
@@ -24,7 +25,7 @@ pub fn fastq2sam(
     }
     info!("sample name set: {}", sm);
 
-    let mut sam = file_writer(out, compression_level)?;
+    let mut sam = file_writer(out, compression_level, stdout_type)?;
     let rg = if let Some(x) = rg {
         x
     } else {

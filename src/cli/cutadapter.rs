@@ -13,6 +13,7 @@ pub fn cut_adapter(
     miss: usize,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -43,7 +44,7 @@ pub fn cut_adapter(
     }
 
     let fq_reader = file_reader(input).map(fastq::Reader::new)?;
-    let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
     let mut flag = false;
     for rec in fq_reader.records().map_while(Result::ok) {
         let read_len = rec.seq().len();

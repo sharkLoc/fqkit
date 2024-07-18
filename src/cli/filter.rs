@@ -20,6 +20,7 @@ pub fn filter_fastq(
     out1: &String,
     out2: &String,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
     info!("read forward reads from file: {}", read1);
@@ -38,9 +39,12 @@ pub fn filter_fastq(
 
     let fq_reader1 = file_reader(Some(read1)).map(fastq::Reader::new)?;
     let fq_reader2 = file_reader(Some(read2)).map(fastq::Reader::new)?;
-    let mut out_writer1 = file_writer(Some(out1), compression_level).map(fastq::Writer::new)?;
-    let mut out_writer2 = file_writer(Some(out2), compression_level).map(fastq::Writer::new)?;
-    let mut failed_writer = file_writer(Some(failed), compression_level).map(fastq::Writer::new)?;
+    let mut out_writer1 =
+        file_writer(Some(out1), compression_level, stdout_type).map(fastq::Writer::new)?;
+    let mut out_writer2 =
+        file_writer(Some(out2), compression_level, stdout_type).map(fastq::Writer::new)?;
+    let mut failed_writer =
+        file_writer(Some(failed), compression_level, stdout_type).map(fastq::Writer::new)?;
     let complex = complexity as usize;
     let (mut pe_ok, mut pe_fail) = (0usize, 0usize);
 

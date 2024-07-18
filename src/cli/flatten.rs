@@ -14,6 +14,7 @@ pub fn flatten_fq(
     len: bool,
     gc: bool,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -31,7 +32,7 @@ pub fn flatten_fq(
     }
 
     let fields = get_flag(flag);
-    let mut out_writer = file_writer(out, compression_level)?;
+    let mut out_writer = file_writer(out, compression_level, stdout_type)?;
 
     for rec in fq_reader.records().map_while(Result::ok) {
         let read = [rec.id().as_bytes(), rec.seq(), "+".as_bytes(), rec.qual()];

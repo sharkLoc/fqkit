@@ -13,6 +13,7 @@ fn select_fastq(
     seed: u64,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -40,7 +41,7 @@ fn select_fastq(
         }
     }
 
-    let fo = file_writer(out, compression_level)?;
+    let fo = file_writer(out, compression_level, stdout_type)?;
     let mut w = fastq::Writer::new(fo);
     let fq_reader2 = fastq::Reader::new(file_reader(file)?);
     for (order, rec) in fq_reader2.records().map_while(Result::ok).enumerate() {
@@ -61,6 +62,7 @@ fn select_fastq2(
     seed: u64,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     if let Some(file) = file {
         info!("reading from file: {}", file);
@@ -87,7 +89,7 @@ fn select_fastq2(
         }
     }
 
-    let fo = file_writer(out, compression_level)?;
+    let fo = file_writer(out, compression_level, stdout_type)?;
     let mut w = fastq::Writer::new(fo);
     for rec in get {
         w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
@@ -105,15 +107,16 @@ pub fn subset_fastq(
     seed: u64,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     if rdc {
         if file.is_none() {
             error!("opt -r used, fastq data can't from stdin.");
             std::process::exit(1);
         }
-        select_fastq(file, n, seed, out, compression_level)?;
+        select_fastq(file, n, seed, out, compression_level, stdout_type)?;
     } else {
-        select_fastq2(file, n, seed, out, compression_level)?;
+        select_fastq2(file, n, seed, out, compression_level, stdout_type)?;
     }
 
     Ok(())

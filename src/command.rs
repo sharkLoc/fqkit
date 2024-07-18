@@ -38,6 +38,10 @@ pub struct Args {
     )]
     pub compression_level: u32,
 
+    /// output type for stdout: 'g' gzip; 'b' bzip2; 'x' xz; 'u' uncompressed txt format
+    #[arg(long = "output-type", global = true, help_heading = Some("Global Arguments"), value_name = "u|g|b|x", default_value_t = 'u')]
+    pub stdout_type: char,
+
     /// if file name specified, write log message to this file, or write to stderr
     #[arg(long = "log", global = true, help_heading = Some("Global Arguments"), value_name = "FILE")]
     pub logfile: Option<String>,

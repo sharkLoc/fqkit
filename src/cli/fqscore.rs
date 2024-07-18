@@ -10,6 +10,7 @@ pub fn phred_score(
     to33: bool,
     to64: bool,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -36,7 +37,7 @@ pub fn phred_score(
         std::process::exit(1);
     }
 
-    let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
     for rec in fq_reader.records().map_while(Result::ok) {
         let mut qual = vec![];
         if to33 {

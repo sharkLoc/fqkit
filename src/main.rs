@@ -22,7 +22,13 @@ fn main() -> Result<(), Error> {
 
     match arg.command {
         Subcli::topn { input, num, out } => {
-            top_n_records(input.as_ref(), num, out.as_ref(), arg.compression_level)?;
+            top_n_records(
+                input.as_ref(),
+                num,
+                out.as_ref(),
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::tail {
             input,
@@ -36,6 +42,7 @@ fn main() -> Result<(), Error> {
                 rdc,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::subfq {
@@ -52,6 +59,7 @@ fn main() -> Result<(), Error> {
                 seed,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::select {
@@ -60,7 +68,14 @@ fn main() -> Result<(), Error> {
             out1,
             out2,
         } => {
-            select_pe_fastq(&read1, &read2, &out1, &out2, arg.compression_level)?;
+            select_pe_fastq(
+                &read1,
+                &read2,
+                &out1,
+                &out2,
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::trim {
             input,
@@ -76,6 +91,7 @@ fn main() -> Result<(), Error> {
                 len,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::adapter {
@@ -92,6 +108,7 @@ fn main() -> Result<(), Error> {
                 miss,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::range {
@@ -106,6 +123,7 @@ fn main() -> Result<(), Error> {
                 take,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::search {
@@ -126,6 +144,7 @@ fn main() -> Result<(), Error> {
                 out.as_ref(),
                 thread,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::grep {
@@ -140,10 +159,17 @@ fn main() -> Result<(), Error> {
                 full,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::fq2fa { input, remove, out } => {
-            fq2fa(input.as_ref(), remove, out.as_ref(), arg.compression_level)?;
+            fq2fa(
+                input.as_ref(),
+                remove,
+                out.as_ref(),
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::fq2sam {
             r1,
@@ -163,6 +189,7 @@ fn main() -> Result<(), Error> {
                 pl,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::fqscore {
@@ -177,6 +204,7 @@ fn main() -> Result<(), Error> {
                 to33,
                 to64,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::flatten {
@@ -197,6 +225,7 @@ fn main() -> Result<(), Error> {
                 len,
                 gc,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::plot {
@@ -212,7 +241,13 @@ fn main() -> Result<(), Error> {
             let _x = plot_line(df, show, prefix, width, height, ylim, &types);
         }
         Subcli::check { input, save, out } => {
-            check_fastq(input.as_ref(), save, out.as_ref(), arg.compression_level)?;
+            check_fastq(
+                input.as_ref(),
+                save,
+                out.as_ref(),
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::stats {
             input,
@@ -226,10 +261,17 @@ fn main() -> Result<(), Error> {
                 cyc.as_ref(),
                 phred,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::shuffle { input, seed, out } => {
-            shuffle_fastq(input.as_ref(), seed, out.as_ref(), arg.compression_level)?;
+            shuffle_fastq(
+                input.as_ref(),
+                seed,
+                out.as_ref(),
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::size {
             input,
@@ -243,6 +285,7 @@ fn main() -> Result<(), Error> {
                 chunk,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::slide {
@@ -259,6 +302,7 @@ fn main() -> Result<(), Error> {
                 out.as_ref(),
                 &suffix,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::sort {
@@ -279,6 +323,7 @@ fn main() -> Result<(), Error> {
                 reverse,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::barcode {
@@ -335,6 +380,7 @@ fn main() -> Result<(), Error> {
                 &out1,
                 &out2,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::concat {
@@ -343,7 +389,14 @@ fn main() -> Result<(), Error> {
             out1,
             out2,
         } => {
-            concat_fqstq_lane(&read1, &read2, &out1, &out2, arg.compression_level)?;
+            concat_fqstq_lane(
+                &read1,
+                &read2,
+                &out1,
+                &out2,
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::remove {
             input,
@@ -359,6 +412,7 @@ fn main() -> Result<(), Error> {
                 &save,
                 rm,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::rename {
@@ -377,10 +431,17 @@ fn main() -> Result<(), Error> {
                 before,
                 output.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::reverse { input, rev, out } => {
-            reverse_comp_seq(input.as_ref(), out.as_ref(), rev, arg.compression_level)?;
+            reverse_comp_seq(
+                input.as_ref(),
+                out.as_ref(),
+                rev,
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::split {
             input,
@@ -401,7 +462,13 @@ fn main() -> Result<(), Error> {
             )?;
         }
         Subcli::merge { read1, read2, out } => {
-            interleaved(&read1, &read2, out.as_ref(), arg.compression_level)?;
+            interleaved(
+                &read1,
+                &read2,
+                out.as_ref(),
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::mask {
             input,
@@ -417,6 +484,7 @@ fn main() -> Result<(), Error> {
                 chars,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::split2 {
@@ -437,6 +505,7 @@ fn main() -> Result<(), Error> {
                 &name,
                 &outdir,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::gcplot {
@@ -459,6 +528,7 @@ fn main() -> Result<(), Error> {
                 ylim,
                 &types,
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
         Subcli::length {
@@ -466,10 +536,21 @@ fn main() -> Result<(), Error> {
             reverse,
             out,
         } => {
-            fq_length(input.as_ref(), reverse, out.as_ref(), arg.compression_level)?;
+            fq_length(
+                input.as_ref(),
+                reverse,
+                out.as_ref(),
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::view { input, out } => {
-            view_fq(input.as_ref(), out.as_ref(), arg.compression_level)?;
+            view_fq(
+                input.as_ref(),
+                out.as_ref(),
+                arg.compression_level,
+                arg.stdout_type,
+            )?;
         }
         Subcli::kmer {
             input,
@@ -483,6 +564,7 @@ fn main() -> Result<(), Error> {
                 header,
                 out.as_ref(),
                 arg.compression_level,
+                arg.stdout_type,
             )?;
         }
     }

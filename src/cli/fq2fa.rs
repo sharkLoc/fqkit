@@ -10,6 +10,7 @@ pub fn fq2fa(
     remove: bool,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -21,7 +22,7 @@ pub fn fq2fa(
         info!("reading from stdin");
     }
 
-    let mut fo = fasta::Writer::new(file_writer(out, compression_level)?);
+    let mut fo = fasta::Writer::new(file_writer(out, compression_level, stdout_type)?);
     if remove {
         for rec in fq_reader.records().map_while(Result::ok) {
             num += 1;

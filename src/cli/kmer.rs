@@ -11,6 +11,7 @@ pub fn kmer_count(
     header: bool,
     output: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
     let reader = file_reader(input).map(fastq::Reader::new)?;
@@ -20,7 +21,7 @@ pub fn kmer_count(
         info!("reading from stdin");
     }
 
-    let mut writer = file_writer(output, compression_level)?;
+    let mut writer = file_writer(output, compression_level, stdout_type)?;
     let mut kmers = HashMap::new();
 
     for rec in reader.records().map_while(Result::ok) {

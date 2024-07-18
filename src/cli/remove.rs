@@ -12,6 +12,7 @@ pub fn remove_read(
     save: &String,
     rm: bool,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -37,7 +38,7 @@ pub fn remove_read(
         info!("removed reads in file: {}", save);
     }
 
-    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level, stdout_type)?);
     if rm {
         for rec in fq_reader.records().map_while(Result::ok) {
             if !ids.contains(&rec.id().to_string()) {
@@ -46,7 +47,8 @@ pub fn remove_read(
         }
         fq_writer.flush()?;
     } else {
-        let mut rm_writer = fastq::Writer::new(file_writer(Some(save), compression_level)?);
+        let mut rm_writer =
+            fastq::Writer::new(file_writer(Some(save), compression_level, stdout_type)?);
         for rec in fq_reader.records().map_while(Result::ok) {
             if !ids.contains(&rec.id().to_string()) {
                 fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;

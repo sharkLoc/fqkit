@@ -10,6 +10,7 @@ pub fn select_pe_fastq(
     out_r1: &String,
     out_r2: &String,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -30,8 +31,10 @@ pub fn select_pe_fastq(
     }
     info!("output selected read1 file: {}", out_r1);
     info!("output selected read2 file: {}", out_r2);
-    let mut out_writer1 = file_writer(Some(out_r1), compression_level).map(fastq::Writer::new)?;
-    let mut out_writer2 = file_writer(Some(out_r2), compression_level).map(fastq::Writer::new)?;
+    let mut out_writer1 =
+        file_writer(Some(out_r1), compression_level, stdout_type).map(fastq::Writer::new)?;
+    let mut out_writer2 =
+        file_writer(Some(out_r2), compression_level, stdout_type).map(fastq::Writer::new)?;
     let (mut pe_r1, mut pe_r2) = (0usize, 0usize);
 
     let fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;

@@ -4,6 +4,7 @@ use bio::io::fastq::{self, Record};
 use log::*;
 use std::time::Instant;
 
+#[allow(clippy::too_many_arguments)]
 pub fn rename_fastq(
     input: Option<&String>,
     keep: bool,
@@ -12,6 +13,7 @@ pub fn rename_fastq(
     before: bool,
     output: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -22,7 +24,7 @@ pub fn rename_fastq(
         info!("reading from stdin");
     }
 
-    let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
+    let mut fo = fastq::Writer::new(file_writer(output, compression_level, stdout_type)?);
     let mut n: usize = 0;
 
     if let Some(pre) = prefix {

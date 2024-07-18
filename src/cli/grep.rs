@@ -12,6 +12,7 @@ pub fn grep_fastq(
     full_name: bool,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -39,7 +40,7 @@ pub fn grep_fastq(
     } else {
         info!("reads write to stdout");
     }
-    let mut fo = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut fo = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
     for rec in fq_reader.records().map_while(Result::ok) {
         let name = if full_name {
             if let Some(desc) = rec.desc() {

@@ -9,6 +9,7 @@ pub fn interleaved(
     file2: &String,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -18,7 +19,7 @@ pub fn interleaved(
     info!("reading from file: {}", file1);
     info!("reading from file: {}", file2);
 
-    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level, stdout_type)?);
     for (rec1, rec2) in fq1_reader
         .records()
         .map_while(Result::ok)

@@ -98,6 +98,7 @@ Commands:
 
 Global Arguments:
       --compress-level <INT>  set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file, just work with option -o/--out [default: 6]
+      --output-type <u|g|b|x>  output type for stdout: 'g' gzip; 'b' bzip2; 'x' xz; 'u' uncompressed txt format [default: u
       --log <FILE>            if file name specified, write log message to this file, or write to stderr
   -v, --verbosity...          control verbosity of logging, [-v: Error, -vv: Warn, -vvv: Info, -vvvv: Debug, -vvvvv: Trace, defalut: Debug]
 

@@ -11,6 +11,7 @@ pub fn trim_fq(
     len: usize,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -22,7 +23,7 @@ pub fn trim_fq(
         info!("reading from stdin");
     }
 
-    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level)?);
+    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level, stdout_type)?);
     for (idx, rec) in fq_reader.records().map_while(Result::ok).enumerate() {
         let rlen = rec.seq().len();
         if left >= rlen || right >= rlen || length >= rlen {

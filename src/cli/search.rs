@@ -16,6 +16,7 @@ pub fn search_fq(
     out: Option<&String>,
     ncpu: usize,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -42,7 +43,7 @@ pub fn search_fq(
         );
     }
     let mut num = 0usize;
-    let mut fo = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut fo = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
     if let Some(out) = out {
         info!("reads write to file: {}", out);
     } else {

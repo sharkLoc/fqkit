@@ -10,6 +10,7 @@ pub fn fq_length(
     rev: bool,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -22,7 +23,7 @@ pub fn fq_length(
         info!("reading from stdin");
     }
 
-    let mut fo = file_writer(out, compression_level)?;
+    let mut fo = file_writer(out, compression_level, stdout_type)?;
     for rec in fp_reader.records().map_while(Result::ok) {
         let rlen = rec.seq().len();
         *reads_len.entry(rlen).or_insert(0usize) += 1;

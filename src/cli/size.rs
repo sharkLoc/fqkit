@@ -34,6 +34,7 @@ pub fn size_fastq(
     chunk: usize,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -59,7 +60,7 @@ pub fn size_fastq(
     } else {
         info!("output result write to stdout");
     }
-    let mut fo = file_writer(out, compression_level)?;
+    let mut fo = file_writer(out, compression_level, stdout_type)?;
 
     let mut base = Base::new();
     let mut bases = 0usize;

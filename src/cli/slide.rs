@@ -11,6 +11,7 @@ pub fn slide_fastq(
     out: Option<&String>,
     suffix: &str,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -22,7 +23,7 @@ pub fn slide_fastq(
     }
     info!("window size : {}", wind);
     info!("step size: {}", step);
-    let mut fq_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
     let mut window = wind;
     for rec in fq_reader.records().map_while(Result::ok) {
         let seq = rec.seq();

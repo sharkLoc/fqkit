@@ -10,6 +10,7 @@ pub fn tail_n_records(
     rdc: bool,
     output: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -21,7 +22,7 @@ pub fn tail_n_records(
     }
     info!("get tail {} records", number);
 
-    let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
+    let mut fo = fastq::Writer::new(file_writer(output, compression_level, stdout_type)?);
     if rdc {
         let mut total = 0usize;
         for _ in fp.records() {

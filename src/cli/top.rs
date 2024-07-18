@@ -9,6 +9,7 @@ pub fn top_n_records(
     number: usize,
     output: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -20,7 +21,7 @@ pub fn top_n_records(
     }
     info!("get top {} records", number);
 
-    let mut fo = fastq::Writer::new(file_writer(output, compression_level)?);
+    let mut fo = fastq::Writer::new(file_writer(output, compression_level, stdout_type)?);
     for rec in fp.records().take(number).map_while(Result::ok) {
         fo.write_record(&rec)?;
     }

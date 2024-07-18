@@ -10,6 +10,7 @@ pub fn concat_fqstq_lane(
     out_r1: &String,
     out_r2: &String,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -37,8 +38,10 @@ pub fn concat_fqstq_lane(
     info!("outout read1 in file: {}", out_r1);
     info!("outout read1 in file: {}", out_r2);
 
-    let mut out_writer1 = file_writer(Some(out_r1), compression_level).map(fastq::Writer::new)?;
-    let mut out_writer2 = file_writer(Some(out_r2), compression_level).map(fastq::Writer::new)?;
+    let mut out_writer1 =
+        file_writer(Some(out_r1), compression_level, stdout_type).map(fastq::Writer::new)?;
+    let mut out_writer2 =
+        file_writer(Some(out_r2), compression_level, stdout_type).map(fastq::Writer::new)?;
     let mut pe_read = 0;
     for pe in vec1.iter().zip(vec2.iter()) {
         info!("concat pe reads from file {} and {}", pe.0, pe.1);

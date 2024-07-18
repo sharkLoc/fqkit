@@ -19,6 +19,7 @@ pub fn gc_content(
     ylim: usize,
     types: &str,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -29,7 +30,7 @@ pub fn gc_content(
         info!("reading from stdin");
     }
 
-    let mut fo = file_writer(output, compression_level)?;
+    let mut fo = file_writer(output, compression_level, stdout_type)?;
     let mut df_hash = HashMap::new();
 
     for rec in fq_reader.records().map_while(Result::ok) {

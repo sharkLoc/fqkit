@@ -9,6 +9,7 @@ pub fn check_fastq(
     save: bool,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -21,7 +22,8 @@ pub fn check_fastq(
     }
 
     if save {
-        let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
+        let mut out_writer =
+            file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
         for rec in fp_reader.records().map_while(Result::ok) {
             total += 1;
             match rec.check() {

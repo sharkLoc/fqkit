@@ -97,7 +97,11 @@ where
     }
 }
 
-pub fn file_writer<P>(file_out: Option<P>, compression_level: u32) -> Result<Box<dyn Write>>
+pub fn file_writer<P>(
+    file_out: Option<P>,
+    compression_level: u32,
+    stdout_format: char,
+) -> Result<Box<dyn Write>>
 where
     P: AsRef<Path> + Copy,
 {
@@ -134,7 +138,28 @@ where
         } else {
             Ok(Box::new(BufWriter::with_capacity(BUFF_SIZE, fp)))
         }
+    } else if stdout_format == 'g' {
+        Ok(Box::new(BufWriter::with_capacity(
+            BUFF_SIZE,
+            flate2::write::GzEncoder::new(
+                io::stdout(),
+                flate2::Compression::new(compression_level),
+            ),
+        )))
+    } else if stdout_format == 'b' {
+        Ok(Box::new(BufWriter::with_capacity(
+            BUFF_SIZE,
+            bzip2::write::BzEncoder::new(io::stdout(), bzip2::Compression::new(compression_level)),
+        )))
+    } else if stdout_format == 'x' {
+        Ok(Box::new(BufWriter::with_capacity(
+            BUFF_SIZE,
+            xz2::write::XzEncoder::new(io::stdout(), compression_level),
+        )))
+    } else if stdout_format == 'u' {
+        Ok(Box::new(BufWriter::new(io::stdout())))
     } else {
+        warn!("invalid output type option, write uncompressed result in stdout");
         Ok(Box::new(BufWriter::new(io::stdout())))
     }
 }

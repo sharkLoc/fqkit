@@ -11,6 +11,7 @@ pub fn mask_fastq(
     nt: char,
     out: Option<&String>,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -24,7 +25,7 @@ pub fn mask_fastq(
     info!("low quality value： {}", qual_limit);
     info!("mask low quality bases with: {}", nt);
 
-    let mut fp_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut fp_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
     for rec in fp_reader.records().map_while(Result::ok) {
         let score_min = rec.qual().iter().min().unwrap() - phred;
         if score_min > qual_limit {

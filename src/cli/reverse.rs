@@ -10,6 +10,7 @@ pub fn reverse_comp_seq(
     out: Option<&String>,
     rev: bool,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
 
@@ -27,7 +28,8 @@ pub fn reverse_comp_seq(
         (b'C', b'G'),
         (b'N', b'N'),
     ]);
-    let mut out_writer = file_writer(out, compression_level).map(fastq::Writer::new)?;
+    let mut out_writer =
+        file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
 
     for rec in fq_reader.records().map_while(Result::ok) {
         let rev_seq = rec.seq().iter().copied().rev().collect::<Vec<u8>>();

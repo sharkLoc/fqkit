@@ -14,6 +14,7 @@ pub fn split_chunk(
     out_pre: &str,
     out_dir: &str,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<(), Error> {
     let start = Instant::now();
 
@@ -56,6 +57,7 @@ pub fn split_chunk(
     let mut fh = vec![fastq::Writer::new(file_writer(
         Some(&out),
         compression_level,
+        stdout_type,
     )?)];
 
     info!("start to write file: {:?}", out);
@@ -78,6 +80,7 @@ pub fn split_chunk(
             fh.push(fastq::Writer::new(file_writer(
                 Some(&out),
                 compression_level,
+                stdout_type,
             )?));
             let fhthis = fh.get_mut(index).unwrap();
 

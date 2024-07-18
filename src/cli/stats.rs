@@ -91,6 +91,7 @@ pub fn stat_fq(
     pre_cyc: Option<&String>,
     phred: u8,
     compression_level: u32,
+    stdout_type: char,
 ) -> Result<()> {
     let start = Instant::now();
     if ![33u8, 64u8].contains(&phred) {
@@ -111,8 +112,8 @@ pub fn stat_fq(
         info!("cycle result write to stdout");
     }
 
-    let mut fo = file_writer(Some(pre_sum), compression_level)?;
-    let mut fc = file_writer(pre_cyc, compression_level)?;
+    let mut fo = file_writer(Some(pre_sum), compression_level, stdout_type)?;
+    let mut fc = file_writer(pre_cyc, compression_level, stdout_type)?;
 
     let mut stat = info::new();
     let mut max_qva = 0;
