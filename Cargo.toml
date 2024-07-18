@@ -1,3 +1,5 @@
+[workspace]
+
 [package]
 name = "fqkit"
 version = "0.4.10"
@@ -6,13 +8,18 @@ authors = ["sharkLoc <mmtinfo@163.com>"]
 rust-version = "1.77.2"
 homepage = "https://github.com/sharkLoc/fqkit"
 repository = "https://github.com/sharkLoc/fqkit"
-categories = ["Bioinformatics"]
+categories = ["Science"]
 description = "fqkit: a simple and cross-platform program for fastq file manipulation"
 keywords = ["fastq", "reads","bio", "hts", "barcode"]
 readme = "README.md"
 license = "GPL-3.0"
-
+exclude = [
+    "example/*",
+    "doc/*"
+]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
 
 [dependencies]
 anyhow = "1.0.75"
