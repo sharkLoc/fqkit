@@ -1,10 +1,12 @@
 use clap::{value_parser, ArgAction, Parser};
 
+pub const VERSION: &str = "0.4.11";
+
 #[derive(Parser, Debug)]
 #[command(
     name = "FqKit",
     author = "sharkLoc",
-    version = "0.4.10",
+    version = VERSION,
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,

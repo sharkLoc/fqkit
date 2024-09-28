@@ -6,7 +6,6 @@ use log::*;
 use std::collections::HashMap;
 use std::io::BufRead;
 use std::path::{Path, PathBuf};
-use std::time::Instant;
 
 fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>> {
     let mut maps = HashMap::new();
@@ -97,7 +96,7 @@ pub fn split_fq(
     xz: bool,
     compression_level: u32,
 ) -> Result<()> {
-    let start = Instant::now();
+    
 
     if !Path::new(outdir).try_exists().unwrap() {
         error!("{}", FqkitError::InvalidOutputDir(outdir.to_string()));
@@ -229,6 +228,5 @@ pub fn split_fq(
         );
     }
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

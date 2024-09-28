@@ -4,7 +4,6 @@ use anyhow::{Ok, Result};
 use bio::io::fastq;
 use log::*;
 use std::io::BufRead;
-use std::time::Instant;
 
 pub fn grep_fastq(
     fq: Option<&String>,
@@ -14,7 +13,6 @@ pub fn grep_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let fq_reader = file_reader(fq).map(fastq::Reader::new)?;
     if let Some(file) = fq {
@@ -59,6 +57,5 @@ pub fn grep_fastq(
     fo.flush()?;
 
     info!("total reads matched number: {}", num);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

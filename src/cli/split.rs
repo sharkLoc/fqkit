@@ -2,7 +2,7 @@ use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
-use std::{path::PathBuf, time::Instant};
+use std::path::PathBuf;
 
 pub fn split_interleaved(
     file: Option<&String>,
@@ -13,7 +13,6 @@ pub fn split_interleaved(
     xz: bool,
     compression_level: u32,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut n = 0;
     if gzip {
@@ -77,6 +76,5 @@ pub fn split_interleaved(
     fh2.flush()?;
 
     info!("total split PE reads number: {}", num);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

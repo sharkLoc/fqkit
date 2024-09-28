@@ -2,7 +2,7 @@ use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
-use std::{path::PathBuf, time::Instant};
+use std::path::PathBuf;
 
 #[allow(clippy::too_many_arguments)]
 pub fn split_chunk(
@@ -16,7 +16,6 @@ pub fn split_chunk(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut n = 0;
     if gzip {
@@ -91,6 +90,5 @@ pub fn split_chunk(
     }
 
     info!("total chunk number is: {}", index + 1);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

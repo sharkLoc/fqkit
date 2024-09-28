@@ -4,7 +4,6 @@ use bio::io::fastq;
 use colored::*;
 use log::*;
 use std::io;
-use std::time::Instant;
 use term_size::dimensions;
 
 pub fn view_fq(
@@ -13,7 +12,6 @@ pub fn view_fq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let time = Instant::now();
     if file.is_none() {
         error!("do not read file from stdin.");
         std::process::exit(1);
@@ -56,6 +54,5 @@ pub fn view_fq(
         }
     }
 
-    info!("time elapsed is: {:?}", time.elapsed());
     Ok(())
 }

@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 pub fn trim_fq(
     file: Option<&String>,
@@ -13,7 +12,6 @@ pub fn trim_fq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let length = right + left;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
@@ -46,6 +44,5 @@ pub fn trim_fq(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

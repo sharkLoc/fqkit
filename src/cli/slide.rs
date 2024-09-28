@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::{Ok, Result};
 use bio::io::{fastq, fastq::Record};
 use log::*;
-use std::time::Instant;
 
 pub fn slide_fastq(
     file: Option<&String>,
@@ -13,7 +12,6 @@ pub fn slide_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
@@ -73,6 +71,5 @@ pub fn slide_fastq(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

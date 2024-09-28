@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 pub fn check_fastq(
     file: Option<&String>,
@@ -11,7 +10,6 @@ pub fn check_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let (mut total, mut ok_read, mut err_read) = (0, 0, 0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
@@ -57,7 +55,6 @@ pub fn check_fastq(
         "total reads num: {}, ok reads number: {}, error reads number: {}",
         total, ok_read, err_read
     );
-    info!("time elapsed is: {:?}", start.elapsed());
 
     Ok(())
 }

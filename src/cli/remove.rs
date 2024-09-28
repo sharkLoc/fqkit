@@ -3,7 +3,6 @@ use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
 use std::io::BufRead;
-use std::time::Instant;
 
 pub fn remove_read(
     file: Option<&String>,
@@ -14,7 +13,6 @@ pub fn remove_read(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut ids = vec![];
     let list = file_reader(Some(name))?;
@@ -60,6 +58,5 @@ pub fn remove_read(
         rm_writer.flush()?;
     }
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

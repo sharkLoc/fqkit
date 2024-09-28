@@ -6,7 +6,6 @@ use log::*;
 use lowcharts::plot;
 use plotters::prelude::*;
 use std::collections::HashMap;
-use std::time::Instant;
 
 #[allow(clippy::too_many_arguments)]
 pub fn gc_content(
@@ -21,7 +20,6 @@ pub fn gc_content(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
     if let Some(inp) = fqin {
@@ -76,7 +74,6 @@ pub fn gc_content(
     }
     plot_gc(df_ret, prefix, width, height, ylim, types)?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 

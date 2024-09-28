@@ -4,7 +4,6 @@ use bio::io::fastq;
 use log::*;
 use rand::{prelude::*, Rng};
 use rand_pcg::Pcg64;
-use std::time::Instant;
 
 // reduce much memory but cost more time
 fn select_fastq(
@@ -15,7 +14,6 @@ fn select_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut rng = Pcg64::seed_from_u64(seed);
     let mut get: Vec<usize> = Vec::with_capacity(n);
@@ -51,7 +49,6 @@ fn select_fastq(
     }
     w.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 
@@ -72,7 +69,6 @@ fn select_fastq2(
     info!("rand seed: {}", seed);
     info!("subseq num: {}", n);
     info!("fast mode but cost more memory");
-    let start = Instant::now();
 
     let mut rng = Pcg64::seed_from_u64(seed);
     let mut get: Vec<fastq::Record> = Vec::with_capacity(n);
@@ -96,7 +92,6 @@ fn select_fastq2(
     }
     w.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 

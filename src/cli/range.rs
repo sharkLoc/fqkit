@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 pub fn range_fastq(
     input: Option<&String>,
@@ -12,7 +11,6 @@ pub fn range_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let fp_reader = file_reader(input).map(fastq::Reader::new)?;
     if let Some(file) = input {
@@ -35,6 +33,5 @@ pub fn range_fastq(
     }
     fp_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

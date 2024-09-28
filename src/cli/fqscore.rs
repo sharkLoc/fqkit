@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::{Ok, Result};
 use bio::io::{fastq, fastq::Record};
 use log::*;
-use std::time::Instant;
 
 pub fn phred_score(
     file: Option<&String>,
@@ -12,8 +11,7 @@ pub fn phred_score(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
-
+    
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(r) = file {
         info!("read file from: {}", r);
@@ -55,6 +53,5 @@ pub fn phred_score(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

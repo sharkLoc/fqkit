@@ -1,0 +1,18 @@
+read average length:	126
+read min length:	126
+read max length:	126
+total gc content(%):	57.52
+total read count:	2000
+total base count:	252000
+
+base A count:	53864	(21.37%)
+base T count:	53136	(21.09%)
+base G count:	70989	(28.17%)
+base C count:	73967	(29.35%)
+base N count:	44	(0.02%)
+
+Number of base calls with quality value of 5 or higher (Q5+) (%)	251956	(99.98%)
+Number of base calls with quality value of 10 or higher (Q10+) (%)	251956	(99.98%)
+Number of base calls with quality value of 15 or higher (Q15+) (%)	244768	(97.13%)
+Number of base calls with quality value of 20 or higher (Q20+) (%)	237670	(94.31%)
+Number of base calls with quality value of 30 or higher (Q30+) (%)	223461	(88.67%)

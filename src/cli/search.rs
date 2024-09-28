@@ -4,7 +4,6 @@ use bio::io::fastq;
 use crossbeam::channel::unbounded;
 use log::*;
 use regex::RegexBuilder;
-use std::time::Instant;
 
 #[allow(clippy::too_many_arguments)]
 pub fn search_fq(
@@ -18,7 +17,6 @@ pub fn search_fq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let fq_reader = file_reader(fq).map(fastq::Reader::new).unwrap();
     if let Some(file) = fq {
@@ -126,6 +124,5 @@ pub fn search_fq(
     }
 
     info!("total reads number: {}", num);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

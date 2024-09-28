@@ -3,7 +3,6 @@ use anyhow::{Error, Ok};
 use bio::io::fasta;
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 pub fn fq2fa(
     file: Option<&String>,
@@ -12,7 +11,6 @@ pub fn fq2fa(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut num = 0usize;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
@@ -37,6 +35,5 @@ pub fn fq2fa(
     fo.flush()?;
 
     info!("total reads number: {}", num);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

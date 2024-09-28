@@ -3,7 +3,6 @@ use anyhow::Result;
 use bio::io::fastq;
 use crossbeam::channel::unbounded;
 use log::*;
-use std::time::Instant;
 
 #[derive(Clone, Copy)]
 struct Base {
@@ -36,7 +35,6 @@ pub fn size_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let fq_reader = fastq::Reader::new(file_reader(fq)?);
     if let Some(inp) = fq {
@@ -143,6 +141,5 @@ pub fn size_fastq(
     )?;
     fo.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

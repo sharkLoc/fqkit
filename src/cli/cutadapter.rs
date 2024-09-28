@@ -4,7 +4,6 @@ use anyhow::{Error, Ok, Result};
 use bio::io::{fasta, fastq};
 use log::*;
 use std::collections::HashMap;
-use std::time::Instant;
 
 pub fn cut_adapter(
     input: Option<&String>,
@@ -15,7 +14,6 @@ pub fn cut_adapter(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
     if let Some(file) = input {
@@ -99,6 +97,5 @@ pub fn cut_adapter(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

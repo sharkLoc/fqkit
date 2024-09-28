@@ -2,7 +2,7 @@ use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
-use std::{io::BufRead, time::Instant};
+use std::io::BufRead;
 
 pub fn concat_fqstq_lane(
     r1_list: &String,
@@ -12,7 +12,6 @@ pub fn concat_fqstq_lane(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut vec1 = vec![];
     let mut vec2 = vec![];
@@ -65,7 +64,6 @@ pub fn concat_fqstq_lane(
         pe_read,
         vec1.len()
     );
-    info!("time elapsed is: {:?}", start.elapsed());
 
     Ok(())
 }

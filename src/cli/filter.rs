@@ -3,7 +3,6 @@ use anyhow::{Ok, Result};
 use bio::io::fastq;
 use crossbeam::channel::unbounded;
 use log::*;
-use std::time::Instant;
 
 #[allow(clippy::too_many_arguments)]
 pub fn filter_fastq(
@@ -22,7 +21,6 @@ pub fn filter_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
     info!("read forward reads from file: {}", read1);
     info!("read reverse reads from file: {}", read2);
     if ![33u8, 64u8].contains(&phred) {
@@ -210,7 +208,6 @@ pub fn filter_fastq(
 
     info!("total clean pe reads number (r1+r2): {}", pe_ok * 2);
     info!("total failed pe reads number (r1+r2): {}", pe_fail * 2);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 

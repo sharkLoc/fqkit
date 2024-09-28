@@ -5,7 +5,6 @@ use log::*;
 use plotters::{prelude::*, style::Color};
 use std::collections::BTreeMap;
 use std::io::BufRead;
-use std::time::Instant;
 use textplots::{Chart, ColorPlot, LabelBuilder, LabelFormat, Shape};
 
 // get cycle result
@@ -46,7 +45,6 @@ pub fn plot_line(
     ylim: f32,
     types: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let start = Instant::now();
 
     if !["svg", "png"].contains(&types) {
         error!("{}", FqkitError::InvalidFigureType);
@@ -309,6 +307,5 @@ pub fn plot_line(
             .draw()?;
     }
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

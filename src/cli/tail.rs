@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 pub fn tail_n_records(
     input: Option<&String>,
@@ -12,7 +11,6 @@ pub fn tail_n_records(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let fp = fastq::Reader::new(file_reader(input)?);
     if let Some(file) = input {
@@ -46,6 +44,5 @@ pub fn tail_n_records(
     }
     fo.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

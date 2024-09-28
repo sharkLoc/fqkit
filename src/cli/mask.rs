@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::{Ok, Result};
 use bio::io::{fastq, fastq::Record};
 use log::*;
-use std::time::Instant;
 
 pub fn mask_fastq(
     file: Option<&String>,
@@ -13,7 +12,6 @@ pub fn mask_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let (mut mask_base, mut mask_read) = (0, 0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
@@ -50,6 +48,5 @@ pub fn mask_fastq(
     fp_writer.flush()?;
 
     info!("total mask {} bases from {} reads", mask_base, mask_read);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

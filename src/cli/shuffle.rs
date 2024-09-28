@@ -4,7 +4,6 @@ use bio::io::fastq;
 use log::*;
 use rand::prelude::*;
 use rand_pcg::Pcg64;
-use std::time::Instant;
 
 pub fn shuffle_fastq(
     file: Option<&String>,
@@ -13,7 +12,6 @@ pub fn shuffle_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let mut rng = Pcg64::seed_from_u64(seed);
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
@@ -39,6 +37,5 @@ pub fn shuffle_fastq(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

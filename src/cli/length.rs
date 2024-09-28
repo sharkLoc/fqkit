@@ -3,7 +3,6 @@ use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
 use std::collections::HashMap;
-use std::time::Instant;
 
 pub fn fq_length(
     file: Option<&String>,
@@ -12,7 +11,6 @@ pub fn fq_length(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut reads_len = HashMap::new();
     let mut total = 0usize;
@@ -43,7 +41,6 @@ pub fn fq_length(
     }
     fo.flush()?;
     info!("total scan reads number: {}", total);
-    info!("time elapsed is: {:?}", start.elapsed());
 
     Ok(())
 }

@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 #[allow(clippy::too_many_arguments)]
 pub fn sort_fastq(
@@ -16,7 +15,6 @@ pub fn sort_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut n = 0;
     if sort_by_gc {
@@ -147,6 +145,5 @@ pub fn sort_fastq(
     }
     fq_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

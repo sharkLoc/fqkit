@@ -3,7 +3,6 @@ use anyhow::Result;
 use bio::io::fastq;
 use log::*;
 use std::collections::HashMap;
-use std::time::Instant;
 
 pub fn reverse_comp_seq(
     input: Option<&String>,
@@ -12,7 +11,6 @@ pub fn reverse_comp_seq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let fq_reader = file_reader(input).map(fastq::Reader::new)?;
     if let Some(file) = input {
@@ -59,6 +57,5 @@ pub fn reverse_comp_seq(
     }
     out_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

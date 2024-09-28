@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq::{self, Record};
 use log::*;
-use std::time::Instant;
 
 #[allow(clippy::too_many_arguments)]
 pub fn rename_fastq(
@@ -15,7 +14,6 @@ pub fn rename_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let fp = fastq::Reader::new(file_reader(input)?);
     if let Some(file) = input {
@@ -82,6 +80,5 @@ pub fn rename_fastq(
     }
 
     info!("total rename sequence number: {}", n);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

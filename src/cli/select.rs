@@ -2,7 +2,7 @@ use crate::utils::*;
 use anyhow::{Ok, Result};
 use bio::io::fastq;
 use log::*;
-use std::{collections::HashMap, time::Instant};
+use std::collections::HashMap;
 
 pub fn select_pe_fastq(
     fq1: &String,
@@ -12,7 +12,6 @@ pub fn select_pe_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
 
     let mut read1_id = HashMap::new();
     let mut read2_id = HashMap::new();
@@ -57,7 +56,6 @@ pub fn select_pe_fastq(
     assert_eq!(pe_r1, pe_r2);
 
     info!("total selected pe reads: {}", pe_r1);
-    info!("time elapsed is: {:?}", start.elapsed());
 
     Ok(())
 }

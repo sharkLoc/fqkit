@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 #[allow(clippy::too_many_arguments)]
 pub fn flatten_fq(
@@ -16,7 +15,6 @@ pub fn flatten_fq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
@@ -62,7 +60,6 @@ pub fn flatten_fq(
     }
     out_writer.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }
 

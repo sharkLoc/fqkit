@@ -2,7 +2,6 @@ use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 
 pub fn interleaved(
     file1: &String,
@@ -11,7 +10,6 @@ pub fn interleaved(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-    let start = Instant::now();
 
     let mut num = 0usize;
     let fq1_reader = fastq::Reader::new(file_reader(Some(file1))?);
@@ -32,6 +30,5 @@ pub fn interleaved(
     fq_writer.flush()?;
 
     info!("total PE reads number: {}", num);
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

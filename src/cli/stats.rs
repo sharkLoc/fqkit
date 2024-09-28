@@ -3,7 +3,6 @@ use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
 use log::*;
-use std::time::Instant;
 use std::{collections::HashMap, vec};
 
 #[allow(non_camel_case_types)]
@@ -93,7 +92,6 @@ pub fn stat_fq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<()> {
-    let start = Instant::now();
     if ![33u8, 64u8].contains(&phred) {
         error!("{}", FqkitError::InvalidPhredValue);
         std::process::exit(1);
@@ -369,6 +367,5 @@ pub fn stat_fq(
     }
     fc.flush()?;
 
-    info!("time elapsed is: {:?}", start.elapsed());
     Ok(())
 }

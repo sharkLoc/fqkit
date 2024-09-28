@@ -1,5 +1,7 @@
 use anyhow::{Error, Ok};
 use clap::Parser;
+use std::time::Instant;
+use log::info;
 
 mod logger;
 use logger::*;
@@ -19,6 +21,8 @@ use cli::{
 fn main() -> Result<(), Error> {
     let arg = Args::parse();
     logger(arg.verbose, arg.logfile, arg.quiet)?;
+    let start = Instant::now();
+    info!("version: {}", VERSION);
 
     match arg.command {
         Subcli::topn { input, num, out } => {
@@ -568,6 +572,8 @@ fn main() -> Result<(), Error> {
             )?;
         }
     }
+
+    info!("time elapsed is: {:?}", start.elapsed());
 
     Ok(())
 }
