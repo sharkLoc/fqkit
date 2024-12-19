@@ -140,7 +140,6 @@ fn main() -> Result<(), Error> {
             case,
             invert,
             chunk,
-            thread,
             out,
         } => {
             search_fq(
@@ -150,7 +149,7 @@ fn main() -> Result<(), Error> {
                 invert,
                 chunk,
                 out.as_ref(),
-                thread,
+                arg.threads,
                 arg.compression_level,
                 arg.stdout_type,
             )?;
@@ -283,13 +282,12 @@ fn main() -> Result<(), Error> {
         }
         Subcli::size {
             input,
-            thread,
             chunk,
             out,
         } => {
             size_fastq(
                 input.as_ref(),
-                thread,
+                arg.threads,
                 chunk,
                 out.as_ref(),
                 arg.compression_level,
@@ -369,7 +367,6 @@ fn main() -> Result<(), Error> {
             average_qual,
             phred,
             chunk,
-            thread,
             failed,
             out1,
             out2,
@@ -383,7 +380,7 @@ fn main() -> Result<(), Error> {
                 average_qual,
                 phred,
                 chunk,
-                thread,
+                arg.threads,
                 &failed,
                 &out1,
                 &out2,

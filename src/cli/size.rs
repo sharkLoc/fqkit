@@ -1,7 +1,6 @@
 use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
-//use crossbeam::channel::unbounded;
 use crossbeam::channel::bounded;
 use log::*;
 
@@ -43,7 +42,6 @@ pub fn size_fastq(
     } else {
         info!("reading from stdin");
     }
-    info!("additional worker threads is: {}", ncpu);
 
     let mut chunk = chunk;
     if chunk == 0 {

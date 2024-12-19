@@ -217,9 +217,6 @@ pub enum Subcli {
         /// the number of reads in the chunk on each thread
         #[arg(short, long, default_value_t = 5000, value_name = "INT")]
         chunk: usize,
-        /// number of additional worker threads to use
-        #[arg(short = '@', long = "thread", default_value_t = 4, value_name = "INT")]
-        thread: usize,
         /// specify the file to store reads(interleaved) that cannot pass the filters, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'u', long = "failed", value_name = "FILE")]
         failed: String,
@@ -260,9 +257,6 @@ pub enum Subcli {
         /// the number of reads in the chunk on each thread
         #[arg(short, long, default_value_t = 5000, value_name = "INT")]
         chunk: usize,
-        /// number of additional worker threads to use
-        #[arg(short = '@', long = "thread", default_value_t = 1, value_name = "INT")]
-        thread: usize,
         /// output contain pattern/motif reads result fastq file or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
@@ -334,9 +328,6 @@ pub enum Subcli {
         /// the number of reads in the chunk on each thread
         #[arg(short, long, default_value_t = 5000, value_name = "INT")]
         chunk: usize,
-        /// number of additional worker threads to use
-        #[arg(short = '@', long = "thread", default_value_t = 3, value_name = "INT")]
-        thread: usize,
         /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,

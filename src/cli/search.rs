@@ -26,11 +26,6 @@ pub fn search_fq(
     }
 
     info!("regex pattern is: {}", pat);
-    if ncpu == 1 || ncpu == 0 {
-        info!("thread num is: {}", ncpu);
-    } else {
-        info!("additional thread num is: {}", ncpu);
-    }
 
     let mut chunk = chunk;
     if chunk == 0 {

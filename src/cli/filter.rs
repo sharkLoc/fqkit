@@ -27,11 +27,6 @@ pub fn filter_fastq(
         error!("{}", FqkitError::InvalidPhredValue);
         std::process::exit(1);
     }
-    if ncpu <= 1 {
-        info!("thread num is: {}", ncpu);
-    } else {
-        info!("additional thread num is: {}", ncpu);
-    }
     info!("output clean read1 file: {}", out1);
     info!("output clean read2 file: {}", out2);
 
