@@ -3,21 +3,24 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum FqkitError {
-    #[error("stdin not detected")]
+    #[error("Stdin not detected")]
     StdinNotDetected,
 
-    #[error("failed to open file: {0}")]
+    #[error("Failed to open file: {0}")]
     IoError(#[from] io::Error),
 
-    #[error("invalid output dir: {0}")]
+    #[error("Invalid output dir: {0}")]
     InvalidOutputDir(String),
 
-    #[error("empty file: {0}")]
+    #[error("ThreadPoolBuildError error")]
+    ThreadPoolBuildError(#[from] rayon::ThreadPoolBuildError),
+
+    #[error("Empty file: {0}")]
     EmptyFile(String),
 
-    #[error("invalid phred value")]
+    #[error("Invalid phred value")]
     InvalidPhredValue,
 
-    #[error("invalid figure types")]
+    #[error("Invalid figure types")]
     InvalidFigureType,
 }

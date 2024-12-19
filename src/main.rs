@@ -23,6 +23,10 @@ fn main() -> Result<(), Error> {
     logger(arg.verbose, arg.logfile, arg.quiet)?;
     let start = Instant::now();
     info!("version: {}", VERSION);
+    
+    let cpus = num_cpus::get();
+    info!("cpu numbers: {}", cpus);
+    rayon::ThreadPoolBuilder::new().num_threads(arg.threads).build_global()?;
 
     match arg.command {
         Subcli::topn { input, num, out } => {

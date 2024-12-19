@@ -1,7 +1,8 @@
 use crate::utils::*;
 use anyhow::Result;
 use bio::io::fastq;
-use crossbeam::channel::unbounded;
+//use crossbeam::channel::unbounded;
+use crossbeam::channel::bounded;
 use log::*;
 
 #[derive(Clone, Copy)]
@@ -79,7 +80,7 @@ pub fn size_fastq(
         }
         bases = base.a + base.t + base.g + base.c + base.n;
     } else {
-        let (tx, rx) = unbounded();
+        let (tx, rx) = bounded(5000);//unbounded();
         let mut fqiter = fq_reader.records();
         loop {
             let chunk: Vec<_> = fqiter.by_ref().take(chunk).map_while(Result::ok).collect();
@@ -91,7 +92,7 @@ pub fn size_fastq(
         drop(tx);
 
         crossbeam::scope(|s| {
-            let (tx2, rx2) = unbounded();
+            let (tx2, rx2) = bounded(5000); //unbounded();
             let _handles: Vec<_> = (0..ncpu)
                 .map(|_| {
                     let rx_tmp = rx.clone();

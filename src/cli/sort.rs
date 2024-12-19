@@ -2,6 +2,7 @@ use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
+use rayon::prelude::*;
 
 #[allow(clippy::too_many_arguments)]
 pub fn sort_fastq(
@@ -13,7 +14,7 @@ pub fn sort_fastq(
     reverse: bool,
     out: Option<&String>,
     compression_level: u32,
-    stdout_type: char,
+    stdout_type: char
 ) -> Result<(), Error> {
 
     let mut n = 0;
@@ -57,28 +58,28 @@ pub fn sort_fastq(
     if sort_by_name {
         info!("sort read by name");
         if reverse {
-            vec_reads.sort_by(|a, b| {
+            vec_reads.par_sort_by(|a, b| {
                 let read_name1 = if let Some(des) = a.desc() {
                     format!("{} {}", a.id(), des)
                 } else {
                     a.id().to_string()
                 };
                 let read_name2 = if let Some(des) = b.desc() {
-                    format!("{} {}", a.id(), des)
+                    format!("{} {}", b.id(), des)
                 } else {
                     b.id().to_string()
                 };
                 read_name2.cmp(&read_name1)
             });
         } else {
-            vec_reads.sort_by(|a, b| {
+            vec_reads.par_sort_by(|a, b| {
                 let read_name1 = if let Some(des) = a.desc() {
                     format!("{} {}", a.id(), des)
                 } else {
                     a.id().to_string()
                 };
                 let read_name2 = if let Some(des) = b.desc() {
-                    format!("{} {}", a.id(), des)
+                    format!("{} {}", b.id(), des)
                 } else {
                     b.id().to_string()
                 };
@@ -88,23 +89,23 @@ pub fn sort_fastq(
     } else if sort_by_seq {
         info!("sort read by sequence");
         if reverse {
-            vec_reads.sort_by(|a, b| b.seq().cmp(a.seq()));
+            vec_reads.par_sort_by(|a, b| b.seq().cmp(a.seq()));
         } else {
-            vec_reads.sort_by(|a, b| a.seq().cmp(b.seq()));
+            vec_reads.par_sort_by(|a, b| a.seq().cmp(b.seq()));
         }
     } else if sort_by_length {
         info!("sort read by length");
         if reverse {
             //vec_reads.sort_by(|a, b| b.seq().len().cmp(&a.seq().len()));
-            vec_reads.sort_by_key(|b| std::cmp::Reverse(b.seq().len()))
+            vec_reads.par_sort_by_key(|b| std::cmp::Reverse(b.seq().len()))
         } else {
             //vec_reads.sort_by(|a, b| a.seq().len().cmp(&b.seq().len()));
-            vec_reads.sort_by_key(|a| a.seq().len())
+            vec_reads.par_sort_by_key(|a| a.seq().len())
         }
     } else if sort_by_gc {
         info!("sort read by gc content");
         if reverse {
-            vec_reads.sort_by(|a, b| {
+            vec_reads.par_sort_by(|a, b| {
                 let r1_gc = a
                     .seq()
                     .iter()
@@ -120,7 +121,7 @@ pub fn sort_fastq(
                 r2_gc.partial_cmp(&r1_gc).unwrap()
             });
         } else {
-            vec_reads.sort_by(|a, b| {
+            vec_reads.par_sort_by(|a, b| {
                 let r1_gc = a
                     .seq()
                     .iter()

@@ -1,7 +1,7 @@
 use crate::{error::FqkitError, utils::*};
 use anyhow::{Ok, Result};
 use bio::io::fastq;
-use crossbeam::channel::unbounded;
+use crossbeam::channel::bounded;
 use log::*;
 
 #[allow(clippy::too_many_arguments)]
@@ -112,7 +112,7 @@ pub fn filter_fastq(
             chunk = 5000;
         }
 
-        let (tx, rx) = unbounded();
+        let (tx, rx) = bounded(5000);
         let mut fq_iter1 = fq_reader1.records();
         let mut fq_iter2 = fq_reader2.records();
         loop {
@@ -130,7 +130,7 @@ pub fn filter_fastq(
         drop(tx);
 
         crossbeam::scope(|s| {
-            let (tx2, rx2) = unbounded();
+            let (tx2, rx2) = bounded(5000);
             let _handles: Vec<_> = (0..ncpu)
                 .map(|_| {
                     let tx_tmp = tx2.clone();
