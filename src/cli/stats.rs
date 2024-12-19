@@ -199,55 +199,6 @@ pub fn stat_fq(
                     tf[4] += 1;
                 }
             }
-            /*if each.contains_key(&pos) {
-                let tf = each.get_mut(&pos).unwrap();
-                let gap = (idx + 5 + 1) as i32 - tf.len() as i32;
-                if gap > 0 {
-                    //tf.resize(gap+tf.len(), 0);           // error
-                    //tf.resize_with(gap+tf.len(), || 0);   // error
-                    //tf.append(&mut vec![0;gap]);          // error
-                    //for _ in 0..gap { tf.push(0); }       // error
-                    for _ in 0..gap {
-                        tf.insert(tf.len(), 0);
-                    } // WFK? ok:  add zero at vec![] tail in loop n
-                }
-                tf[idx + 5] += 1;
-                if sf == &b'A' {
-                    tf[0] += 1;
-                }
-                if sf == &b'T' {
-                    tf[1] += 1;
-                }
-                if sf == &b'G' {
-                    tf[2] += 1;
-                }
-                if sf == &b'C' {
-                    tf[3] += 1;
-                }
-                if sf == &b'N' {
-                    tf[4] += 1;
-                }
-            } else {
-                let cap = this_q as usize + 1 + 5;
-                let mut v_tmp = vec![0usize; cap];
-                v_tmp[idx + 5] += 1;
-                if sf == &b'A' {
-                    v_tmp[0] += 1;
-                }
-                if sf == &b'T' {
-                    v_tmp[1] += 1;
-                }
-                if sf == &b'G' {
-                    v_tmp[2] += 1;
-                }
-                if sf == &b'C' {
-                    v_tmp[3] += 1;
-                }
-                if sf == &b'N' {
-                    v_tmp[4] += 1;
-                }
-                each.insert(pos, v_tmp);
-            }*/
         }
     }
 

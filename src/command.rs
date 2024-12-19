@@ -34,7 +34,7 @@ pub struct Args {
     pub command: Subcli,
 
     /// threads number
-    #[arg(short = '@', long = "threads", default_value_t = 1, global = true, value_name = "INT", help_heading = Some("Global Arguments"))]
+    #[arg(short = '@', long = "threads", default_value_t = 4, global = true, value_name = "INT", help_heading = Some("Global Arguments"))]
     pub threads: usize,
 
     /// set gzip/bzip2/xz compression level 1 (compress faster) - 9 (compress better) for gzip/bzip2/xz output file, just work with option -o/--out

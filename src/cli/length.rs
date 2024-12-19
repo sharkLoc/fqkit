@@ -3,6 +3,7 @@ use anyhow::{Error, Ok};
 use bio::io::fastq;
 use log::*;
 use std::collections::HashMap;
+use rayon::prelude::*;
 
 pub fn fq_length(
     file: Option<&String>,
@@ -30,9 +31,9 @@ pub fn fq_length(
 
     let mut sort_len: Vec<(&usize, &usize)> = reads_len.iter().collect();
     if rev {
-        sort_len.sort_by(|x, y| y.0.cmp(x.0));
+        sort_len.par_sort_by(|x, y| y.0.cmp(x.0));
     } else {
-        sort_len.sort_by_key(|x| x.0);
+        sort_len.par_sort_by_key(|x| x.0);
     }
 
     fo.write_all("lenth\tcount\n".as_bytes())?;

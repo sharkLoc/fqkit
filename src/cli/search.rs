@@ -1,7 +1,7 @@
 use crate::utils::*;
 use anyhow::{Error, Ok};
 use bio::io::fastq;
-use crossbeam::channel::unbounded;
+use crossbeam::channel::bounded;
 use log::*;
 use regex::RegexBuilder;
 
@@ -67,7 +67,7 @@ pub fn search_fq(
         }
         fo.flush()?;
     } else {
-        let (tx, rx) = unbounded();
+        let (tx, rx) = bounded(5000);
         let mut fqiter = fq_reader.records();
         loop {
             let chunks: Vec<_> = fqiter.by_ref().take(chunk).map_while(Result::ok).collect();
@@ -79,7 +79,7 @@ pub fn search_fq(
         drop(tx);
 
         crossbeam::scope(|s| {
-            let (tx2, rx2) = unbounded();
+            let (tx2, rx2) = bounded(5000);
             let _handles: Vec<_> = (0..ncpu)
                 .map(|_| {
                     let tx_tmp = tx2.clone();
