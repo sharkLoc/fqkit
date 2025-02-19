@@ -1,6 +1,6 @@
 use clap::{value_parser, ArgAction, Parser};
 
-pub const VERSION: &str = "0.4.11";
+pub const VERSION: &str = "0.4.12";
 
 #[derive(Parser, Debug)]
 #[command(
