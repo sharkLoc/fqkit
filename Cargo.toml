@@ -3,9 +3,9 @@
 [package]
 name = "fqkit"
 version = "0.4.12"
-edition = "2021"
+edition = "2024"
 authors = ["sharkLoc <mmtinfo@163.com>"]
-rust-version = "1.83.0"
+rust-version = "1.85.0"
 homepage = "https://github.com/sharkLoc/fqkit"
 repository = "https://github.com/sharkLoc/fqkit"
 categories = ["science::bioinformatics::sequence-analysis","command-line-utilities"]
