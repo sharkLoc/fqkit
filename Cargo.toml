@@ -23,7 +23,6 @@ exclude = [
 
 [dependencies]
 anyhow = "1.0.75"
-atty = "0.2.14"
 bio = "2.0.3"
 bzip2 = "0.5.1"
 chrono = "0.4.30"
