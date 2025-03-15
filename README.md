@@ -68,6 +68,7 @@ Commands:
   trim     trim fastq reads by position
   adapter  cut the adapter sequence on the reads
   filter   a simple filter for pair end fastq sqeuence
+  join     join paired end reads that are overlapping into a single longer read
   range    print fastq records in a range
   search   search reads/motifs from fastq file
   grep     grep fastq sequence by read id or full name

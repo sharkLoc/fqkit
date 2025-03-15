@@ -16,6 +16,7 @@ fn reverse_complement(seq: &[u8]) -> Vec<u8> {
         .collect()
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn join_overlap(
     read1: &str,
     read2: &str,
