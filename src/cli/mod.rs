@@ -9,6 +9,7 @@ pub mod fq2sam;
 pub mod fqscore;
 pub mod gcplot;
 pub mod grep;
+pub mod join;
 pub mod kmer;
 pub mod length;
 pub mod mask;

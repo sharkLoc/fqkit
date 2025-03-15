@@ -11,11 +11,11 @@ mod utils;
 use command::*;
 mod cli;
 use cli::{
-    barcode::*, check::*, concat::*, cutadapter::cut_adapter, filter::*, flatten::*, fq2fa::*,
+    barcode::*, check::*, concat::*, cutadapter::*, filter::*, flatten::*, fq2fa::*,
     fq2sam::*, fqscore::*, gcplot::*, grep::*, kmer::*, length::*, mask::*, merge::*, plot::*,
     range::*, remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*,
     slide::*, sort::*, split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*,
-    view::*,
+    view::*, join::*,
 };
 
 fn main() -> Result<(), Error> {
@@ -555,6 +555,18 @@ fn main() -> Result<(), Error> {
                 out.as_ref(),
                 arg.compression_level,
                 arg.stdout_type,
+            )?;
+        }
+        Subcli::join { read1, read2, length, miss, output, non } => {
+            join_overlap(
+                &read1, 
+                &read2,
+                miss,
+                length,
+                output.as_ref(),
+                non.as_ref(),
+                arg.compression_level,
+                arg.stdout_type
             )?;
         }
         Subcli::kmer {
