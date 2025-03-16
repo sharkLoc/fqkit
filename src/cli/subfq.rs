@@ -32,7 +32,7 @@ fn select_fastq(
         if order < n {
             get.push(order);
         } else {
-            let ret = rng.gen_range(0..=order);
+            let ret = rng.random_range(0..=order);
             if ret < n {
                 get[ret] = order;
             }
@@ -78,7 +78,7 @@ fn select_fastq2(
         if order < n {
             get.push(rec);
         } else {
-            let ret = rng.gen_range(0..=order);
+            let ret = rng.random_range(0..=order);
             if ret < n {
                 get[ret] = rec;
             }

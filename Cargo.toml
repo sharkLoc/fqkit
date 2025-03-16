@@ -22,29 +22,29 @@ exclude = [
 
 
 [dependencies]
-anyhow = "1.0.75"
-bio = "2.0.3"
-bzip2 = "0.5.1"
-chrono = "0.4.30"
-clap = { version = "4.4.7", features = ["derive", "wrap_help"] }
-clap-verbosity-flag = "2.2.0"
-colored = "2.0.4"
-crossbeam = { version = "0.8.2", features = ["crossbeam-channel"] }
-env_logger = "0.10.0"
-flate2 = "1.0.24"
-log = "0.4.20"
+anyhow = "1.0.97"
+bio = "2.2.0"
+bzip2 = "0.5.2"
+chrono = "0.4.40"
+clap = { version = "4.5.32", features = ["derive", "wrap_help"] }
+clap-verbosity-flag = "3.0.2"
+colored = "3.0.0"
+crossbeam = { version = "0.8.4", features = ["crossbeam-channel"] }
+env_logger = "0.10.2"
+flate2 = "1.1.0"
+log = "0.4.26"
 lowcharts = "0.5.8"
 nthash = "0.5.1"
 num_cpus = "1.16.0"
-plotters = "0.3.4"
-rand = "0.8.5"
-rand_pcg = "0.3.1"
+plotters = "0.3.7"
+rand = "0.9.0"
+rand_pcg = "0.9.0"
 rayon = "1.10.0"
 regex = "1.11.1"
 rgb = "0.8.36"
 term_size = "0.3.2"
-textplots = "0.8.4"
-thiserror = "1.0.60"
+textplots = "0.8.7"
+thiserror = "2.0.12"
 xz2 = "0.1.7"
 
 
