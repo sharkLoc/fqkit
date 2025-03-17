@@ -33,6 +33,8 @@ pub fn join_overlap(
     
     let mut count_join = 0usize;
     let mut count_total = 0usize;
+    let mut count_base_overlap = 0usize;
+    let mut count_miss_overlap = 0usize;
     let mut writer_single = fastq::Writer::new(file_writer(overlap_merge, compression_level, stdout_type)?);
     let mut nuoverlap_writer = fastq::Writer::new(file_writer(nonoverlap_pe, compression_level, stdout_type)?);
 
@@ -56,6 +58,7 @@ pub fn join_overlap(
                 if overlap_len < min_overlap_len { continue; } // overlap length is too short
                 // pe reads overlaped
                 fine_overlap_len = overlap_len;
+                count_miss_overlap += mismatch;
                 break;
             }
         }
@@ -63,6 +66,7 @@ pub fn join_overlap(
         // build longer single read
         if fine_overlap_len > 0{
             count_join += 1; 
+            count_base_overlap += fine_overlap_len;
             let mut single_seq = vec![];
             let mut single_qual = vec![];
             single_seq.extend_from_slice(&rec1.seq()[..rec1.seq().len()-fine_overlap_len]);
@@ -103,6 +107,8 @@ pub fn join_overlap(
     nuoverlap_writer.flush()?;
     
     let rate = count_join as f64 / count_total as f64;
+    info!("total bases in overlap region: {}", count_base_overlap);
+    info!("total mismatchs in overlap region: {}", count_miss_overlap);
     info!("total pe reads overlaped and joined number: {}", count_join);
     info!("total pe reads number: {}", count_total);
     info!("pe reads overlap rate: {:.2}%", rate*100.0);
