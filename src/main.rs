@@ -1,4 +1,4 @@
-use anyhow::{Error, Ok};
+use anyhow::Error;
 use clap::Parser;
 use std::time::Instant;
 use log::info;
@@ -18,7 +18,18 @@ use cli::{
     view::*, join::*,
 };
 
-fn main() -> Result<(), Error> {
+
+fn main() {
+
+    match run_main() {
+        Ok(_) => {}
+        Err(_) => {
+            std::process::exit(1);     
+        }
+    }
+}
+
+fn run_main() -> Result<(), Error> {
     let arg = Args::parse();
     logger(arg.verbose, arg.logfile, arg.quiet)?;
     let start = Instant::now();
