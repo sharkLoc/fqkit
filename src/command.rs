@@ -1,12 +1,27 @@
-use clap::{value_parser, ArgAction, Parser};
+use clap::{
+    value_parser, 
+    ArgAction, 
+    Parser,
+    builder::{
+        styling::{AnsiColor, Effects},
+        Styles,
+    },
+};
 
-pub const VERSION: &str = "0.4.13";
+// Configures Clap v3-style help menu colors
+const STYLES: Styles = Styles::styled()
+    .header(AnsiColor::Green.on_default().effects(Effects::BOLD))
+    .usage(AnsiColor::Green.on_default().effects(Effects::BOLD))
+    .literal(AnsiColor::Cyan.on_default().effects(Effects::BOLD))
+    .placeholder(AnsiColor::Cyan.on_default());
 
+    
 #[derive(Parser, Debug)]
+#[command(styles = STYLES)]
 #[command(
     name = "FqKit",
-    author = "sharkLoc",
-    version = VERSION,
+    author = env!("CARGO_PKG_AUTHORS"),
+    version = env!("CARGO_PKG_VERSION"),
     about = "A simple and cross-platform program for fastq file manipulation",
     long_about = None,
     next_line_help = false,

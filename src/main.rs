@@ -33,7 +33,7 @@ fn run_main() -> Result<(), Error> {
     let arg = Args::parse();
     logger(arg.verbose, arg.logfile, arg.quiet)?;
     let start = Instant::now();
-    info!("version: {}", VERSION);
+    info!("version: {}", env!("CARGO_PKG_VERSION"));
     
     let cpus = num_cpus::get();
     info!("cpu numbers: {}", cpus);
