@@ -1,8 +1,7 @@
-use crate::error::FqkitError;
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use anyhow::Error;
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 use lowcharts::plot;
 use plotters::prelude::*;
 use std::collections::HashMap;
@@ -20,7 +19,6 @@ pub fn gc_content(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
-
     let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
     if let Some(inp) = fqin {
         info!("reading from file: {}", inp);

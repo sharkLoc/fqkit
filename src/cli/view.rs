@@ -1,8 +1,7 @@
-use crate::utils::*;
-use anyhow::Result;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
 use colored::*;
-use log::*;
+use log::error;
 use std::io;
 use term_size::dimensions;
 
@@ -11,7 +10,7 @@ pub fn view_fq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
+) -> Result<(), FqkitError> {
     if file.is_none() {
         error!("do not read file from stdin.");
         std::process::exit(1);

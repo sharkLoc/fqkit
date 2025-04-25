@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::info;
 
 #[allow(clippy::too_many_arguments)]
 pub fn fastq2sam(
@@ -14,7 +13,7 @@ pub fn fastq2sam(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
+) -> Result<(), FqkitError> {
     if let Some(r2) = r2 {
         info!("read file1 from: {}", r1);
         info!("read file2 from: {}", r2);

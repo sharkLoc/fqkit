@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::Result;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::info;
 use std::collections::HashMap;
 
 pub fn reverse_comp_seq(
@@ -10,8 +9,7 @@ pub fn reverse_comp_seq(
     rev: bool,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let fq_reader = file_reader(input).map(fastq::Reader::new)?;
     if let Some(file) = input {
         info!("reading from file: {}", file);

@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer_append};
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 use std::path::PathBuf;
 
 pub fn split_interleaved(
@@ -12,8 +11,7 @@ pub fn split_interleaved(
     bzip2: bool,
     xz: bool,
     compression_level: u32,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let mut n = 0;
     if gzip {
         n += 1;

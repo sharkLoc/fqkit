@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 use rayon::prelude::*;
 
 #[allow(clippy::too_many_arguments)]
@@ -14,9 +13,8 @@ pub fn sort_fastq(
     reverse: bool,
     out: Option<&String>,
     compression_level: u32,
-    stdout_type: char
-) -> Result<(), Error> {
-
+    stdout_type: char,
+) -> Result<(), FqkitError> {
     let mut n = 0;
     if sort_by_gc {
         n += 1;
@@ -31,7 +29,9 @@ pub fn sort_fastq(
         n += 1;
     }
     if n > 1 {
-        error!("only one of the flags -l (--sort-by-length), -n (--sort-by-name), -g (--sort-by-gc) and -s (--sort-by-seq) is allowed");
+        error!(
+            "only one of the flags -l (--sort-by-length), -n (--sort-by-name), -g (--sort-by-gc) and -s (--sort-by-seq) is allowed"
+        );
         std::process::exit(1);
     }
     if n == 0 {

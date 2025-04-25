@@ -1,9 +1,8 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
-use std::collections::HashMap;
+use log::info;
 use rayon::prelude::*;
+use std::collections::HashMap;
 
 pub fn fq_length(
     file: Option<&String>,
@@ -11,8 +10,7 @@ pub fn fq_length(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let mut reads_len = HashMap::new();
     let mut total = 0usize;
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;

@@ -1,5 +1,4 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
 use crossbeam::channel::bounded;
 use log::*;
@@ -16,8 +15,7 @@ pub fn search_fq(
     ncpu: usize,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let fq_reader = file_reader(fq).map(fastq::Reader::new).unwrap();
     if let Some(file) = fq {
         info!("reading from file: {}", file);

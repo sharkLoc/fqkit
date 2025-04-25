@@ -1,6 +1,6 @@
 use anyhow::{Ok, Result};
 use chrono::Local;
-use env_logger::{fmt::Color, Builder, Target};
+use env_logger::{Builder, Target, fmt::Color};
 use log::{Level, LevelFilter};
 use std::{
     fs::File,
@@ -22,10 +22,9 @@ pub fn logger<P: AsRef<Path>>(
             3 => LevelFilter::Info,
             4 => LevelFilter::Debug,
             5 => LevelFilter::Trace,
-            _ => LevelFilter::Off
+            _ => LevelFilter::Off,
         }
     };
-    
 
     let mut builder = Builder::from_default_env();
     builder.format(|buf, record| {

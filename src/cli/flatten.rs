@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 
 #[allow(clippy::too_many_arguments)]
 pub fn flatten_fq(
@@ -14,8 +13,7 @@ pub fn flatten_fq(
     gc: bool,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
         info!("reading from file: {}", file);

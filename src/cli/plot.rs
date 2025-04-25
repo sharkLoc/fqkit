@@ -1,7 +1,7 @@
-use crate::{error::FqkitError, utils::file_reader};
+use crate::{errors::FqkitError, utils::file_reader};
 use anyhow::Result;
-use colored::*;
-use log::*;
+use colored::Colorize;
+use log::error;
 use plotters::{prelude::*, style::Color};
 use std::collections::BTreeMap;
 use std::io::BufRead;
@@ -45,7 +45,6 @@ pub fn plot_line(
     ylim: f32,
     types: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-
     if !["svg", "png"].contains(&types) {
         error!("{}", FqkitError::InvalidFigureType);
         std::process::exit(1);

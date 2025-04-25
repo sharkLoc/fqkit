@@ -1,8 +1,6 @@
-use crate::error::FqkitError;
-use crate::utils::*;
-use anyhow::Result;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 use std::{collections::HashMap, vec};
 
 #[allow(non_camel_case_types)]
@@ -91,7 +89,7 @@ pub fn stat_fq(
     phred: u8,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
+) -> Result<(), FqkitError> {
     if ![33u8, 64u8].contains(&phred) {
         error!("{}", FqkitError::InvalidPhredValue);
         std::process::exit(1);

@@ -1,8 +1,8 @@
-use crate::{error::FqkitError, utils::*};
+use crate::{errors::FqkitError, utils::*};
 use anyhow::{Ok, Result};
 use bio::io::fastq;
 use crossbeam::channel::bounded;
-use log::*;
+use log::{error, info, warn};
 
 #[allow(clippy::too_many_arguments)]
 pub fn filter_fastq(

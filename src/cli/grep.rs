@@ -1,8 +1,6 @@
-use crate::error::FqkitError;
-use crate::utils::*;
-use anyhow::{Ok, Result};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 use std::io::BufRead;
 
 pub fn grep_fastq(
@@ -12,8 +10,7 @@ pub fn grep_fastq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let fq_reader = file_reader(fq).map(fastq::Reader::new)?;
     if let Some(file) = fq {
         info!("reading from file: {}", file);

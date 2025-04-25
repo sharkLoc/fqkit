@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::{Ok, Result};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::info;
 use std::collections::HashMap;
 
 pub fn select_pe_fastq(
@@ -11,8 +10,7 @@ pub fn select_pe_fastq(
     out_r2: &String,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let mut read1_id = HashMap::new();
     let mut read2_id = HashMap::new();
     let fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;

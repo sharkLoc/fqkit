@@ -1,11 +1,10 @@
 use clap::{
-    value_parser, 
-    ArgAction, 
-    Parser,
+    ArgAction, Parser,
     builder::{
-        styling::{AnsiColor, Effects},
         Styles,
+        styling::{AnsiColor, Effects},
     },
+    value_parser,
 };
 
 // Configures Clap v3-style help menu colors
@@ -15,7 +14,6 @@ const STYLES: Styles = Styles::styled()
     .literal(AnsiColor::Cyan.on_default().effects(Effects::BOLD))
     .placeholder(AnsiColor::Cyan.on_default());
 
-    
 #[derive(Parser, Debug)]
 #[command(styles = STYLES)]
 #[command(
@@ -243,7 +241,7 @@ pub enum Subcli {
         out2: String,
     },
     /// join paired end reads that are overlapping into a single longer read
-    #[command(before_help=r"Note:
+    #[command(before_help = r"Note:
     1. if overlapping regions are detected, low quality bases are corrected by high quality paired bases. 
     2. if a base is corrected, the quality value is also corrected.
     3. only paired end reads such as the following will be detected and merged, overlap mode:
@@ -259,10 +257,10 @@ pub enum Subcli {
         #[arg(short = '2', long = "read2", value_name = "FILE")]
         read2: String,
         /// minimum overlap length in PE reads
-        #[arg(short = 'l', long = "length", default_value_t=30)]
+        #[arg(short = 'l', long = "length", default_value_t = 30)]
         length: usize,
         /// maximum mismatch rate count in overlap region
-        #[arg(short = 'm', long = "miss", default_value_t=0.1)]
+        #[arg(short = 'm', long = "miss", default_value_t = 0.1)]
         miss: f64,
         /// output joinde long fastq file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "output")]
@@ -270,7 +268,6 @@ pub enum Subcli {
         /// output interleaved fastq file name for non-overlap pe reads
         #[arg(short = 'n', long = "non-overlap", value_name = "FILE")]
         non: Option<String>,
-
     },
     /// print fastq records in a range
     range {

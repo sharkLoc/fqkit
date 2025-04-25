@@ -1,8 +1,6 @@
-use crate::error::FqkitError;
-use crate::utils::*;
-use anyhow::{Error, Ok, Result};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::{fasta, fastq};
-use log::*;
+use log::{error, info, warn};
 use std::collections::HashMap;
 
 pub fn cut_adapter(
@@ -13,8 +11,7 @@ pub fn cut_adapter(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
     if let Some(file) = input {
         info!("reading seq from file: {}", seqfile);
@@ -26,8 +23,6 @@ pub fn cut_adapter(
     let mut seqs = HashMap::new();
     let iters = seqfile_reader.records();
     for rec in iters.map_while(Result::ok) {
-        //while let Some(each) = iters.next() {
-        //let rec = each?;
         if seqs.contains_key(rec.id()) {
             warn!("found duplicate sequence id: {}, keep first one", rec.id());
             continue;

@@ -1,5 +1,4 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
 use log::*;
 use std::path::PathBuf;
@@ -15,8 +14,7 @@ pub fn split_chunk(
     out_dir: &str,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let mut n = 0;
     if gzip {
         n += 1;

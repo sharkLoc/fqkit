@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::Result;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 
 pub fn check_fastq(
     file: Option<&String>,
@@ -9,8 +8,7 @@ pub fn check_fastq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let (mut total, mut ok_read, mut err_read) = (0, 0, 0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {

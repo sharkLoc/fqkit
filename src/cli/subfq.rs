@@ -1,8 +1,7 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
-use rand::{prelude::*, Rng};
+use log::{error, info};
+use rand::{Rng, prelude::*};
 use rand_pcg::Pcg64;
 
 // reduce much memory but cost more time
@@ -13,9 +12,8 @@ fn select_fastq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
-    let mut rng = Pcg64::seed_from_u64(seed);
+) -> Result<(), FqkitError> {
+    let mut rng: rand_pcg::Lcg128Xsl64 = Pcg64::seed_from_u64(seed);
     let mut get: Vec<usize> = Vec::with_capacity(n);
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
@@ -60,7 +58,7 @@ fn select_fastq2(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
+) -> Result<(), FqkitError> {
     if let Some(file) = file {
         info!("reading from file: {}", file);
     } else {
@@ -103,7 +101,7 @@ pub fn subset_fastq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
+) -> Result<(), FqkitError> {
     if rdc {
         if file.is_none() {
             error!("opt -r used, fastq data can't from stdin.");

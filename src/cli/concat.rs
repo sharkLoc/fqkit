@@ -1,7 +1,7 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+
 use bio::io::fastq;
-use log::*;
+use log::{error, info};
 use std::io::BufRead;
 
 pub fn concat_fqstq_lane(
@@ -11,8 +11,7 @@ pub fn concat_fqstq_lane(
     out_r2: &String,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let mut vec1 = vec![];
     let mut vec2 = vec![];
     let fp1 = file_reader(Some(r1_list))?;

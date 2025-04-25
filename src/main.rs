@@ -1,30 +1,29 @@
 use anyhow::Error;
 use clap::Parser;
+use log::{error, info};
 use std::time::Instant;
-use log::info;
 
 mod logger;
 use logger::*;
 mod command;
-mod error;
+mod errors;
 mod utils;
 use command::*;
 mod cli;
 use cli::{
-    barcode::*, check::*, concat::*, cutadapter::*, filter::*, flatten::*, fq2fa::*,
-    fq2sam::*, fqscore::*, gcplot::*, grep::*, kmer::*, length::*, mask::*, merge::*, plot::*,
+    barcode::*, check::*, concat::*, cutadapter::*, filter::*, flatten::*, fq2fa::*, fq2sam::*,
+    fqscore::*, gcplot::*, grep::*, join::*, kmer::*, length::*, mask::*, merge::*, plot::*,
     range::*, remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*,
     slide::*, sort::*, split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*,
-    view::*, join::*,
+    view::*,
 };
 
-
 fn main() {
-
     match run_main() {
         Ok(_) => {}
-        Err(_) => {
-            std::process::exit(1);     
+        Err(e) => {
+            error!("Error: {}", e);
+            std::process::exit(1);
         }
     }
 }
@@ -34,10 +33,12 @@ fn run_main() -> Result<(), Error> {
     logger(arg.verbose, arg.logfile, arg.quiet)?;
     let start = Instant::now();
     info!("version: {}", env!("CARGO_PKG_VERSION"));
-    
+
     let cpus = num_cpus::get();
     info!("cpu numbers: {}", cpus);
-    rayon::ThreadPoolBuilder::new().num_threads(arg.threads).build_global()?;
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(arg.threads)
+        .build_global()?;
 
     match arg.command {
         Subcli::topn { input, num, out } => {
@@ -291,11 +292,7 @@ fn run_main() -> Result<(), Error> {
                 arg.stdout_type,
             )?;
         }
-        Subcli::size {
-            input,
-            chunk,
-            out,
-        } => {
+        Subcli::size { input, chunk, out } => {
             size_fastq(
                 input.as_ref(),
                 arg.threads,
@@ -568,16 +565,23 @@ fn run_main() -> Result<(), Error> {
                 arg.stdout_type,
             )?;
         }
-        Subcli::join { read1, read2, length, miss, output, non } => {
+        Subcli::join {
+            read1,
+            read2,
+            length,
+            miss,
+            output,
+            non,
+        } => {
             join_overlap(
-                &read1, 
+                &read1,
                 &read2,
                 miss,
                 length,
                 output.as_ref(),
                 non.as_ref(),
                 arg.compression_level,
-                arg.stdout_type
+                arg.stdout_type,
             )?;
         }
         Subcli::kmer {

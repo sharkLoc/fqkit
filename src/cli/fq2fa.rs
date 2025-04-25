@@ -1,8 +1,6 @@
-use crate::utils::*;
-use anyhow::{Error, Ok};
-use bio::io::fasta;
-use bio::io::fastq;
-use log::*;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use bio::io::{fasta, fastq};
+use log::info;
 
 pub fn fq2fa(
     file: Option<&String>,
@@ -10,8 +8,7 @@ pub fn fq2fa(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<(), Error> {
-
+) -> Result<(), FqkitError> {
     let mut num = 0usize;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
     if let Some(file) = file {

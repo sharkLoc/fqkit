@@ -1,13 +1,18 @@
-use crate::error::FqkitError;
-use crate::utils::*;
-use anyhow::Result;
 use bio::io::fastq;
-use log::*;
-use std::collections::HashMap;
-use std::io::BufRead;
-use std::path::{Path, PathBuf};
+use log::{error, info, warn};
 
-fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>> {
+use std::{
+    collections::HashMap,
+    io::BufRead,
+    path::{Path, PathBuf},
+};
+
+use crate::{
+    errors::FqkitError,
+    utils::{file_reader, file_writer_append},
+};
+
+fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>, FqkitError> {
     let mut maps = HashMap::new();
     let mut error_flag = "";
     let fp = file_reader(Some(file))?;
@@ -95,9 +100,7 @@ pub fn split_fq(
     bzip2: bool,
     xz: bool,
     compression_level: u32,
-) -> Result<()> {
-    
-
+) -> Result<(), FqkitError> {
     if !Path::new(outdir).try_exists().unwrap() {
         error!("{}", FqkitError::InvalidOutputDir(outdir.to_string()));
         std::process::exit(1);

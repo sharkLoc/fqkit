@@ -1,5 +1,4 @@
-use crate::utils::*;
-use anyhow::Result;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq::{self, Record};
 use log::*;
 
@@ -13,8 +12,7 @@ pub fn rename_fastq(
     output: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let fp = fastq::Reader::new(file_reader(input)?);
     if let Some(file) = input {
         info!("reading from file: {}", file);

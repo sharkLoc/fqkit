@@ -1,8 +1,7 @@
-use crate::utils::*;
-use anyhow::Result;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
 use crossbeam::channel::bounded;
-use log::*;
+use log::{info, warn};
 
 #[derive(Clone, Copy)]
 struct Base {
@@ -34,8 +33,7 @@ pub fn size_fastq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let fq_reader = fastq::Reader::new(file_reader(fq)?);
     if let Some(inp) = fq {
         info!("reading from file: {}", inp);
@@ -78,7 +76,7 @@ pub fn size_fastq(
         }
         bases = base.a + base.t + base.g + base.c + base.n;
     } else {
-        let (tx, rx) = bounded(5000);//unbounded();
+        let (tx, rx) = bounded(5000); //unbounded();
         let mut fqiter = fq_reader.records();
         loop {
             let chunk: Vec<_> = fqiter.by_ref().take(chunk).map_while(Result::ok).collect();

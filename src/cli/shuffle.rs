@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::Result;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::*;
+use log::info;
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 
@@ -11,8 +10,7 @@ pub fn shuffle_fastq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let mut rng = Pcg64::seed_from_u64(seed);
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {

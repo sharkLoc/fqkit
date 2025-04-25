@@ -1,7 +1,6 @@
-use crate::utils::*;
-use anyhow::{Ok, Result};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::{fastq, fastq::Record};
-use log::*;
+use log::{info, trace};
 
 pub fn mask_fastq(
     file: Option<&String>,
@@ -11,8 +10,7 @@ pub fn mask_fastq(
     out: Option<&String>,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-
+) -> Result<(), FqkitError> {
     let (mut mask_base, mut mask_read) = (0, 0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
     if let Some(file) = file {
