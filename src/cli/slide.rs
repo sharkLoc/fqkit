@@ -12,11 +12,6 @@ pub fn slide_fastq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     info!("window size : {}", wind);
     info!("step size: {}", step);
     let mut fq_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;

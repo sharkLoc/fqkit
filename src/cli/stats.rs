@@ -96,11 +96,6 @@ pub fn stat_fq(
     }
 
     let fq = fastq::Reader::new(file_reader(inp)?);
-    if let Some(inp) = inp {
-        info!("reading from file: {}", inp);
-    } else {
-        info!("reading from stdin");
-    }
     info!("summary result write to file: {}", pre_sum);
     if let Some(file) = pre_cyc {
         info!("cycle result write to file: {}", file);

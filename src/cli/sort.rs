@@ -40,11 +40,6 @@ pub fn sort_fastq(
     }
 
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     if reverse {
         info!("output reversed result");
     }

@@ -11,11 +11,6 @@ pub fn fq2fa(
 ) -> Result<(), FqkitError> {
     let mut num = 0usize;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut fo = fasta::Writer::new(file_writer(out, compression_level, stdout_type)?);
     if remove {

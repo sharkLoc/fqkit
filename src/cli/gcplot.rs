@@ -20,11 +20,6 @@ pub fn gc_content(
     stdout_type: char,
 ) -> Result<(), Error> {
     let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
-    if let Some(inp) = fqin {
-        info!("reading from file: {}", inp);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut fo = file_writer(output, compression_level, stdout_type)?;
     let mut df_hash = HashMap::new();

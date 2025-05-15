@@ -14,11 +14,6 @@ pub fn fq_length(
     let mut reads_len = HashMap::new();
     let mut total = 0usize;
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut fo = file_writer(out, compression_level, stdout_type)?;
     for rec in fp_reader.records().map_while(Result::ok) {

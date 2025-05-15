@@ -1,6 +1,6 @@
 use anyhow::Error;
 use clap::Parser;
-use log::{error, info};
+use log::{debug, error, info};
 use std::time::Instant;
 
 mod logger;
@@ -35,7 +35,7 @@ fn run_main() -> Result<(), Error> {
     info!("version: {}", env!("CARGO_PKG_VERSION"));
 
     let cpus = num_cpus::get();
-    info!("cpu numbers: {}", cpus);
+    debug!("cpu numbers: {}", cpus);
     rayon::ThreadPoolBuilder::new()
         .num_threads(arg.threads)
         .build_global()?;

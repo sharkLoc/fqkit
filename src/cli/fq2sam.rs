@@ -14,12 +14,6 @@ pub fn fastq2sam(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
-    if let Some(r2) = r2 {
-        info!("read file1 from: {}", r1);
-        info!("read file2 from: {}", r2);
-    } else {
-        info!("read file from: {}", r1);
-    }
     info!("sample name set: {}", sm);
 
     let mut sam = file_writer(out, compression_level, stdout_type)?;

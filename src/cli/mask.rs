@@ -13,11 +13,7 @@ pub fn mask_fastq(
 ) -> Result<(), FqkitError> {
     let (mut mask_base, mut mask_read) = (0, 0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
+
     info!("low quality value： {}", qual_limit);
     info!("mask low quality bases with: {}", nt);
 

@@ -12,11 +12,6 @@ pub fn grep_fastq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fq_reader = file_reader(fq).map(fastq::Reader::new)?;
-    if let Some(file) = fq {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut num = 0usize;
     let mut ids = vec![];

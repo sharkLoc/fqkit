@@ -11,11 +11,6 @@ pub fn range_fastq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fp_reader = file_reader(input).map(fastq::Reader::new)?;
-    if let Some(file) = input {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     info!("skip first {} records", skip);
     info!("get {} records", take);
 

@@ -15,8 +15,6 @@ pub fn select_pe_fastq(
     let mut read2_id = HashMap::new();
     let fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;
     let fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
-    info!("read forward reads from file: {}", fq1);
-    info!("read reverse reads from file: {}", fq2);
 
     for rec in fq_reader1.records().map_while(Result::ok) {
         let k = rec.id().to_owned();

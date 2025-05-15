@@ -13,11 +13,6 @@ pub fn shuffle_fastq(
 ) -> Result<(), FqkitError> {
     let mut rng = Pcg64::seed_from_u64(seed);
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     info!("rand seed: {}", seed);
 
     let mut vec_reads = vec![];

@@ -1,6 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::info;
 use nthash::nthash;
 use std::collections::HashMap;
 
@@ -13,11 +12,6 @@ pub fn kmer_count(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let reader = file_reader(input).map(fastq::Reader::new)?;
-    if let Some(file) = input {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut writer = file_writer(output, compression_level, stdout_type)?;
     let mut kmers = HashMap::new();

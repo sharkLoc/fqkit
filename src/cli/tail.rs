@@ -11,11 +11,6 @@ pub fn tail_n_records(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fp = fastq::Reader::new(file_reader(input)?);
-    if let Some(file) = input {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     info!("get tail {} records", number);
 
     let mut fo = fastq::Writer::new(file_writer(output, compression_level, stdout_type)?);

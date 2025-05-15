@@ -1,5 +1,5 @@
 use crate::errors::FqkitError;
-use log::{error, warn};
+use log::{error, info, warn};
 use std::{
     fs::{File, OpenOptions},
     io::{self, BufRead, BufReader, BufWriter, IsTerminal, Write, prelude::*, stdin},
@@ -66,6 +66,7 @@ where
         let bz_flag = is_bzipped(file_name)?;
         let zx_flag = is_xz(file_name)?;
 
+        info!("reading from file {}", file_name.as_ref().display());
         let fp = File::open(file_name).map_err(FqkitError::IoError)?;
 
         if gz_flag {
@@ -91,6 +92,7 @@ where
             error!("{}", FqkitError::StdinNotDetected);
             std::process::exit(1);
         }
+        info!("reading from stdin");
         let fp = BufReader::new(io::stdin());
         Ok(Box::new(fp))
     }

@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fastq;
-use log::{info, warn};
+use log::warn;
 
 pub fn trim_fq(
     file: Option<&String>,
@@ -13,11 +13,6 @@ pub fn trim_fq(
 ) -> Result<(), FqkitError> {
     let length = right + left;
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level, stdout_type)?);
     for (idx, rec) in fq_reader.records().map_while(Result::ok).enumerate() {

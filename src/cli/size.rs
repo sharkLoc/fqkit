@@ -35,11 +35,6 @@ pub fn size_fastq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fq_reader = fastq::Reader::new(file_reader(fq)?);
-    if let Some(inp) = fq {
-        info!("reading from file: {}", inp);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut chunk = chunk;
     if chunk == 0 {

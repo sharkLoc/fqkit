@@ -15,11 +15,6 @@ pub fn flatten_fq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     info!("flag value is: {}", flag);
 
     if flag == 0 || flag > 15 {

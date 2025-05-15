@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::{fastq, fastq::Record};
-use log::{error, info};
+use log::error;
 
 pub fn phred_score(
     file: Option<&String>,
@@ -11,11 +11,6 @@ pub fn phred_score(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fq_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(r) = file {
-        info!("read file from: {}", r);
-    } else {
-        info!("read file from: stdin");
-    }
 
     let mut n = 0;
     if to33 {

@@ -27,11 +27,6 @@ pub fn split_interleaved(
         std::process::exit(1);
     }
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     //let pre1 = format!("{}/{}_r1.fq.gz", out_dir, out_pre);
     let pre1 = if gzip {

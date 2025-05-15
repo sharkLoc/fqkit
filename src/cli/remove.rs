@@ -24,11 +24,6 @@ pub fn remove_read(
     }
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    if let Some(file) = file {
-        info!("reading reads from file: {}", file);
-    } else {
-        info!("reading reads from stdin");
-    }
 
     if !rm {
         info!("removed reads in file: {}", save);

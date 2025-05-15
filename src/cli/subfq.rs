@@ -17,11 +17,6 @@ fn select_fastq(
     let mut get: Vec<usize> = Vec::with_capacity(n);
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     info!("rand seed: {}", seed);
     info!("subseq number: {}", n);
     info!("reduce much memory but cost more time");

@@ -46,11 +46,6 @@ pub fn split_chunk(
     };
 
     let fq_reader = fastq::Reader::new(file_reader(file)?);
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     let mut fh = vec![fastq::Writer::new(file_writer(
         Some(&out),
         compression_level,

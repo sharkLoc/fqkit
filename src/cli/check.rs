@@ -11,11 +11,6 @@ pub fn check_fastq(
 ) -> Result<(), FqkitError> {
     let (mut total, mut ok_read, mut err_read) = (0, 0, 0);
     let fp_reader = file_reader(file).map(fastq::Reader::new)?;
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     if save {
         let mut out_writer =

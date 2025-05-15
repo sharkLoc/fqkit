@@ -14,11 +14,6 @@ pub fn rename_fastq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fp = fastq::Reader::new(file_reader(input)?);
-    if let Some(file) = input {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     let mut fo = fastq::Writer::new(file_writer(output, compression_level, stdout_type)?);
     let mut n: usize = 0;
@@ -54,7 +49,6 @@ pub fn rename_fastq(
         fo.write_record(&record)?;
     }
     fo.flush()?;
-
 
     info!("total rename sequence number: {}", n);
     Ok(())

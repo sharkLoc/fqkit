@@ -17,11 +17,6 @@ pub fn search_fq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fq_reader = file_reader(fq).map(fastq::Reader::new).unwrap();
-    if let Some(file) = fq {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
 
     info!("regex pattern is: {}", pat);
 

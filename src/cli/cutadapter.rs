@@ -13,12 +13,7 @@ pub fn cut_adapter(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
-    if let Some(file) = input {
-        info!("reading seq from file: {}", seqfile);
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
+    info!("reading seq from file: {}", seqfile);
 
     let mut seqs = HashMap::new();
     let iters = seqfile_reader.records();
