@@ -292,11 +292,10 @@ fn run_main() -> Result<(), Error> {
                 arg.stdout_type,
             )?;
         }
-        Subcli::size { input, chunk, out } => {
+        Subcli::size { input, out } => {
             size_fastq(
                 input.as_ref(),
                 arg.threads,
-                chunk,
                 out.as_ref(),
                 arg.compression_level,
                 arg.stdout_type,

@@ -57,7 +57,7 @@ fn is_xz<P: AsRef<Path> + Copy>(file_name: P) -> Result<bool, FqkitError> {
             .is_some_and(|ext| ext == "xz"))
 }
 
-pub fn file_reader<P>(file_in: Option<P>) -> Result<Box<dyn BufRead>, FqkitError>
+pub fn file_reader<P>(file_in: Option<P>) -> Result<Box<dyn BufRead + Send>, FqkitError>
 where
     P: AsRef<Path> + Copy,
 {

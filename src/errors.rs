@@ -15,6 +15,9 @@ pub enum FqkitError {
     #[error("ThreadPoolBuildError error")]
     ThreadPoolBuildError(#[from] rayon::ThreadPoolBuildError),
 
+    #[error("ProcessError")]
+    ProcessError(#[from] paraseq::parallel::ProcessError),
+
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 
