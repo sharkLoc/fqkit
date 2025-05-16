@@ -551,6 +551,7 @@ fn run_main() -> Result<(), Error> {
             fq_length(
                 input.as_ref(),
                 reverse,
+                arg.threads,
                 out.as_ref(),
                 arg.compression_level,
                 arg.stdout_type,
