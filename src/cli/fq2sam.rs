@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fastq;
 use log::info;
+use paraseq::fastq;
 
 #[allow(clippy::too_many_arguments)]
 pub fn fastq2sam(
@@ -37,62 +37,52 @@ pub fn fastq2sam(
     sam.write_all("\n".as_bytes())?;
 
     if let Some(r2) = r2 {
-        let fq1 = file_reader(Some(r1)).map(fastq::Reader::new)?;
-        let fq2 = file_reader(Some(r2)).map(fastq::Reader::new)?;
-        for (rec1, rec2) in fq1
-            .records()
-            .map_while(Result::ok)
-            .zip(fq2.records().map_while(Result::ok))
-        {
-            sam.write_fmt(format_args!(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\tRG:Z:{}\n",
-                rec1.id(),
-                77,
-                "*",
-                "0",
-                "0",
-                "*",
-                "*",
-                "0",
-                "0",
-                std::str::from_utf8(rec1.seq())?,
-                std::str::from_utf8(rec1.qual())?,
-                rg,
-            ))?;
-            sam.write_fmt(format_args!(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\tRG:Z:{}\n",
-                rec2.id(),
-                141,
-                "*",
-                "0",
-                "0",
-                "*",
-                "*",
-                "0",
-                "0",
-                std::str::from_utf8(rec2.seq())?,
-                std::str::from_utf8(rec2.qual())?,
-                rg,
-            ))?;
+        let mut fq1 = file_reader(Some(r1)).map(fastq::Reader::new)?;
+        let mut fq2 = file_reader(Some(r2)).map(fastq::Reader::new)?;
+
+        let mut rset1 = fastq::RecordSet::default();
+        let mut rset2 = fastq::RecordSet::default();
+
+        while rset1.fill(&mut fq1)? && rset2.fill(&mut fq2)? {
+            for (rec1, rec2) in rset1
+                .iter()
+                .map_while(Result::ok)
+                .zip(rset2.iter().map_while(Result::ok))
+            {
+                sam.write_all(rec1.id())?;
+                sam.write_all(b"\t77\t*\t0\t0\t*\t*\t0\t0\t")?;
+                sam.write_all(rec1.sep())?;
+                sam.write_all(b"\t")?;
+                sam.write_all(rec1.qual())?;
+                sam.write_all(b"\tRG:Z:")?;
+                sam.write_all(rg.as_bytes())?;
+                sam.write_all(b"\n")?;
+
+                sam.write_all(rec2.id())?;
+                sam.write_all(b"\t141\t*\t0\t0\t*\t*\t0\t0\t")?;
+                sam.write_all(rec2.sep())?;
+                sam.write_all(b"\t")?;
+                sam.write_all(rec2.qual())?;
+                sam.write_all(b"\tRG:Z:")?;
+                sam.write_all(rg.as_bytes())?;
+                sam.write_all(b"\n")?;
+            }
         }
     } else {
-        let fq = file_reader(Some(r1)).map(fastq::Reader::new)?;
-        for rec in fq.records().map_while(Result::ok) {
-            sam.write_fmt(format_args!(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\tRG:Z:{}\n",
-                rec.id(),
-                4,
-                "*",
-                "0",
-                "0",
-                "*",
-                "*",
-                "0",
-                "0",
-                unsafe { std::str::from_utf8_unchecked(rec.seq()) },
-                unsafe { std::str::from_utf8_unchecked(rec.qual()) },
-                rg,
-            ))?;
+        let mut fq = file_reader(Some(r1)).map(fastq::Reader::new)?;
+
+        let mut rset = fastq::RecordSet::default();
+        while rset.fill(&mut fq)? {
+            for rec in rset.iter().map_while(Result::ok) {
+                sam.write_all(rec.id())?;
+                sam.write_all(b"\t4\t*\t0\t0\t*\t*\t0\t0\t")?;
+                sam.write_all(rec.sep())?;
+                sam.write_all(b"\t")?;
+                sam.write_all(rec.qual())?;
+                sam.write_all(b"\tRG:Z:")?;
+                sam.write_all(rg.as_bytes())?;
+                sam.write_all(b"\n")?;
+            }
         }
     }
     sam.flush()?;

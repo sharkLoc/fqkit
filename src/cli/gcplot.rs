@@ -3,7 +3,6 @@ use anyhow::Error;
 use log::{error, info};
 use lowcharts::plot;
 use plotters::prelude::*;
-
 use paraseq::{
     fastq,
     fastx::Record,

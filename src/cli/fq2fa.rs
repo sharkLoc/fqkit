@@ -19,11 +19,7 @@ pub fn fq2fa(
         for rec in rset.iter().map_while(Result::ok) {
             num += 1;
             if remove {
-                let id = rec
-                .id()
-                .splitn(2, |&e| e == b' ')
-                .next()
-                .unwrap();
+                let id = rec.id().splitn(2, |&e| e == b' ').next().unwrap();
                 fa_writer.write_all(id)?;
             } else {
                 fa_writer.write_all(rec.id())?;

@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fastq;
 use log::{error, info};
+use paraseq::fastq;
 
 #[allow(clippy::too_many_arguments)]
 pub fn flatten_fq(
@@ -14,7 +14,7 @@ pub fn flatten_fq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
-    let fq_reader = file_reader(file).map(fastq::Reader::new)?;
+    let mut fq_reader = file_reader(file).map(fastq::Reader::new)?;
     info!("flag value is: {}", flag);
 
     if flag == 0 || flag > 15 {
@@ -24,32 +24,36 @@ pub fn flatten_fq(
 
     let fields = get_flag(flag);
     let mut out_writer = file_writer(out, compression_level, stdout_type)?;
+    let mut rset = fastq::RecordSet::default();
+    while rset.fill(&mut fq_reader)? {
+        for rec in rset.iter().map_while(Result::ok) {
+            let read = [rec.id(), rec.seq(), b"+", rec.qual()];
+            let res: Vec<&[u8]> = fields.iter().map(|idx| read[*idx]).collect::<Vec<&[u8]>>();
 
-    for rec in fq_reader.records().map_while(Result::ok) {
-        let read = [rec.id().as_bytes(), rec.seq(), "+".as_bytes(), rec.qual()];
-        let res = fields.iter().map(|idx| read[*idx]).collect::<Vec<&[u8]>>();
-
-        let mut out = Vec::new();
-        for x in res {
-            out.push(std::str::from_utf8(x)?.to_string());
+            for x in res {
+                out_writer.write_all(x)?;
+                out_writer.write_all(sep.to_string().as_bytes())?;
+            }
+            if gap {
+                let gc_count = rec.seq().iter().filter(|x| *x == &b'N').count();
+                out_writer.write_all(format!("{}", gc_count).as_bytes())?;
+                out_writer.write_all(sep.to_string().as_bytes())?;
+            }
+            if len {
+                out_writer.write_all(format!("{}", rec.sep().len()).as_bytes())?;
+                out_writer.write_all(sep.to_string().as_bytes())?;
+            }
+            if gc {
+                let gc_count = rec
+                    .seq()
+                    .iter()
+                    .filter(|x| *x == &b'G' || *x == &b'C')
+                    .count();
+                let gc_ratio = format!("{:.2}", gc_count as f64 / rec.seq().len() as f64 * 100.0);
+                out_writer.write_all(gc_ratio.as_bytes())?;
+            }
+            out_writer.write_all(b"\n")?;
         }
-        if gap {
-            out.push(rec.seq().iter().filter(|x| *x == &b'N').count().to_string());
-        }
-        if len {
-            out.push(rec.seq().len().to_string());
-        }
-        if gc {
-            let gc_count = rec
-                .seq()
-                .iter()
-                .filter(|x| *x == &b'G' || *x == &b'C')
-                .count();
-            let gc_ratio = format!("{:.2}", gc_count as f64 / rec.seq().len() as f64 * 100.0);
-            out.push(gc_ratio);
-        }
-        out_writer.write_all(out.join(sep.to_string().as_str()).as_bytes())?;
-        out_writer.write_all("\n".as_bytes())?;
     }
     out_writer.flush()?;
 
