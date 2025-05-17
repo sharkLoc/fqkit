@@ -710,6 +710,7 @@ pub enum Subcli {
         outdir: String,
     },
     /// get GC content result and plot
+    #[command(visible_alias = "gc")]
     gcplot {
         /// input fastq file, or read from stdin
         input: Option<String>,

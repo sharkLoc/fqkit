@@ -10,12 +10,12 @@ use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-type ArchHash = Arc<Mutex<HashMap<usize, usize>>>;
+type ArcHash = Arc<Mutex<HashMap<usize, usize>>>;
 
 #[derive(Clone)]
 struct Length {
     len: HashMap<usize, usize>,
-    total: ArchHash,
+    total: ArcHash,
 }
 
 impl Length {

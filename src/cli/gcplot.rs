@@ -1,10 +1,59 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use anyhow::Error;
-use bio::io::fastq;
 use log::{error, info};
 use lowcharts::plot;
 use plotters::prelude::*;
+
+use paraseq::{
+    fastq,
+    fastx::Record,
+    parallel::{ParallelProcessor, ParallelReader, ProcessError},
+};
+use parking_lot::Mutex;
 use std::collections::HashMap;
+use std::sync::Arc;
+
+type Gctype = HashMap<u64, usize>;
+
+#[derive(Clone)]
+struct Gchash {
+    thread_hash: Gctype,
+    glob_hash: Arc<Mutex<Gctype>>,
+}
+
+impl Gchash {
+    pub fn new() -> Self {
+        Gchash {
+            thread_hash: HashMap::new(),
+            glob_hash: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+}
+
+impl ParallelProcessor for Gchash {
+    fn process_record<Rf: Record>(&mut self, record: Rf) -> Result<(), ProcessError> {
+        let gc_count = record
+            .seq()
+            .iter()
+            .filter(|x| *x == &b'G' || *x == &b'C')
+            .count();
+        let gc_ratio = (gc_count as f64 / record.seq().len() as f64 * 100.0).round() as u64;
+        *self.thread_hash.entry(gc_ratio).or_insert(0) += 1usize;
+
+        Ok(())
+    }
+
+    fn on_batch_complete(&mut self) -> Result<(), ProcessError> {
+        let mut global_hash = self.glob_hash.lock();
+        for (k, v) in self.thread_hash.iter() {
+            global_hash.entry(*k).and_modify(|e| *e += *v).or_insert(*v);
+        }
+
+        // reset for next batch
+        self.thread_hash = HashMap::new();
+        Ok(())
+    }
+}
 
 #[allow(clippy::too_many_arguments)]
 pub fn gc_content(
@@ -16,24 +65,17 @@ pub fn gc_content(
     height: usize,
     ylim: usize,
     types: &str,
+    ncpu: usize,
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), Error> {
     let fq_reader = file_reader(fqin).map(fastq::Reader::new)?;
 
+    let gc_hash = Gchash::new();
+    fq_reader.process_parallel(gc_hash.clone(), ncpu)?;
+    let df_hash = gc_hash.glob_hash.lock();
+
     let mut fo = file_writer(output, compression_level, stdout_type)?;
-    let mut df_hash = HashMap::new();
-
-    for rec in fq_reader.records().map_while(Result::ok) {
-        let gc_count = rec
-            .seq()
-            .iter()
-            .filter(|x| *x == &b'G' || *x == &b'C')
-            .count();
-        let gc_ratio = (gc_count as f64 / rec.seq().len() as f64 * 100.0).round() as u64;
-        *df_hash.entry(gc_ratio).or_insert(0) += 1usize;
-    }
-
     fo.write_all("GC(%)\tReads\tRatio(%)\n".as_bytes())?;
     let mut df_ret = vec![]; // data for PNG / SVG
     let mut df_num = vec![]; // data for histogram in terminal

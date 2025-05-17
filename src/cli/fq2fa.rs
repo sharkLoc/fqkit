@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::{fasta, fastq};
 use log::info;
+use paraseq::fastq;
 
 pub fn fq2fa(
     file: Option<&String>,
@@ -10,21 +10,30 @@ pub fn fq2fa(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let mut num = 0usize;
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
+    let mut fq_reader = fastq::Reader::new(file_reader(file)?);
+    let mut rset = fastq::RecordSet::default();
 
-    let mut fo = fasta::Writer::new(file_writer(out, compression_level, stdout_type)?);
-    if remove {
-        for rec in fq_reader.records().map_while(Result::ok) {
+    let mut fa_writer = file_writer(out, compression_level, stdout_type)?;
+
+    while rset.fill(&mut fq_reader)? {
+        for rec in rset.iter().map_while(Result::ok) {
             num += 1;
-            fo.write(rec.id(), None, rec.seq())?;
-        }
-    } else {
-        for rec in fq_reader.records().flatten() {
-            num += 1;
-            fo.write(rec.id(), rec.desc(), rec.seq())?;
+            if remove {
+                let id = rec
+                .id()
+                .splitn(2, |&e| e == b' ')
+                .next()
+                .unwrap();
+                fa_writer.write_all(id)?;
+            } else {
+                fa_writer.write_all(rec.id())?;
+            }
+            fa_writer.write_all(b"\n")?;
+            fa_writer.write_all(rec.seq())?;
+            fa_writer.write_all(b"\n")?;
         }
     }
-    fo.flush()?;
+    fa_writer.flush()?;
 
     info!("total reads number: {}", num);
     Ok(())

@@ -539,6 +539,7 @@ fn run_main() -> Result<(), Error> {
                 height,
                 ylim,
                 &types,
+                arg.threads,
                 arg.compression_level,
                 arg.stdout_type,
             )?;
