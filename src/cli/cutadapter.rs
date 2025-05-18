@@ -1,6 +1,7 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::{fasta, fastq};
-use log::{error, info, warn};
+use bio::io::fasta;
+use log::{error, warn};
+use paraseq::fastq;
 use std::collections::HashMap;
 
 pub fn cut_adapter(
@@ -13,7 +14,6 @@ pub fn cut_adapter(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
-    info!("reading seq from file: {}", seqfile);
 
     let mut seqs = HashMap::new();
     let iters = seqfile_reader.records();
@@ -31,58 +31,67 @@ pub fn cut_adapter(
         std::process::exit(1);
     }
 
-    let fq_reader = file_reader(input).map(fastq::Reader::new)?;
-    let mut fq_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
+    let mut fq_reader = file_reader(input).map(fastq::Reader::new)?;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type)?;
     let mut flag = false;
-    for rec in fq_reader.records().map_while(Result::ok) {
-        let read_len = rec.seq().len();
-        for (_, seq) in seqs.iter() {
-            let pat = seq;
+    let mut rset = fastq::RecordSet::default();
 
-            if read_len >= pat.len() {
-                if left {
-                    let hanming = pat
-                        .iter()
-                        .zip(rec.seq().iter())
-                        .enumerate()
-                        .filter(|(_, (y, z))| y != z)
-                        .count();
-                    if hanming <= miss {
-                        fq_writer.write(
-                            rec.id(),
-                            rec.desc(),
-                            &rec.seq()[pat.len()..],
-                            &rec.qual()[pat.len()..],
-                        )?;
-                        flag = true;
-                        break;
-                    }
-                } else {
-                    let idx = read_len - pat.len();
-                    let hanming = pat
-                        .iter()
-                        .zip(rec.seq()[idx..].iter())
-                        .enumerate()
-                        .filter(|(_, (y, z))| y != z)
-                        .count();
-                    if hanming <= miss {
-                        fq_writer.write(
-                            rec.id(),
-                            rec.desc(),
-                            &rec.seq()[0..idx],
-                            &rec.qual()[0..idx],
-                        )?;
-                        flag = true;
-                        break;
+    while rset.fill(&mut fq_reader)? {
+        for rec in rset.iter().map_while(Result::ok) {
+            let read_len = rec.seq().len();
+
+            for (_, seq) in seqs.iter() {
+                let pat = seq;
+                if read_len >= pat.len() {
+                    if left {
+                        let hanming = pat
+                            .iter()
+                            .zip(rec.seq().iter())
+                            .enumerate()
+                            .filter(|(_, (y, z))| y != z)
+                            .count();
+                        if hanming <= miss {
+                            fq_writer.write_all(rec.id())?;
+                            fq_writer.write_all(b"\n")?;
+                            fq_writer.write_all(&rec.seq()[pat.len()..])?;
+                            fq_writer.write_all(b"\n+\n")?;
+                            fq_writer.write_all(&rec.qual()[pat.len()..])?;
+                            fq_writer.write_all(b"\n")?;
+                            flag = true;
+                            break;
+                        }
+                    } else {
+                        let idx = read_len - pat.len();
+                        let hanming = pat
+                            .iter()
+                            .zip(rec.seq()[idx..].iter())
+                            .enumerate()
+                            .filter(|(_, (y, z))| y != z)
+                            .count();
+                        if hanming <= miss {
+                            fq_writer.write_all(rec.id())?;
+                            fq_writer.write_all(b"\n")?;
+                            fq_writer.write_all(&rec.seq()[0..idx])?;
+                            fq_writer.write_all(b"\n+\n")?;
+                            fq_writer.write_all(&rec.qual()[0..idx])?;
+                            fq_writer.write_all(b"\n")?;
+                            flag = true;
+                            break;
+                        }
                     }
                 }
             }
-        }
-        if flag {
-            flag = false;
-            continue;
-        } else {
-            fq_writer.write_record(&rec)?;
+            if flag {
+                flag = false;
+                continue;
+            } else {
+                fq_writer.write_all(rec.id())?;
+                fq_writer.write_all(b"\n")?;
+                fq_writer.write_all(rec.seq())?;
+                fq_writer.write_all(b"\n+\n")?;
+                fq_writer.write_all(rec.qual())?;
+                fq_writer.write_all(b"\n")?;
+            }
         }
     }
     fq_writer.flush()?;

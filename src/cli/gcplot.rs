@@ -2,13 +2,13 @@ use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use anyhow::Error;
 use log::{error, info};
 use lowcharts::plot;
-use plotters::prelude::*;
 use paraseq::{
     fastq,
     fastx::Record,
     parallel::{ParallelProcessor, ParallelReader, ProcessError},
 };
 use parking_lot::Mutex;
+use plotters::prelude::*;
 use std::collections::HashMap;
 use std::sync::Arc;
 

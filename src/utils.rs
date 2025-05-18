@@ -102,7 +102,7 @@ pub fn file_writer<P>(
     file_out: Option<P>,
     compression_level: u32,
     stdout_format: char,
-) -> Result<Box<dyn Write>, FqkitError>
+) -> Result<Box<dyn Write + Send>, FqkitError>
 where
     P: AsRef<Path> + Copy,
 {
