@@ -1,8 +1,182 @@
-use crate::{errors::FqkitError, utils::*};
-use anyhow::{Ok, Result};
-use bio::io::fastq;
-use crossbeam::channel::bounded;
-use log::{error, info, warn};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use log::{error, info};
+use paraseq::{
+    fastq,
+    fastx::Record,
+    parallel::{PairedParallelProcessor, PairedParallelReader, ProcessError},
+};
+use parking_lot::Mutex;
+use std::{io::Write, sync::Arc};
+
+#[derive(Clone)]
+struct FilterSeq {
+    count_n: usize,
+    length: usize,
+    complexity: usize,
+    average_qual: u8,
+    phred: u8,
+    buffer1: Vec<u8>,
+    buffer2: Vec<u8>,
+    failed_buffer: Vec<u8>,
+    pe_ok: usize,
+    pe_fail: usize,
+    total_pe_ok: Arc<Mutex<usize>>,
+    total_pe_fail: Arc<Mutex<usize>>,
+    writer1: Arc<Mutex<Box<dyn Write + Send>>>,
+    writer2: Arc<Mutex<Box<dyn Write + Send>>>,
+    failed_writer: Option<Arc<Mutex<Box<dyn Write + Send>>>>,
+}
+
+impl FilterSeq {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        count_n: usize,
+        length: usize,
+        complexity: usize,
+        average_qual: u8,
+        phred: u8,
+        buffer1: Vec<u8>,
+        buffer2: Vec<u8>,
+        failed_buffer: Vec<u8>,
+        pe_ok: usize,
+        pe_fail: usize,
+        output1: Box<dyn Write + Send>,
+        output2: Box<dyn Write + Send>,
+        failed_out: Option<Box<dyn Write + Send>>,
+    ) -> Self {
+        Self {
+            count_n,
+            length,
+            complexity,
+            average_qual,
+            phred,
+            buffer1,
+            buffer2,
+            failed_buffer,
+            pe_ok,
+            pe_fail,
+            total_pe_ok: Arc::new(Mutex::new(0)),
+            total_pe_fail: Arc::new(Mutex::new(0)),
+            writer1: Arc::new(Mutex::new(output1)),
+            writer2: Arc::new(Mutex::new(output2)),
+            failed_writer: if let Some(failed_out) = failed_out {
+                Some(Arc::new(Mutex::new(failed_out)))
+            } else {
+                None
+            },
+        }
+    }
+
+    pub fn qc_base_n(&self, seq: &[u8]) -> bool {
+        seq.iter().filter(|v| *v == &b'N').count() <= self.count_n
+    }
+
+    pub fn qc_phread_mean(&self, qual: &[u8]) -> bool {
+        phred_mean(qual, self.phred) >= self.average_qual
+    }
+
+    pub fn qc_length(&self, seq: &[u8]) -> bool {
+        seq.len() >= self.length
+    }
+
+    pub fn qc_complx(&self, seq: &[u8]) -> bool {
+        let complex = seq
+            .iter()
+            .skip(1)
+            .zip(seq.iter())
+            .filter(|(q1, q2)| q1 != q2)
+            .count() as f64
+            / (seq.len() - 1) as f64;
+        complex as usize >= self.complexity
+    }
+
+    pub fn qc_all(&self, seq: &[u8], qual: &[u8]) -> bool {
+        self.qc_base_n(seq)
+            && self.qc_phread_mean(qual)
+            && self.qc_complx(seq)
+            && self.qc_length(seq)
+    }
+
+    pub fn write_record1<Rf: Record>(&mut self, record: Rf) -> std::io::Result<()> {
+        self.buffer1.write_all(b"@")?;
+        self.buffer1.extend_from_slice(record.id());
+        self.buffer1.write_all(b"\n")?;
+        self.buffer1.extend_from_slice(record.seq());
+        self.buffer1.write_all(b"\n+\n")?;
+        self.buffer1.extend_from_slice(record.qual().unwrap());
+        self.buffer1.write_all(b"\n")?;
+        Ok(())
+    }
+
+    pub fn write_record2<Rf: Record>(&mut self, record: Rf) -> std::io::Result<()> {
+        self.buffer2.write_all(b"@")?;
+        self.buffer2.extend_from_slice(record.id());
+        self.buffer2.write_all(b"\n")?;
+        self.buffer2.extend_from_slice(record.seq());
+        self.buffer2.write_all(b"\n+\n")?;
+        self.buffer2.extend_from_slice(record.qual().unwrap());
+        self.buffer2.write_all(b"\n")?;
+        Ok(())
+    }
+
+    pub fn write_record_fail<Rf: Record>(&mut self, record: Rf) -> std::io::Result<()> {
+        self.failed_buffer.write_all(b"@")?;
+        self.failed_buffer.extend_from_slice(record.id());
+        self.failed_buffer.write_all(b"\n")?;
+        self.failed_buffer.extend_from_slice(record.seq());
+        self.failed_buffer.write_all(b"\n+\n")?;
+        self.failed_buffer.extend_from_slice(record.qual().unwrap());
+        self.failed_buffer.write_all(b"\n")?;
+        Ok(())
+    }
+}
+
+impl PairedParallelProcessor for FilterSeq {
+    fn process_record_pair<Rf: Record>(&mut self, rec1: Rf, rec2: Rf) -> Result<(), ProcessError> {
+        if self.qc_all(rec1.seq(), rec1.qual().unwrap())
+            && self.qc_all(rec2.seq(), rec2.qual().unwrap())
+        {
+            self.write_record1(rec1)?;
+            self.write_record2(rec2)?;
+            self.pe_ok += 1;
+        } else {
+            if self.failed_writer.is_some() {
+                self.write_record_fail(rec1)?;
+                self.write_record_fail(rec2)?;
+            }
+            self.pe_fail += 1;
+        }
+        Ok(())
+    }
+
+    fn on_batch_complete(&mut self) -> Result<(), ProcessError> {
+        let mut writer1 = self.writer1.lock();
+        let mut writer2 = self.writer2.lock();
+        let mut pe_ok = self.total_pe_ok.lock();
+        let mut pe_fail = self.total_pe_fail.lock();
+
+        *pe_ok += self.pe_ok;
+        *pe_fail += self.pe_fail;
+
+        writer1.write_all(&self.buffer1)?;
+        writer2.write_all(&self.buffer2)?;
+        writer1.flush()?;
+        writer2.flush()?;
+
+        if let Some(failed_writer) = &self.failed_writer {
+            let mut writer = failed_writer.lock();
+            writer.write_all(&self.failed_buffer)?;
+            writer.flush()?;
+            // rest for next batch
+            self.failed_buffer.clear();
+        }
+
+        // rest for next batch
+        self.buffer1.clear();
+        self.buffer2.clear();
+        Ok(())
+    }
+}
 
 #[allow(clippy::too_many_arguments)]
 pub fn filter_fastq(
@@ -13,196 +187,57 @@ pub fn filter_fastq(
     complexity: u32,
     average_qual: u8,
     phred: u8,
-    chunks: usize,
     ncpu: usize,
-    failed: &String,
+    failed: Option<&String>,
     out1: &String,
     out2: &String,
     compression_level: u32,
     stdout_type: char,
-) -> Result<()> {
-    info!("read forward reads from file: {}", read1);
-    info!("read reverse reads from file: {}", read2);
+) -> Result<(), FqkitError> {
     if ![33u8, 64u8].contains(&phred) {
         error!("{}", FqkitError::InvalidPhredValue);
         std::process::exit(1);
     }
-    info!("output clean read1 file: {}", out1);
-    info!("output clean read2 file: {}", out2);
 
     let fq_reader1 = file_reader(Some(read1)).map(fastq::Reader::new)?;
     let fq_reader2 = file_reader(Some(read2)).map(fastq::Reader::new)?;
-    let mut out_writer1 =
-        file_writer(Some(out1), compression_level, stdout_type).map(fastq::Writer::new)?;
-    let mut out_writer2 =
-        file_writer(Some(out2), compression_level, stdout_type).map(fastq::Writer::new)?;
-    let mut failed_writer =
-        file_writer(Some(failed), compression_level, stdout_type).map(fastq::Writer::new)?;
-    let complex = complexity as usize;
-    let (mut pe_ok, mut pe_fail) = (0usize, 0usize);
+    let out_writer1 = file_writer(Some(out1), compression_level, stdout_type)?;
+    let out_writer2 = file_writer(Some(out2), compression_level, stdout_type)?;
 
-    if ncpu <= 1 {
-        for (rec1, rec2) in fq_reader1
-            .records()
-            .flatten()
-            .zip(fq_reader2.records().map_while(Result::ok))
-        {
-            if rec1.seq().iter().filter(|v| v == &&b'N').count() > nbase
-                || rec2.seq().iter().filter(|v| v == &&b'N').count() > nbase
-            {
-                pe_fail += 1;
-                failed_writer.write_record(&rec1)?;
-                failed_writer.write_record(&rec2)?;
-                continue;
-            }
-            if rec1.seq().len() < length || rec2.seq().len() < length {
-                pe_fail += 1;
-                failed_writer.write_record(&rec1)?;
-                failed_writer.write_record(&rec2)?;
-                continue;
-            }
-            let complx1 = (rec1
-                .seq()
-                .iter()
-                .skip(1)
-                .zip(rec1.seq().iter())
-                .filter(|(q1, q2)| q1 != q2)
-                .count() as f64
-                / rec1.seq().len() as f64
-                * 100.0) as usize;
-            let complx2 = (rec2
-                .seq()
-                .iter()
-                .skip(1)
-                .zip(rec2.seq().iter())
-                .filter(|(q1, q2)| q1 != q2)
-                .count() as f64
-                / rec2.seq().len() as f64
-                * 100.0) as usize;
-            if complx1 < complex || complx2 < complex {
-                pe_fail += 1;
-                failed_writer.write_record(&rec1)?;
-                failed_writer.write_record(&rec2)?;
-                continue;
-            }
-            if phred_mean(rec1.qual(), phred) < average_qual
-                || phred_mean(rec2.qual(), phred) < average_qual
-            {
-                pe_fail += 1;
-                failed_writer.write_record(&rec1)?;
-                failed_writer.write_record(&rec2)?;
-                continue;
-            }
-            pe_ok += 1;
-            out_writer1.write_record(&rec1)?;
-            out_writer2.write_record(&rec2)?;
-        }
+    let failed_writer = if let Some(failed) = failed {
+        Some(file_writer(Some(failed), compression_level, stdout_type)?)
     } else {
-        let mut chunk = chunks;
-        if chunk == 0 {
-            warn!(
-                "pe read conut in chunk can't be: {}, changed to default value.",
-                chunk
-            );
-            chunk = 5000;
-        }
+        None
+    };
 
-        let (tx, rx) = bounded(5000);
-        let mut fq_iter1 = fq_reader1.records();
-        let mut fq_iter2 = fq_reader2.records();
-        loop {
-            let pe_vec: Vec<_> = fq_iter1
-                .by_ref()
-                .take(chunk)
-                .map_while(Result::ok)
-                .zip(fq_iter2.by_ref().take(chunk).map_while(Result::ok))
-                .collect();
-            if pe_vec.is_empty() {
-                break;
-            }
-            tx.send(pe_vec).unwrap();
-        }
-        drop(tx);
+    let complex = complexity as usize;
+    let (pe_ok, pe_fail) = (0usize, 0usize);
+    let buffer1 = vec![];
+    let buffer2 = vec![];
+    let failed_buffer = vec![];
 
-        crossbeam::scope(|s| {
-            let (tx2, rx2) = bounded(5000);
-            let _handles: Vec<_> = (0..ncpu)
-                .map(|_| {
-                    let tx_tmp = tx2.clone();
-                    let rx_tmp = rx.clone();
-                    s.spawn(move |_| {
-                        let mut passed = vec![];
-                        let mut failed = vec![];
-                        for vec_pe in rx_tmp.iter() {
-                            for (rec1, rec2) in vec_pe {
-                                if rec1.seq().iter().filter(|v| v == &&b'N').count() > nbase
-                                    || rec2.seq().iter().filter(|v| v == &&b'N').count() > nbase
-                                {
-                                    failed.push((rec1, rec2));
-                                    continue;
-                                }
-                                if rec1.seq().len() < length || rec2.seq().len() < length {
-                                    failed.push((rec1, rec2));
-                                    continue;
-                                }
-                                let complx1 = (rec1
-                                    .seq()
-                                    .iter()
-                                    .skip(1)
-                                    .zip(rec1.seq().iter())
-                                    .filter(|(q1, q2)| q1 != q2)
-                                    .count() as f64
-                                    / rec1.seq().len() as f64
-                                    * 100.0) as usize;
-                                let complx2 = (rec2
-                                    .seq()
-                                    .iter()
-                                    .skip(1)
-                                    .zip(rec2.seq().iter())
-                                    .filter(|(q1, q2)| q1 != q2)
-                                    .count() as f64
-                                    / rec2.seq().len() as f64
-                                    * 100.0) as usize;
-                                if complx1 < complex || complx2 < complex {
-                                    failed.push((rec1, rec2));
-                                    continue;
-                                }
-                                if phred_mean(rec1.qual(), phred) < average_qual
-                                    || phred_mean(rec2.qual(), phred) < average_qual
-                                {
-                                    failed.push((rec1, rec2));
-                                    continue;
-                                }
-                                passed.push((rec1, rec2));
-                            }
-                        }
-                        tx_tmp.send((passed, failed)).unwrap();
-                    });
-                })
-                .collect();
-            drop(tx2);
+    let filters = FilterSeq::new(
+        nbase,
+        length,
+        complex,
+        average_qual,
+        phred,
+        buffer1,
+        buffer2,
+        failed_buffer,
+        pe_ok,
+        pe_fail,
+        out_writer1,
+        out_writer2,
+        failed_writer,
+    );
+    // run the filter
+    fq_reader1.process_parallel_paired(fq_reader2, filters.clone(), ncpu)?;
 
-            for (vec_pass, vec_failed) in rx2.iter() {
-                for (rec1, rec2) in vec_pass {
-                    pe_ok += 1;
-                    out_writer1.write_record(&rec1).unwrap();
-                    out_writer2.write_record(&rec2).unwrap();
-                }
-                for (rec1, rec2) in vec_failed.iter() {
-                    pe_fail += 1;
-                    failed_writer.write_record(rec1).unwrap();
-                    failed_writer.write_record(rec2).unwrap();
-                }
-            }
-        })
-        .unwrap();
-    }
-    out_writer1.flush()?;
-    out_writer2.flush()?;
-    failed_writer.flush()?;
-
-    info!("total clean pe reads number (r1+r2): {}", pe_ok * 2);
-    info!("total failed pe reads number (r1+r2): {}", pe_fail * 2);
+    let pe_ok = filters.total_pe_ok.lock();
+    let pe_fail = filters.total_pe_fail.lock();
+    info!("total clean pe reads number (r1+r2): {}", *pe_ok * 2);
+    info!("total failed pe reads number (r1+r2): {}", *pe_fail * 2);
     Ok(())
 }
 

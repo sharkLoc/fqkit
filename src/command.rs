@@ -227,12 +227,9 @@ pub enum Subcli {
         ///phred score 33 or 64
         #[arg(short = 'p', long = "phred", default_value_t = 33, value_name = "INT")]
         phred: u8,
-        /// the number of reads in the chunk on each thread
-        #[arg(short, long, default_value_t = 5000, value_name = "INT")]
-        chunk: usize,
-        /// specify the file to store reads(interleaved) that cannot pass the filters, file ending in .gz/.bz2/.xz will be compressed automatically
+        /// if set, specify the file to store reads(interleaved) that cannot pass the filters, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'u', long = "failed", value_name = "FILE")]
-        failed: String,
+        failed: Option<String>,
         /// output pass filtered  forward(read1) fastq file name,  file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'f', long = "out1", value_name = "FILE")]
         out1: String,
