@@ -174,6 +174,8 @@ impl PairedParallelProcessor for FilterSeq {
         // rest for next batch
         self.buffer1.clear();
         self.buffer2.clear();
+        self.pe_ok = 0;
+        self.pe_fail = 0;
         Ok(())
     }
 }
