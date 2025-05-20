@@ -168,7 +168,7 @@ where
 pub fn file_writer_append<P>(
     file_out: P,
     compression_level: u32,
-) -> Result<Box<dyn Write>, FqkitError>
+) -> Result<Box<dyn Write + Send>, FqkitError>
 where
     P: AsRef<Path> + Copy,
 {

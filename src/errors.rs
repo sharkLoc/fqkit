@@ -12,6 +12,9 @@ pub enum FqkitError {
     #[error("Invalid output dir: {0}")]
     InvalidOutputDir(String),
 
+    #[error("EmptyQualRecord")]
+    EmptyQualRecord,
+
     #[error("ThreadPoolBuildError error")]
     ThreadPoolBuildError(#[from] rayon::ThreadPoolBuildError),
 

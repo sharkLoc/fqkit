@@ -16,7 +16,6 @@ fn barcode_list(file: &String, rev_comp: bool) -> Result<HashMap<String, String>
     let mut maps = HashMap::new();
     let mut error_flag = "";
     let fp = file_reader(Some(file))?;
-    info!("reading from barcode list file: {}", file);
 
     if rev_comp {
         for line in fp.lines().map_while(Result::ok) {

@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::{fastq, fastq::Record};
-use log::{info, trace};
+use paraseq::{fastq, fastx::Record};
+use log::{info, debug};
 
 pub fn mask_fastq(
     file: Option<&String>,
@@ -12,34 +12,47 @@ pub fn mask_fastq(
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let (mut mask_base, mut mask_read) = (0, 0);
-    let fp_reader = file_reader(file).map(fastq::Reader::new)?;
+    let mut fq_reader = file_reader(file).map(fastq::Reader::new)?;
 
     info!("low quality value： {}", qual_limit);
     info!("mask low quality bases with: {}", nt);
 
-    let mut fp_writer = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
-    for rec in fp_reader.records().map_while(Result::ok) {
-        let score_min = rec.qual().iter().min().unwrap() - phred;
-        if score_min > qual_limit {
-            fp_writer.write_record(&rec)?;
-        } else {
-            trace!("mask read record id: {}", rec.id());
-            mask_read += 1;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type)?;
+    let mut rset = fastq::RecordSet::default();
 
-            let mut seq = String::new();
-            for (s, q) in rec.seq().iter().zip(rec.qual().iter()) {
-                if q - phred <= qual_limit {
-                    seq.push(nt);
-                    mask_base += 1;
-                } else {
-                    seq.push(*s as char);
+    while rset.fill(&mut fq_reader)? {
+        for rec in rset.iter().map_while(Result::ok) {
+            let score_min = rec.qual().iter().min().ok_or(FqkitError::EmptyQualRecord)? - phred;
+            if score_min > qual_limit {
+                fq_writer.write_all(rec.id())?;
+                fq_writer.write_all(b"\n")?;
+                fq_writer.write_all(rec.seq())?;
+                fq_writer.write_all(b"\n+\n")?;
+                fq_writer.write_all(rec.qual())?;
+                fq_writer.write_all(b"\n")?;
+            } else {
+                debug!("mask read record id: {}", rec.id_str());
+                mask_read += 1;
+
+                let mut seq = Vec::with_capacity(rec.seq().len());
+                for (s, q) in rec.seq().iter().zip(rec.qual().iter()) {
+                    if q - phred <= qual_limit {
+                        seq.push(nt as u8);
+                        mask_base += 1;
+                    } else {
+                        seq.push(*s);
+                    }
                 }
+                fq_writer.write_all(rec.id())?;
+                fq_writer.write_all(b"\n")?;
+                fq_writer.write_all(seq.as_slice())?;
+                fq_writer.write_all(b"\n+\n")?;
+                fq_writer.write_all(rec.qual())?;
+                fq_writer.write_all(b"\n")?;
             }
-            let record = Record::with_attrs(rec.id(), rec.desc(), seq.as_bytes(), rec.qual());
-            fp_writer.write_record(&record)?;
         }
     }
-    fp_writer.flush()?;
+    fq_writer.flush()?;
 
     info!("total mask {} bases from {} reads", mask_base, mask_read);
     Ok(())
