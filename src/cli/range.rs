@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use paraseq::fastq;
 use log::info;
+use paraseq::fastq;
 
 pub fn range_fastq(
     input: Option<&String>,

@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use paraseq::fastq;
 use log::info;
+use paraseq::fastq;
 
 pub fn interleaved(
     file1: &String,
@@ -38,7 +38,6 @@ pub fn interleaved(
             fq_writer.write_all(b"\n")?;
         }
     }
-    
 
     fq_writer.flush()?;
 

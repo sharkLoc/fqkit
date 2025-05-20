@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use log::{debug, info};
 use paraseq::{fastq, fastx::Record};
-use log::{info, debug};
 
 pub fn mask_fastq(
     file: Option<&String>,
