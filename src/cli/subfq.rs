@@ -1,6 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fastq;
 use log::{error, info};
+use paraseq::{fastq, fastx::Record};
 use rand::{Rng, prelude::*};
 use rand_pcg::Pcg64;
 
@@ -16,31 +16,45 @@ fn select_fastq(
     let mut rng: rand_pcg::Lcg128Xsl64 = Pcg64::seed_from_u64(seed);
     let mut get: Vec<usize> = Vec::with_capacity(n);
 
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
+    let mut fq_reader = fastq::Reader::new(file_reader(file)?);
     info!("rand seed: {}", seed);
     info!("subseq number: {}", n);
     info!("reduce much memory but cost more time");
-
-    for (order, _) in fq_reader.records().map_while(Result::ok).enumerate() {
-        if order < n {
-            get.push(order);
-        } else {
-            let ret = rng.random_range(0..=order);
-            if ret < n {
-                get[ret] = order;
+    let mut rset = fastq::RecordSet::default();
+    let mut order: usize = 0;
+    while rset.fill(&mut fq_reader)? {
+        for _ in rset.iter().map_while(Result::ok) {
+            order += 1;
+            if order < n {
+                get.push(order);
+            } else {
+                let ret = rng.random_range(0..=order);
+                if ret < n {
+                    get[ret] = order;
+                }
             }
         }
     }
 
-    let fo = file_writer(out, compression_level, stdout_type)?;
-    let mut w = fastq::Writer::new(fo);
-    let fq_reader2 = fastq::Reader::new(file_reader(file)?);
-    for (order, rec) in fq_reader2.records().map_while(Result::ok).enumerate() {
-        if get.contains(&order) {
-            w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type)?;
+    let mut fq_reader2 = fastq::Reader::new(file_reader(file)?);
+    let mut rset2 = fastq::RecordSet::default();
+    let mut order2: usize = 0;
+
+    while rset2.fill(&mut fq_reader2)? {
+        for rec in rset2.iter().map_while(Result::ok) {
+            order2 += 1;
+            if get.contains(&order2) {
+                fq_writer.write_all(rec.id())?;
+                fq_writer.write_all(b"\n")?;
+                fq_writer.write_all(rec.sep())?;
+                fq_writer.write_all(b"\n+\n")?;
+                fq_writer.write_all(rec.qual())?;
+                fq_writer.write_all(b"\n")?;
+            }
         }
     }
-    w.flush()?;
+    fq_writer.flush()?;
 
     Ok(())
 }
@@ -54,36 +68,41 @@ fn select_fastq2(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
-    if let Some(file) = file {
-        info!("reading from file: {}", file);
-    } else {
-        info!("reading from stdin");
-    }
     info!("rand seed: {}", seed);
     info!("subseq num: {}", n);
     info!("fast mode but cost more memory");
 
     let mut rng = Pcg64::seed_from_u64(seed);
-    let mut get: Vec<fastq::Record> = Vec::with_capacity(n);
+    let mut get = Vec::with_capacity(n);
 
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-    for (order, rec) in fq_reader.records().map_while(Result::ok).enumerate() {
-        if order < n {
-            get.push(rec);
-        } else {
-            let ret = rng.random_range(0..=order);
-            if ret < n {
-                get[ret] = rec;
+    let mut fq_reader = fastq::Reader::new(file_reader(file)?);
+    let mut rset = fastq::RecordSet::default();
+    let mut order: usize = 0;
+    while rset.fill(&mut fq_reader)? {
+        for rec in rset.iter().map_while(Result::ok) {
+            order += 1;
+            if order < n {
+                let rec_t= vec![rec.id_str().to_owned(),rec.seq_str().to_owned(), rec.qual_str().to_owned()];
+                get.push(rec_t);
+            } else {
+                let ret = rng.random_range(0..=order);
+                if ret < n {
+                    get[ret] = vec![rec.id_str().to_owned(),rec.seq_str().to_owned(), rec.qual_str().to_owned()];
+                }
             }
         }
     }
 
-    let fo = file_writer(out, compression_level, stdout_type)?;
-    let mut w = fastq::Writer::new(fo);
-    for rec in get {
-        w.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+    let mut fq_writer = file_writer(out, compression_level, stdout_type)?;
+    for rec in get.iter() {
+        fq_writer.write_all(rec[0].as_bytes())?;
+        fq_writer.write_all(b"\n")?;
+        fq_writer.write_all(rec[1].as_bytes())?;
+        fq_writer.write_all(b"\n+\n")?;
+        fq_writer.write_all(rec[2].as_bytes())?;
+        fq_writer.write_all(b"\n")?;
     }
-    w.flush()?;
+    fq_writer.flush()?;
 
     Ok(())
 }
