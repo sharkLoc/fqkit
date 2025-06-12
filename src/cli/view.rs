@@ -56,6 +56,5 @@ pub fn view_fq(
             }
         }
     }
-
     Ok(())
 }
