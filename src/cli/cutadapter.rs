@@ -1,5 +1,5 @@
-use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use super::misc::write_record;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use bio::io::fasta;
 use log::{error, warn};
 use paraseq::fastq;
@@ -52,7 +52,12 @@ pub fn cut_adapter(
                             .filter(|(_, (y, z))| y != z)
                             .count();
                         if hanming <= miss {
-                            write_record(&mut fq_writer, rec.id(), &rec.seq()[pat.len()..], &rec.qual()[pat.len()..])?;
+                            write_record(
+                                &mut fq_writer,
+                                rec.id(),
+                                &rec.seq()[pat.len()..],
+                                &rec.qual()[pat.len()..],
+                            )?;
                             flag = true;
                             break;
                         }
@@ -65,7 +70,12 @@ pub fn cut_adapter(
                             .filter(|(_, (y, z))| y != z)
                             .count();
                         if hanming <= miss {
-                            write_record(&mut fq_writer, rec.id(), &rec.seq()[0..idx], &rec.qual()[0..idx])?;
+                            write_record(
+                                &mut fq_writer,
+                                rec.id(),
+                                &rec.seq()[0..idx],
+                                &rec.qual()[0..idx],
+                            )?;
                             flag = true;
                             break;
                         }

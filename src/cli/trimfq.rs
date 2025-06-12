@@ -1,5 +1,5 @@
-use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use super::misc::write_record;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use log::warn;
 use paraseq::{fastq, fastx::Record};
 

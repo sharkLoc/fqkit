@@ -1,5 +1,5 @@
-use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use super::misc::write_record;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use log::{error, info};
 use paraseq::{
     fastq,
@@ -99,7 +99,12 @@ impl FilterSeq {
     }
 
     pub fn write_record1<Rf: Record>(&mut self, record: Rf) -> std::io::Result<()> {
-        write_record(&mut  self.buffer1, record.id(), record.seq(), record.qual().unwrap())?;
+        write_record(
+            &mut self.buffer1,
+            record.id(),
+            record.seq(),
+            record.qual().unwrap(),
+        )?;
         // self.buffer1.write_all(b"@")?;
         // self.buffer1.extend_from_slice(record.id());
         // self.buffer1.write_all(b"\n")?;
@@ -111,7 +116,12 @@ impl FilterSeq {
     }
 
     pub fn write_record2<Rf: Record>(&mut self, record: Rf) -> std::io::Result<()> {
-        write_record(&mut  self.buffer2, record.id(), record.seq(), record.qual().unwrap())?;
+        write_record(
+            &mut self.buffer2,
+            record.id(),
+            record.seq(),
+            record.qual().unwrap(),
+        )?;
         // self.buffer2.write_all(b"@")?;
         // self.buffer2.extend_from_slice(record.id());
         // self.buffer2.write_all(b"\n")?;
@@ -123,7 +133,12 @@ impl FilterSeq {
     }
 
     pub fn write_record_fail<Rf: Record>(&mut self, record: Rf) -> std::io::Result<()> {
-        write_record(&mut  self.failed_buffer, record.id(), record.seq(), record.qual().unwrap())?;
+        write_record(
+            &mut self.failed_buffer,
+            record.id(),
+            record.seq(),
+            record.qual().unwrap(),
+        )?;
         // self.failed_buffer.write_all(b"@")?;
         // self.failed_buffer.extend_from_slice(record.id());
         // self.failed_buffer.write_all(b"\n")?;
