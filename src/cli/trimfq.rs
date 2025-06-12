@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use log::warn;
 use paraseq::{fastq, fastx::Record};
 
@@ -35,12 +36,7 @@ pub fn trim_fq(
             if seq.len() < len {
                 continue;
             }
-            fq_writer.write_all(rec.id())?;
-            fq_writer.write_all(b"\n")?;
-            fq_writer.write_all(seq)?;
-            fq_writer.write_all(b"\n+\n")?;
-            fq_writer.write_all(qual)?;
-            fq_writer.write_all(b"\n")?;
+            write_record(&mut fq_writer, rec.id(), seq, qual)?;
         }
     }
     // Flush the writer to ensure all data is written

@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use log::error;
 use paraseq::fastq;
 
@@ -44,12 +45,7 @@ pub fn phred_score(
                     qual.push(q + 31);
                 }
             }
-            fq_writer.write_all(rec.id())?;
-            fq_writer.write_all(b"\n")?;
-            fq_writer.write_all(rec.seq())?;
-            fq_writer.write_all(b"\n+\n")?;
-            fq_writer.write_all(&qual)?;
-            fq_writer.write_all(b"\n")?;
+            write_record(&mut fq_writer, rec.id(), rec.seq(), &qual)?;
         }
     }
     fq_writer.flush()?;

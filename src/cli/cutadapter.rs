@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use bio::io::fasta;
 use log::{error, warn};
 use paraseq::fastq;
@@ -51,12 +52,7 @@ pub fn cut_adapter(
                             .filter(|(_, (y, z))| y != z)
                             .count();
                         if hanming <= miss {
-                            fq_writer.write_all(rec.id())?;
-                            fq_writer.write_all(b"\n")?;
-                            fq_writer.write_all(&rec.seq()[pat.len()..])?;
-                            fq_writer.write_all(b"\n+\n")?;
-                            fq_writer.write_all(&rec.qual()[pat.len()..])?;
-                            fq_writer.write_all(b"\n")?;
+                            write_record(&mut fq_writer, rec.id(), &rec.seq()[pat.len()..], &rec.qual()[pat.len()..])?;
                             flag = true;
                             break;
                         }
@@ -69,12 +65,7 @@ pub fn cut_adapter(
                             .filter(|(_, (y, z))| y != z)
                             .count();
                         if hanming <= miss {
-                            fq_writer.write_all(rec.id())?;
-                            fq_writer.write_all(b"\n")?;
-                            fq_writer.write_all(&rec.seq()[0..idx])?;
-                            fq_writer.write_all(b"\n+\n")?;
-                            fq_writer.write_all(&rec.qual()[0..idx])?;
-                            fq_writer.write_all(b"\n")?;
+                            write_record(&mut fq_writer, rec.id(), &rec.seq()[0..idx], &rec.qual()[0..idx])?;
                             flag = true;
                             break;
                         }
@@ -85,12 +76,7 @@ pub fn cut_adapter(
                 flag = false;
                 continue;
             } else {
-                fq_writer.write_all(rec.id())?;
-                fq_writer.write_all(b"\n")?;
-                fq_writer.write_all(rec.seq())?;
-                fq_writer.write_all(b"\n+\n")?;
-                fq_writer.write_all(rec.qual())?;
-                fq_writer.write_all(b"\n")?;
+                write_record(&mut fq_writer, rec.id(), rec.seq(), rec.qual())?;
             }
         }
     }

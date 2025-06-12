@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use log::info;
 use paraseq::fastq;
 
@@ -21,12 +22,7 @@ pub fn top_n_records(
             if count >= number {
                 break 'outer;
             }
-            fq_writer.write_all(rec.id())?;
-            fq_writer.write_all(b"\n")?;
-            fq_writer.write_all(rec.seq())?;
-            fq_writer.write_all(b"\n+\n")?;
-            fq_writer.write_all(rec.qual())?;
-            fq_writer.write_all(b"\n")?;
+            write_record(&mut fq_writer, rec.id(), rec.seq(), rec.qual())?;
             count += 1;
         }
     }

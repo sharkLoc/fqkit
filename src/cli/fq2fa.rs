@@ -18,6 +18,7 @@ pub fn fq2fa(
     while rset.fill(&mut fq_reader)? {
         for rec in rset.iter().map_while(Result::ok) {
             num += 1;
+            fa_writer.write_all(b">")?;
             if remove {
                 let id = rec.id().splitn(2, |&e| e == b' ').next().unwrap();
                 fa_writer.write_all(id)?;

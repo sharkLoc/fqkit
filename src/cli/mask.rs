@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use  super::misc::write_record;
 use log::{debug, info};
 use paraseq::{fastq, fastx::Record};
 
@@ -24,12 +25,7 @@ pub fn mask_fastq(
         for rec in rset.iter().map_while(Result::ok) {
             let score_min = rec.qual().iter().min().ok_or(FqkitError::EmptyQualRecord)? - phred;
             if score_min > qual_limit {
-                fq_writer.write_all(rec.id())?;
-                fq_writer.write_all(b"\n")?;
-                fq_writer.write_all(rec.seq())?;
-                fq_writer.write_all(b"\n+\n")?;
-                fq_writer.write_all(rec.qual())?;
-                fq_writer.write_all(b"\n")?;
+                write_record(&mut fq_writer, rec.id(), rec.seq(), rec.qual())?;
             } else {
                 debug!("mask read record id: {}", rec.id_str());
                 mask_read += 1;
@@ -43,12 +39,7 @@ pub fn mask_fastq(
                         seq.push(*s);
                     }
                 }
-                fq_writer.write_all(rec.id())?;
-                fq_writer.write_all(b"\n")?;
-                fq_writer.write_all(seq.as_slice())?;
-                fq_writer.write_all(b"\n+\n")?;
-                fq_writer.write_all(rec.qual())?;
-                fq_writer.write_all(b"\n")?;
+                write_record(&mut fq_writer, rec.id(), seq.as_slice(), rec.qual())?;
             }
         }
     }

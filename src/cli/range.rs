@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use log::info;
 use paraseq::fastq;
 
@@ -27,12 +28,7 @@ pub fn range_fastq(
                 continue;
             }
             if taken < take {
-                fq_writer.write_all(rec.id())?;
-                fq_writer.write_all(b"\n")?;
-                fq_writer.write_all(rec.seq())?;
-                fq_writer.write_all(b"\n+\n")?;
-                fq_writer.write_all(rec.qual())?;
-                fq_writer.write_all(b"\n")?;
+                write_record(&mut fq_writer, rec.id(), rec.seq(), rec.qual())?;
                 taken += 1;
             }
             if taken >= take {

@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use log::info;
 use paraseq::fastq;
 
@@ -23,19 +24,8 @@ pub fn interleaved(
             .zip(rset2.iter().map_while(Result::ok))
         {
             num += 2;
-            fq_writer.write_all(rec1.id())?;
-            fq_writer.write_all(b"\n")?;
-            fq_writer.write_all(rec1.seq())?;
-            fq_writer.write_all(b"\n+\n")?;
-            fq_writer.write_all(rec1.qual())?;
-            fq_writer.write_all(b"\n")?;
-
-            fq_writer.write_all(rec2.id())?;
-            fq_writer.write_all(b"\n")?;
-            fq_writer.write_all(rec2.seq())?;
-            fq_writer.write_all(b"\n+\n")?;
-            fq_writer.write_all(rec2.qual())?;
-            fq_writer.write_all(b"\n")?;
+            write_record(&mut fq_writer, rec1.id(), rec1.seq(), rec1.qual())?;
+            write_record(&mut fq_writer, rec2.id(), rec2.seq(), rec2.qual())?;
         }
     }
 

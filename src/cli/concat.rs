@@ -1,4 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use log::{error, info};
 use paraseq::fastq;
 use std::io::BufRead;
@@ -51,19 +52,8 @@ pub fn concat_fqstq_lane(
                 .zip(rset2.iter().map_while(Result::ok))
             {
                 pe_read += 1;
-                out_writer1.write_all(rec1.id())?;
-                out_writer1.write_all(b"\n")?;
-                out_writer1.write_all(rec1.seq())?;
-                out_writer1.write_all(b"\n+\n")?;
-                out_writer1.write_all(rec1.qual())?;
-                out_writer1.write_all(b"\n")?;
-
-                out_writer2.write_all(rec2.id())?;
-                out_writer2.write_all(b"\n")?;
-                out_writer2.write_all(rec2.seq())?;
-                out_writer2.write_all(b"\n+\n")?;
-                out_writer2.write_all(rec2.qual())?;
-                out_writer2.write_all(b"\n")?;
+                write_record(&mut out_writer1, rec1.id(), rec1.seq(), rec1.qual())?;
+                write_record(&mut out_writer2, rec2.id(), rec2.seq(), rec2.qual())?;
             }
         }
         out_writer1.flush()?;

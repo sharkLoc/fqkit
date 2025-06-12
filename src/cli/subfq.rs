@@ -1,8 +1,10 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
+use super::misc::write_record;
 use log::{error, info};
 use paraseq::{fastq, fastx::Record};
 use rand::{Rng, prelude::*};
 use rand_pcg::Pcg64;
+// use std::collections::HashSet;
 
 // reduce much memory but cost more time
 fn select_fastq(
@@ -15,6 +17,11 @@ fn select_fastq(
 ) -> Result<(), FqkitError> {
     let mut rng: rand_pcg::Lcg128Xsl64 = Pcg64::seed_from_u64(seed);
     let mut get: Vec<usize> = Vec::with_capacity(n);
+    // let mut get: HashSet<usize> = HashSet::with_capacity(n);
+    if n == 0 {
+        error!("n must be greater than 0");
+        std::process::exit(1);
+    }
 
     let mut fq_reader = fastq::Reader::new(file_reader(file)?);
     info!("rand seed: {}", seed);
@@ -24,7 +31,6 @@ fn select_fastq(
     let mut order: usize = 0;
     while rset.fill(&mut fq_reader)? {
         for _ in rset.iter().map_while(Result::ok) {
-            order += 1;
             if order < n {
                 get.push(order);
             } else {
@@ -33,6 +39,7 @@ fn select_fastq(
                     get[ret] = order;
                 }
             }
+            order += 1;
         }
     }
 
@@ -43,15 +50,10 @@ fn select_fastq(
 
     while rset2.fill(&mut fq_reader2)? {
         for rec in rset2.iter().map_while(Result::ok) {
-            order2 += 1;
             if get.contains(&order2) {
-                fq_writer.write_all(rec.id())?;
-                fq_writer.write_all(b"\n")?;
-                fq_writer.write_all(rec.sep())?;
-                fq_writer.write_all(b"\n+\n")?;
-                fq_writer.write_all(rec.qual())?;
-                fq_writer.write_all(b"\n")?;
+                write_record(&mut fq_writer, rec.id(), rec.seq(), rec.qual())?;
             }
+            order2 += 1;
         }
     }
     fq_writer.flush()?;
@@ -74,13 +76,16 @@ fn select_fastq2(
 
     let mut rng = Pcg64::seed_from_u64(seed);
     let mut get = Vec::with_capacity(n);
+     if n == 0 {
+        error!("n must be greater than 0");
+        std::process::exit(1);
+    }
 
     let mut fq_reader = fastq::Reader::new(file_reader(file)?);
     let mut rset = fastq::RecordSet::default();
     let mut order: usize = 0;
     while rset.fill(&mut fq_reader)? {
         for rec in rset.iter().map_while(Result::ok) {
-            order += 1;
             if order < n {
                 let rec_t= vec![rec.id_str().to_owned(),rec.seq_str().to_owned(), rec.qual_str().to_owned()];
                 get.push(rec_t);
@@ -90,17 +95,13 @@ fn select_fastq2(
                     get[ret] = vec![rec.id_str().to_owned(),rec.seq_str().to_owned(), rec.qual_str().to_owned()];
                 }
             }
+            order += 1;
         }
     }
 
     let mut fq_writer = file_writer(out, compression_level, stdout_type)?;
     for rec in get.iter() {
-        fq_writer.write_all(rec[0].as_bytes())?;
-        fq_writer.write_all(b"\n")?;
-        fq_writer.write_all(rec[1].as_bytes())?;
-        fq_writer.write_all(b"\n+\n")?;
-        fq_writer.write_all(rec[2].as_bytes())?;
-        fq_writer.write_all(b"\n")?;
+        write_record(&mut fq_writer, rec[0].as_bytes(),rec[1].as_bytes(), rec[2].as_bytes())?
     }
     fq_writer.flush()?;
 
