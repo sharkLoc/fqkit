@@ -1,6 +1,7 @@
+use super::misc::write_record;
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fastq;
 use log::*;
+use paraseq::fastq;
 use std::path::PathBuf;
 
 #[allow(clippy::too_many_arguments)]
@@ -32,53 +33,45 @@ pub fn split_chunk(
 
     let (mut flag, mut index) = (0usize, 0usize);
     let out = if gzip {
-        //format!("{}/{}{}.fastq.gz", out_dir, out_pre, index)
         PathBuf::from(out_dir).join(format!("{}{}.fq.gz", out_pre, index))
     } else if bzip2 {
-        //format!("{}/{}{}.fastq.bz2", out_dir, out_pre, index)
         PathBuf::from(out_dir).join(format!("{}{}.fq.bz2", out_pre, index))
     } else if xz {
-        //format!("{}/{}{}.fastq.xz", out_dir, out_pre, index)
         PathBuf::from(out_dir).join(format!("{}{}.fq.xz", out_pre, index))
     } else {
-        //format!("{}/{}{}.fastq", out_dir, out_pre, index)
         PathBuf::from(out_dir).join(format!("{}{}.fq", out_pre, index))
     };
 
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-    let mut fh = vec![fastq::Writer::new(file_writer(
-        Some(&out),
-        compression_level,
-        stdout_type,
-    )?)];
+    let mut fq_reader = fastq::Reader::new(file_reader(file)?);
+    let mut rest = fastq::RecordSet::default();
+    let mut fh = vec![file_writer(Some(&out), compression_level, stdout_type)?];
 
-    info!("start to write file: {:?}", out);
-    for rec in fq_reader.records().map_while(Result::ok) {
-        if flag < num {
-            let fhthis = fh.get_mut(index).unwrap();
-            fhthis.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-            flag += 1;
-        } else {
-            index += 1;
-            let out = if gzip {
-                PathBuf::from(out_dir).join(format!("{}{}.fq.gz", out_pre, index))
-            } else if bzip2 {
-                PathBuf::from(out_dir).join(format!("{}{}.fq.bz2", out_pre, index))
-            } else if xz {
-                PathBuf::from(out_dir).join(format!("{}{}.fq.xz", out_pre, index))
+    info!("start to write file: {}", out.display());
+    while rest.fill(&mut fq_reader)? {
+        for rec in rest.iter().map_while(Result::ok) {
+            if flag < num {
+                let mut this_writer = fh.get_mut(index).unwrap();
+                write_record(&mut this_writer, rec.id(), rec.seq(), rec.qual())?;
+                flag += 1;
             } else {
-                PathBuf::from(out_dir).join(format!("{}{}.fq", out_pre, index))
-            };
-            fh.push(fastq::Writer::new(file_writer(
-                Some(&out),
-                compression_level,
-                stdout_type,
-            )?));
-            let fhthis = fh.get_mut(index).unwrap();
+                index += 1;
+                let out = if gzip {
+                    PathBuf::from(out_dir).join(format!("{}{}.fq.gz", out_pre, index))
+                } else if bzip2 {
+                    PathBuf::from(out_dir).join(format!("{}{}.fq.bz2", out_pre, index))
+                } else if xz {
+                    PathBuf::from(out_dir).join(format!("{}{}.fq.xz", out_pre, index))
+                } else {
+                    PathBuf::from(out_dir).join(format!("{}{}.fq", out_pre, index))
+                };
 
-            info!("start to write file: {:?}", out);
-            fhthis.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-            flag = 1; // already write one record in this loop, flag add one
+                fh.push(file_writer(Some(&out), compression_level, stdout_type)?);
+                let mut fhthis = fh.get_mut(index).unwrap();
+
+                info!("start to write file: {:?}", out);
+                write_record(&mut fhthis, rec.id(), rec.seq(), rec.qual())?;
+                flag = 1; // already write one record in this loop, flag add one
+            }
         }
     }
 

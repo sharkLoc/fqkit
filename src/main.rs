@@ -50,16 +50,10 @@ fn run_main() -> Result<(), Error> {
                 arg.stdout_type,
             )?;
         }
-        Subcli::tail {
-            input,
-            num,
-            rdc,
-            out,
-        } => {
+        Subcli::tail { input, num, out } => {
             tail_n_records(
                 input.as_ref(),
                 num,
-                rdc,
                 out.as_ref(),
                 arg.compression_level,
                 arg.stdout_type,

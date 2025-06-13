@@ -100,7 +100,7 @@ pub enum Subcli {
     },
     /// get last N records from fastq file
     #[command(
-        before_help = "note: if the -r parameter is not specified, all data will be read into memory"
+        before_help = "note: read files twice to reduce much memory but cost more time, can't use in Stream"
     )]
     tail {
         /// input fastq file, or read from stdin
@@ -108,9 +108,6 @@ pub enum Subcli {
         /// print last N fastq records
         #[arg(short = 'n', long = "num", default_value_t = 10, value_name = "INT")]
         num: usize,
-        /// read files twice to reduce much memory but cost more time, can't use in Stream
-        #[arg(short = 'r', long = "rdc", help_heading = Some("FLAGS"))]
-        rdc: bool,
         /// output fastq file name or write to stdout, files ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,
