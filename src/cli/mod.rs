@@ -1,5 +1,4 @@
 pub mod barcode;
-pub mod check;
 pub mod concat;
 pub mod cutadapter;
 pub mod filter;

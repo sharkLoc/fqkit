@@ -11,7 +11,7 @@ mod utils;
 use command::*;
 mod cli;
 use cli::{
-    barcode::*, check::*, concat::*, cutadapter::*, filter::*, flatten::*, fq2fa::*, fq2sam::*,
+    barcode::*, concat::*, cutadapter::*, filter::*, flatten::*, fq2fa::*, fq2sam::*,
     fqscore::*, gcplot::*, grep::*, join::*, kmer::*, length::*, mask::*, merge::*, plot::*,
     range::*, remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*,
     slide::*, sort::*, split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*,
@@ -252,15 +252,6 @@ fn run_main() -> Result<(), Error> {
         } => {
             let df = cycle_data(Some(&data))?;
             let _x = plot_line(df, show, prefix, width, height, ylim, &types);
-        }
-        Subcli::check { input, save, out } => {
-            check_fastq(
-                input.as_ref(),
-                save,
-                out.as_ref(),
-                arg.compression_level,
-                arg.stdout_type,
-            )?;
         }
         Subcli::stats {
             input,

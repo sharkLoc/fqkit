@@ -554,23 +554,6 @@ pub enum Subcli {
         #[arg(short = 'o', long = "outdir", default_value_t = String::from(".") ,value_name = "DIR")]
         outdir: String,
     },
-    /// check the validity of a fastq record
-    #[command(
-        before_help = "note: this function will return an Err if one of the following conditions is met\n
-      1. the record identifier is empty.
-      2. there is a non-ASCII character found in either the sequence or quality strings.
-      3. the sequence and quality strings do not have the same length.\n"
-    )]
-    check {
-        /// input fastq file, or read from stdin
-        input: Option<String>,
-        /// if set, just save correct reads
-        #[arg(short = 's', long = "save", help_heading = Some("FLAGS"))]
-        save: bool,
-        /// output file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
-        #[arg(short = 'o', long = "out", value_name = "FILE")]
-        out: Option<String>,
-    },
     /// remove reads by read name.
     remove {
         /// input fastq file, or read from stdin

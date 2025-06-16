@@ -1,7 +1,7 @@
-use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use super::misc::write_record;
-use paraseq::fastq;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use log::info;
+use paraseq::fastq;
 use std::collections::HashSet;
 
 pub fn select_pe_fastq(
@@ -12,12 +12,10 @@ pub fn select_pe_fastq(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
-    
     let mut fq_reader1 = file_reader(Some(fq1)).map(fastq::Reader::new)?;
     let mut fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
     let mut rset1 = fastq::RecordSet::default();
     let mut rset2 = fastq::RecordSet::default();
-
 
     let mut read1_id = HashSet::new();
     let mut read2_id = HashSet::new();
@@ -33,11 +31,9 @@ pub fn select_pe_fastq(
         }
     }
 
-    let mut out_writer1 =
-        file_writer(Some(out_r1), compression_level, stdout_type)?;
-    let mut out_writer2 =
-        file_writer(Some(out_r2), compression_level, stdout_type)?;
-        
+    let mut out_writer1 = file_writer(Some(out_r1), compression_level, stdout_type)?;
+    let mut out_writer2 = file_writer(Some(out_r2), compression_level, stdout_type)?;
+
     let (mut pe_r1, mut pe_r2) = (0usize, 0usize);
     let intersect: HashSet<_> = read1_id.intersection(&read2_id).collect();
 
@@ -52,7 +48,7 @@ pub fn select_pe_fastq(
         }
     }
     out_writer1.flush()?;
-    
+
     let mut fq_reader2 = file_reader(Some(fq2)).map(fastq::Reader::new)?;
     info!("output selected read2 file: {}", out_r2);
     while rset2.fill(&mut fq_reader2)? {

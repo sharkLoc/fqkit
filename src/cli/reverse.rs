@@ -1,5 +1,5 @@
-use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use super::misc::write_record;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use paraseq::fastq;
 use std::collections::HashMap;
 
@@ -19,8 +19,7 @@ pub fn reverse_comp_seq(
         (b'C', b'G'),
         (b'N', b'N'),
     ]);
-    let mut out_writer =
-        file_writer(out, compression_level, stdout_type)?;
+    let mut out_writer = file_writer(out, compression_level, stdout_type)?;
 
     while rset.fill(&mut fq_reader)? {
         for rec in rset.iter().map_while(Result::ok) {
@@ -34,9 +33,19 @@ pub fn reverse_comp_seq(
             let rev_comp = rc_seq.iter().map(|x| **x).collect::<Vec<u8>>();
 
             if rev {
-                write_record(&mut out_writer, rec.id(), rev_seq.as_slice(), rev_qual.as_slice())?;
+                write_record(
+                    &mut out_writer,
+                    rec.id(),
+                    rev_seq.as_slice(),
+                    rev_qual.as_slice(),
+                )?;
             } else {
-                write_record(&mut out_writer, rec.id(), rev_comp.as_slice(), rev_qual.as_slice())?;
+                write_record(
+                    &mut out_writer,
+                    rec.id(),
+                    rev_comp.as_slice(),
+                    rev_qual.as_slice(),
+                )?;
             }
         }
     }
