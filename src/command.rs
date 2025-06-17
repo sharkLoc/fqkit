@@ -555,6 +555,7 @@ pub enum Subcli {
         outdir: String,
     },
     /// remove reads by read name.
+    #[command(visible_alias = "rm")]
     remove {
         /// input fastq file, or read from stdin
         input: Option<String>,
@@ -572,6 +573,7 @@ pub enum Subcli {
         out: Option<String>,
     },
     /// rename sequence id in fastq file
+    #[command(visible_alias = "rn")]
     rename {
         /// input fastq file, or read from stdin
         input: Option<String>,

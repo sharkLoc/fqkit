@@ -1,5 +1,6 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fastq;
+use paraseq::fastq;
+use super::misc::write_record;
 use log::{error, info};
 use std::io::BufRead;
 
@@ -16,38 +17,41 @@ pub fn remove_read(
     let list = file_reader(Some(name))?;
     info!("reading reads id form file: {}", name);
     for i in list.lines().map_while(Result::ok) {
-        ids.push(i);
+        ids.push(i.as_bytes().to_vec());
     }
     if ids.is_empty() {
         error!("reads id list is empty");
         std::process::exit(1);
     }
 
-    let fq_reader = fastq::Reader::new(file_reader(file)?);
-
+    let mut fq_reader = fastq::Reader::new(file_reader(file)?);
+    let mut rset = fastq::RecordSet::default();
     if !rm {
         info!("removed reads in file: {}", save);
     }
 
-    let mut fq_writer = fastq::Writer::new(file_writer(out, compression_level, stdout_type)?);
+    let mut writer = file_writer(out, compression_level, stdout_type)?;
     if rm {
-        for rec in fq_reader.records().map_while(Result::ok) {
-            if !ids.contains(&rec.id().to_string()) {
-                fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+        while rset.fill(&mut fq_reader)? {
+            for rec in rset.iter().map_while(Result::ok) {
+                if !ids.contains(&rec.id().to_vec()) {
+                    write_record(&mut writer, rec.id(), rec.seq(), rec.qual())?;
+                }
             }
         }
-        fq_writer.flush()?;
+        writer.flush()?;
     } else {
-        let mut rm_writer =
-            fastq::Writer::new(file_writer(Some(save), compression_level, stdout_type)?);
-        for rec in fq_reader.records().map_while(Result::ok) {
-            if !ids.contains(&rec.id().to_string()) {
-                fq_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
-            } else {
-                rm_writer.write(rec.id(), rec.desc(), rec.seq(), rec.qual())?;
+        let mut rm_writer = file_writer(Some(save), compression_level, stdout_type)?;
+        while rset.fill(&mut fq_reader)? {
+            for rec in rset.iter().map_while(Result::ok) {
+                if !ids.contains(&rec.id().to_vec()) {
+                    write_record(&mut writer, rec.id(), rec.seq(), rec.qual())?;
+                } else {
+                    write_record(&mut rm_writer, rec.id(), rec.seq(), rec.qual())?;
+                }
             }
         }
-        fq_writer.flush()?;
+        writer.flush()?;
         rm_writer.flush()?;
     }
 
