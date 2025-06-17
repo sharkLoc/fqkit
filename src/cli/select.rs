@@ -41,7 +41,7 @@ pub fn select_pe_fastq(
     info!("output selected read1 file: {}", out_r1);
     while rset1.fill(&mut fq_reader1)? {
         for rec in rset1.iter().map_while(Result::ok) {
-            if intersect.contains(&rec.id().to_owned()) {
+            if intersect.contains(&rec.id().to_vec()) {
                 pe_r1 += 1;
                 write_record(&mut out_writer1, rec.id(), rec.seq(), rec.qual())?;
             }
@@ -53,7 +53,7 @@ pub fn select_pe_fastq(
     info!("output selected read2 file: {}", out_r2);
     while rset2.fill(&mut fq_reader2)? {
         for rec in rset2.iter().map_while(Result::ok) {
-            if intersect.contains(&rec.id().to_owned()) {
+            if intersect.contains(&rec.id().to_vec()) {
                 pe_r2 += 1;
                 write_record(&mut out_writer2, rec.id(), rec.seq(), rec.qual())?;
             }

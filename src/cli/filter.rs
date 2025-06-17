@@ -60,11 +60,7 @@ impl FilterSeq {
             total_pe_fail: Arc::new(Mutex::new(0)),
             writer1: Arc::new(Mutex::new(output1)),
             writer2: Arc::new(Mutex::new(output2)),
-            failed_writer: if let Some(failed_out) = failed_out {
-                Some(Arc::new(Mutex::new(failed_out)))
-            } else {
-                None
-            },
+            failed_writer: failed_out.map(|failed_out| Arc::new(Mutex::new(failed_out))),
         }
     }
 

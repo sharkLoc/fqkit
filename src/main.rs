@@ -11,11 +11,10 @@ mod utils;
 use command::*;
 mod cli;
 use cli::{
-    barcode::*, concat::*, cutadapter::*, filter::*, flatten::*, fq2fa::*, fq2sam::*,
-    fqscore::*, gcplot::*, grep::*, join::*, kmer::*, length::*, mask::*, merge::*, plot::*,
-    range::*, remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*,
-    slide::*, sort::*, split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*,
-    view::*,
+    barcode::*, concat::*, cutadapter::*, filter::*, flatten::*, fq2fa::*, fq2sam::*, fqscore::*,
+    gcplot::*, grep::*, join::*, kmer::*, length::*, mask::*, merge::*, plot::*, range::*,
+    remove::*, rename::*, reverse::*, search::*, select::*, shuffle::*, size::*, slide::*, sort::*,
+    split::*, split2::*, stats::*, subfq::*, tail::*, top::*, trimfq::*, view::*,
 };
 
 fn main() {
@@ -170,6 +169,7 @@ fn run_main() -> Result<(), Error> {
                 input.as_ref(),
                 &ids,
                 full,
+                arg.threads,
                 out.as_ref(),
                 arg.compression_level,
                 arg.stdout_type,
