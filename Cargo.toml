@@ -24,7 +24,7 @@ exclude = [
 [dependencies]
 anyhow = "1.0.97"
 bio = "2.2.0"
-bzip2 = "0.5.2"
+bzip2 = "0.6.0"
 chrono = "0.4.40"
 clap = { version = "4.5.32", features = ["derive", "wrap_help"] }
 clap-verbosity-flag = "3.0.2"
