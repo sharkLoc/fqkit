@@ -291,6 +291,7 @@ pub fn stat_fq(
     pre_sum: &String,
     pre_cyc: Option<&String>,
     phred: u8,
+    ncp: usize,
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
@@ -310,7 +311,7 @@ pub fn stat_fq(
     let mut stat = Info::new(phred, 0);
     let mut fo = file_writer(Some(pre_sum), compression_level, stdout_type)?;
     let mut fc = file_writer(pre_cyc, compression_level, stdout_type)?;
-    fq_reader.process_parallel(stat.clone(), 4)?;
+    fq_reader.process_parallel(stat.clone(), ncp)?;
 
     stat.calc();
 

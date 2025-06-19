@@ -264,6 +264,7 @@ fn run_main() -> Result<(), Error> {
                 &sum,
                 cyc.as_ref(),
                 phred,
+                arg.threads,
                 arg.compression_level,
                 arg.stdout_type,
             )?;
