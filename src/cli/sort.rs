@@ -3,8 +3,8 @@ use crate::{
     errors::FqkitError,
     utils::{file_reader, file_writer},
 };
-use paraseq::{fastq, fastx::Record};
 use log::{error, info};
+use paraseq::{fastq, fastx::Record};
 use rayon::prelude::*;
 
 #[allow(clippy::too_many_arguments)]

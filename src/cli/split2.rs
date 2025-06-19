@@ -1,6 +1,6 @@
 use super::misc::write_record;
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use log::*;
+use log::{error, info};
 use paraseq::fastq;
 use std::path::PathBuf;
 
