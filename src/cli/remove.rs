@@ -1,7 +1,7 @@
-use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use paraseq::fastq;
 use super::misc::write_record;
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use log::{error, info};
+use paraseq::fastq;
 use std::io::BufRead;
 
 pub fn remove_read(

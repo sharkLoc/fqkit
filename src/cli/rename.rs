@@ -1,7 +1,7 @@
-use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use super::misc::write_record;
-use paraseq::{fastq, fastx::Record};
+use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use log::*;
+use paraseq::{fastq, fastx::Record};
 
 #[allow(clippy::too_many_arguments)]
 pub fn rename_fastq(
@@ -23,8 +23,8 @@ pub fn rename_fastq(
     while rset.fill(&mut fq_reader)? {
         for rec in rset.iter().map_while(Result::ok) {
             n += 1;
-            
-            let mut  newid: Vec<Vec<u8>> = vec![];
+
+            let mut newid: Vec<Vec<u8>> = vec![];
             match &prefix {
                 Some(pre) => {
                     let mut id_split = rec.id_str().split_whitespace();
@@ -43,7 +43,11 @@ pub fn rename_fastq(
                             // add desc in new id
                             if id_split.clone().count() > 0 {
                                 newid.push(" ".as_bytes().to_vec());
-                                let desc = id_split.collect::<Vec<&str>>().join(" ").as_bytes().to_vec();
+                                let desc = id_split
+                                    .collect::<Vec<&str>>()
+                                    .join(" ")
+                                    .as_bytes()
+                                    .to_vec();
                                 newid.push(desc);
                             }
                         }
@@ -61,33 +65,46 @@ pub fn rename_fastq(
                             // add desc in new id
                             if id_split.clone().count() > 0 {
                                 newid.push(" ".as_bytes().to_vec());
-                                let desc = id_split.collect::<Vec<&str>>().join(" ").as_bytes().to_vec();
+                                let desc = id_split
+                                    .collect::<Vec<&str>>()
+                                    .join(" ")
+                                    .as_bytes()
+                                    .to_vec();
                                 newid.push(desc);
                             }
-                        } 
-
+                        }
                     }
                 }
                 None => {
                     let lab = label.unwrap_or(&String::new()).as_bytes().to_vec();
                     if before {
                         newid.push(lab);
-                         if keep{
+                        if keep {
                             newid.push(rec.id().to_vec());
-                         } else {
-                            let id = rec.id_str().split_whitespace().next().unwrap().as_bytes().to_vec();
+                        } else {
+                            let id = rec
+                                .id_str()
+                                .split_whitespace()
+                                .next()
+                                .unwrap()
+                                .as_bytes()
+                                .to_vec();
                             newid.push(id);
-                         }
+                        }
                     } else {
                         let mut id_split = rec.id_str().split_whitespace();
                         if keep {
                             newid.push(id_split.next().unwrap().as_bytes().to_vec());
                             newid.push(lab);
-                            
+
                             // add desc in new id
                             if id_split.clone().count() > 0 {
                                 newid.push(" ".as_bytes().to_vec());
-                                let desc = id_split.collect::<Vec<&str>>().join(" ").as_bytes().to_vec();
+                                let desc = id_split
+                                    .collect::<Vec<&str>>()
+                                    .join(" ")
+                                    .as_bytes()
+                                    .to_vec();
                                 newid.push(desc);
                             }
                         } else {
