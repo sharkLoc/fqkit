@@ -290,9 +290,6 @@ pub enum Subcli {
         /// invert the sense of matching, to select non-matching reads
         #[arg(short = 'u', long = "invert-match", help_heading = Some("FLAGS"))]
         invert: bool,
-        /// the number of reads in the chunk on each thread
-        #[arg(short, long, default_value_t = 5000, value_name = "INT")]
-        chunk: usize,
         /// output contain pattern/motif reads result fastq file or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "out", value_name = "FILE")]
         out: Option<String>,

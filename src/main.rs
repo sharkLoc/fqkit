@@ -144,7 +144,6 @@ fn run_main() -> Result<(), Error> {
             pat,
             case,
             invert,
-            chunk,
             out,
         } => {
             search_fq(
@@ -152,7 +151,6 @@ fn run_main() -> Result<(), Error> {
                 &pat,
                 case,
                 invert,
-                chunk,
                 out.as_ref(),
                 arg.threads,
                 arg.compression_level,

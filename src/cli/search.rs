@@ -1,8 +1,70 @@
+use super::misc::write_record;
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fastq;
-use crossbeam::channel::bounded;
 use log::*;
+use paraseq::{
+    fastq,
+    fastx::Record,
+    parallel::{ParallelProcessor, ParallelReader, ProcessError},
+};
+use parking_lot::Mutex;
 use regex::RegexBuilder;
+use std::io::Write;
+use std::sync::Arc;
+
+#[derive(Clone)]
+struct Search {
+    pat: regex::Regex,
+    invert_match: bool,
+    count: usize,
+    buffer: Vec<u8>,
+    tatal_count: Arc<Mutex<usize>>,
+    writer: Arc<Mutex<Box<dyn Write + Send>>>,
+}
+
+impl Search {
+    pub fn new(pat: &str, case: bool, invert_match: bool, writer: Box<dyn Write + Send>) -> Self {
+        let re = RegexBuilder::new(pat)
+            .case_insensitive(case)
+            .build()
+            .unwrap();
+        Search {
+            pat: re,
+            invert_match,
+            count: 0,
+            buffer: Vec::new(),
+            tatal_count: Arc::new(Mutex::new(0)),
+            writer: Arc::new(Mutex::new(writer)),
+        }
+    }
+}
+
+impl ParallelProcessor for Search {
+    fn process_record<Rf: Record>(&mut self, record: Rf) -> Result<(), ProcessError> {
+        let fq_str = record.seq_str();
+        if (self.invert_match && !self.pat.is_match(fq_str)) || (!self.invert_match && self.pat.is_match(fq_str)) {
+            self.count += 1;
+            write_record(
+                &mut self.buffer,
+                record.id(),
+                record.seq(),
+                record.qual().unwrap(),
+            )?;
+        }
+        Ok(())
+    }
+
+    fn on_batch_complete(&mut self) -> Result<(), ProcessError> {
+        let mut writer = self.writer.lock();
+        writer.write_all(&self.buffer)?;
+
+        let mut total_count = self.tatal_count.lock();
+        *total_count += self.count;
+
+        self.count = 0;
+        self.buffer.clear();
+        Ok(())
+    }
+}
 
 #[allow(clippy::too_many_arguments)]
 pub fn search_fq(
@@ -10,107 +72,24 @@ pub fn search_fq(
     pat: &str,
     case: bool,
     invert_match: bool,
-    chunk: usize,
     out: Option<&String>,
     ncpu: usize,
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
     let fq_reader = file_reader(fq).map(fastq::Reader::new).unwrap();
-
     info!("regex pattern is: {}", pat);
 
-    let mut chunk = chunk;
-    if chunk == 0 {
-        chunk = 5000;
-        warn!(
-            "read conut in chunk can't be 0, changed to default value: {}",
-            chunk
-        );
-    }
-    let mut num = 0usize;
-    let mut fo = file_writer(out, compression_level, stdout_type).map(fastq::Writer::new)?;
+    let fo = file_writer(out, compression_level, stdout_type)?;
     if let Some(out) = out {
         info!("reads write to file: {}", out);
     } else {
         info!("reads write to stdout");
     }
 
-    if ncpu == 1 || ncpu == 0 {
-        let re = RegexBuilder::new(pat)
-            .case_insensitive(case)
-            .build()
-            .unwrap();
-        for rec in fq_reader.records().map_while(Result::ok) {
-            let fq_str = std::str::from_utf8(rec.seq()).unwrap();
-            if invert_match {
-                if !re.is_match(fq_str) {
-                    num += 1;
-                    fo.write_record(&rec)?;
-                }
-            } else if re.is_match(fq_str) {
-                num += 1;
-                fo.write_record(&rec)?;
-            }
-        }
-        fo.flush()?;
-    } else {
-        let (tx, rx) = bounded(5000);
-        let mut fqiter = fq_reader.records();
-        loop {
-            let chunks: Vec<_> = fqiter.by_ref().take(chunk).map_while(Result::ok).collect();
-            if chunks.is_empty() {
-                break;
-            }
-            tx.send(chunks).unwrap();
-        }
-        drop(tx);
+    let processor = Search::new(pat, case, invert_match, fo);
+    fq_reader.process_parallel(processor.clone(), ncpu)?;
 
-        crossbeam::scope(|s| {
-            let (tx2, rx2) = bounded(5000);
-            let _handles: Vec<_> = (0..ncpu)
-                .map(|_| {
-                    let tx_tmp = tx2.clone();
-                    let rx_tmp = rx.clone();
-                    let re = RegexBuilder::new(pat)
-                        .case_insensitive(case)
-                        .build()
-                        .unwrap();
-
-                    s.spawn(move |_| {
-                        for vrec in rx_tmp {
-                            let mut matchs = vec![];
-                            let mut count = 0;
-                            for rec in vrec {
-                                let fq_str = std::str::from_utf8(rec.seq()).unwrap();
-                                if invert_match {
-                                    if !re.is_match(fq_str) {
-                                        matchs.push(rec);
-                                        count += 1;
-                                    }
-                                } else if re.is_match(fq_str) {
-                                    matchs.push(rec);
-                                    count += 1;
-                                }
-                            }
-                            tx_tmp.send((matchs, count)).unwrap();
-                        }
-                    });
-                })
-                .collect();
-            drop(tx2);
-
-            for (recs, count) in rx2.iter() {
-                num += count;
-                for rec in recs {
-                    fo.write_record(&rec).unwrap();
-                }
-                fo.flush().unwrap();
-            }
-        })
-        .unwrap();
-    }
-
-    info!("total reads number: {}", num);
+    info!("total reads number: {}", processor.tatal_count.lock());
     Ok(())
 }
