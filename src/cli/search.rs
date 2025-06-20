@@ -41,7 +41,9 @@ impl Search {
 impl ParallelProcessor for Search {
     fn process_record<Rf: Record>(&mut self, record: Rf) -> Result<(), ProcessError> {
         let fq_str = record.seq_str();
-        if (self.invert_match && !self.pat.is_match(fq_str)) || (!self.invert_match && self.pat.is_match(fq_str)) {
+        if (self.invert_match && !self.pat.is_match(fq_str))
+            || (!self.invert_match && self.pat.is_match(fq_str))
+        {
             self.count += 1;
             write_record(
                 &mut self.buffer,

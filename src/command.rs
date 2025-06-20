@@ -251,10 +251,10 @@ pub enum Subcli {
         #[arg(short = '2', long = "read2", value_name = "FILE")]
         read2: String,
         /// minimum overlap length in PE reads
-        #[arg(short = 'l', long = "length", default_value_t = 30)]
+        #[arg(short = 'l', long = "length", default_value_t = 30, value_name = "INT")]
         length: usize,
         /// maximum mismatch rate count in overlap region
-        #[arg(short = 'm', long = "miss", default_value_t = 0.1)]
+        #[arg(short = 'm', long = "miss", default_value_t = 0.1, value_name = "FLOAT")]
         miss: f64,
         /// output joinde long fastq file name or write to stdout, file ending in .gz/.bz2/.xz will be compressed automatically
         #[arg(short = 'o', long = "output")]
