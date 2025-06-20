@@ -21,6 +21,9 @@ pub enum FqkitError {
     #[error("ProcessError")]
     ProcessError(#[from] paraseq::parallel::ProcessError),
 
+    #[error("ParaseqFastaError")]
+    ParaseqFastaError(#[from] paraseq::fasta::Error),
+
     #[error("ParaseqFastqError")]
     ParaseqFastqError(#[from] paraseq::fastq::Error),
 

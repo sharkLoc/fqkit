@@ -182,6 +182,7 @@ pub enum Subcli {
         /// input fastq file, or read from stdin
         input: Option<String>,
         /// adapter sequence file in Fasta format
+        /// {n}Note: fasta sequences must be in single line
         #[arg(short = 'f', long = "fasta", value_name = "FILE")]
         fa: String,
         /// addpter on the left side of the read

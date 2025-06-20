@@ -1,8 +1,7 @@
 use super::misc::write_record;
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fasta;
 use log::{error, warn};
-use paraseq::fastq;
+use paraseq::{fastq,fasta};
 use std::collections::HashMap;
 
 pub fn cut_adapter(
@@ -14,19 +13,21 @@ pub fn cut_adapter(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
-    let seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
-
+    let mut seqfile_reader = file_reader(Some(seqfile)).map(fasta::Reader::new)?;
+    let mut faset = fasta::RecordSet::default();
     let mut seqs = HashMap::new();
-    let iters = seqfile_reader.records();
-    for rec in iters.map_while(Result::ok) {
-        if seqs.contains_key(rec.id()) {
-            warn!("found duplicate sequence id: {}, keep first one", rec.id());
-            continue;
-        } else {
-            seqs.entry(rec.id().to_owned())
-                .or_insert(rec.seq().to_owned());
+
+    while faset.fill(&mut seqfile_reader)? {
+        for rec in faset.iter().map_while(Result::ok) {
+            if seqs.contains_key(rec.id()) {
+                warn!("found duplicate sequence id: {}, keep first one", std::str::from_utf8(rec.id())?);
+                continue;
+            } else {
+                seqs.entry(rec.id().to_owned()).or_insert(rec.seq().to_vec());
+            }
         }
     }
+
     if seqs.is_empty() {
         error!("{}", FqkitError::EmptyFile(seqfile.to_string()));
         std::process::exit(1);
