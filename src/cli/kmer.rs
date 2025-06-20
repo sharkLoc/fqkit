@@ -1,6 +1,5 @@
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
-use bio::io::fastq;
-use nthash::nthash;
+use paraseq::fastq;
 use std::collections::HashMap;
 
 pub fn kmer_count(
@@ -11,32 +10,29 @@ pub fn kmer_count(
     compression_level: u32,
     stdout_type: char,
 ) -> Result<(), FqkitError> {
-    let reader = file_reader(input).map(fastq::Reader::new)?;
+    let mut reader = file_reader(input).map(fastq::Reader::new)?;
+    let mut rset = fastq::RecordSet::default();
 
     let mut writer = file_writer(output, compression_level, stdout_type)?;
     let mut kmers = HashMap::new();
 
-    for rec in reader.records().map_while(Result::ok) {
-        let (mut sidx, mut eidx) = (0, kmer_len);
-        let khash = nthash(rec.seq(), kmer_len);
-        let len = rec.seq().len();
-
-        while eidx <= len {
-            let kseq = &rec.seq()[sidx..eidx];
-            let khash_this = nthash(kseq, kmer_len)[0];
-            if khash.contains(&khash_this) {
-                *kmers.entry(kseq.to_owned()).or_insert(0_u64) += 1;
+    while rset.fill(&mut reader)? {
+        for rec in rset.iter().map_while(Result::ok) {
+            let seq = rec.seq();
+            if seq.len() < kmer_len {
+                continue;
             }
-            sidx += 1;
-            eidx += 1;
+            for kmer in seq.windows(kmer_len) {
+                *kmers.entry(kmer.to_vec()).or_insert(0_u64) += 1;
+            }
         }
     }
 
     if header {
-        writer.write_all("kmer\tcount\n".as_bytes())?;
+        writer.write_all(b"kmer\tcount\n")?;
     }
     for (k, v) in kmers {
-        writer.write_all(k.as_slice())?;
+        writer.write_all(&k)?;
         writer.write_all(format!("\t{}\n", v).as_bytes())?;
     }
     writer.flush()?;
