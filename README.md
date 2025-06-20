@@ -12,6 +12,9 @@
 
 🦀 a simple program for fastq file manipulation
 
+## new
+Starting from version 0.4.13, the paraseq library is used to parse FASTQ files, significantly improving data processing speed.
+
 
 ## install
 ##### setp1： install cargo first 
