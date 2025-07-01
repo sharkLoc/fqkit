@@ -1,7 +1,7 @@
 use super::misc::write_record;
 use crate::{errors::FqkitError, utils::file_reader, utils::file_writer};
 use log::{error, warn};
-use paraseq::{fastq,fasta};
+use paraseq::{fasta, fastq};
 use std::collections::HashMap;
 
 pub fn cut_adapter(
@@ -20,10 +20,14 @@ pub fn cut_adapter(
     while faset.fill(&mut seqfile_reader)? {
         for rec in faset.iter().map_while(Result::ok) {
             if seqs.contains_key(rec.id()) {
-                warn!("found duplicate sequence id: {}, keep first one", std::str::from_utf8(rec.id())?);
+                warn!(
+                    "found duplicate sequence id: {}, keep first one",
+                    std::str::from_utf8(rec.id())?
+                );
                 continue;
             } else {
-                seqs.entry(rec.id().to_owned()).or_insert(rec.seq().to_vec());
+                seqs.entry(rec.id().to_owned())
+                    .or_insert(rec.seq().to_vec());
             }
         }
     }
