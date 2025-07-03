@@ -151,6 +151,17 @@ impl ParallelProcessor for Info {
             None => self.min_len = Some(len),
         }
 
+        for &base in record.seq() {
+            match base {
+                b'A' => self.num_a += 1,
+                b'T' => self.num_t += 1,
+                b'G' => self.num_g += 1,
+                b'C' => self.num_c += 1,
+                b'N' => self.num_n += 1,
+                _ => {}
+            }
+        }
+
         for (pos, (sf, sq)) in record
             .seq()
             .iter()
@@ -225,14 +236,6 @@ impl ParallelProcessor for Info {
     }
 
     fn on_batch_complete(&mut self) -> Result<(), ProcessError> {
-        // calculate total bases
-        for x in 0..self.each.len() {
-            self.num_a += self.each.get(&x).unwrap()[0];
-            self.num_t += self.each.get(&x).unwrap()[1];
-            self.num_g += self.each.get(&x).unwrap()[2];
-            self.num_c += self.each.get(&x).unwrap()[3];
-            self.num_n += self.each.get(&x).unwrap()[4];
-        }
 
         *self.total_num_a.lock() += self.num_a;
         *self.total_num_t.lock() += self.num_t;
