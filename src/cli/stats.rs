@@ -180,9 +180,9 @@ impl ParallelProcessor for Info {
             }
             if idx >= 20 {
                 self.num_q20 += 1;
-                if idx >= 30 {
-                    self.num_q30 += 1;
-                }
+            }
+            if idx >= 30 {
+                self.num_q30 += 1;
             }
             // for hashmap part
             if let std::collections::hash_map::Entry::Vacant(e) = self.each.entry(pos) {
@@ -285,6 +285,7 @@ impl ParallelProcessor for Info {
         self.num_q30 = 0;
         self.max_len = 0;
         self.min_len = None;
+        self.each = HashMap::new();
         Ok(())
     }
 }
